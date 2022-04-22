@@ -6,6 +6,7 @@ import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
 import com.stfalcon.imageviewer.StfalconImageViewer
+import com.stfalcon.imageviewer.Util.Logger
 import com.stfalcon.imageviewer.common.pager.RecyclingPagerAdapter
 import com.stfalcon.sample.R
 import com.stfalcon.sample.common.extensions.getDrawableCompat
@@ -44,11 +45,13 @@ class PostersGridDemoActivity : AppCompatActivity() {
             when (poster?.imageType) {
                 RecyclingPagerAdapter.VIEW_TYPE_IMAGE -> {
                     val imageView = view as ImageView
+                    Logger.i("url==" + poster?.url)
                     imageView.loadImage(poster?.url)
                 }
 
                 RecyclingPagerAdapter.VIEW_TYPE_SUBSAMPLING_IMAGE -> {
                     val subsamplingScaleImageView = view as SubsamplingScaleImageView
+                    Logger.i("url==" + poster?.url)
                     subsamplingScaleImageView.loadImage(poster?.url)
                 }
             }
@@ -57,6 +60,7 @@ class PostersGridDemoActivity : AppCompatActivity() {
     }
 
     fun getImageType(position: Int): Int {
+        Logger.i("position= "+ position)
         return  Demo.posters[position].imageType
     }
 }
