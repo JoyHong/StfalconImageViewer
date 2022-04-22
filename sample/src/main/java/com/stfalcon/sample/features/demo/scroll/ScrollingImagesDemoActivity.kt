@@ -1,6 +1,7 @@
 package com.stfalcon.sample.features.demo.scroll
 
 import android.os.Bundle
+import android.view.View
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import com.stfalcon.imageviewer.StfalconImageViewer
@@ -54,17 +55,22 @@ class ScrollingImagesDemoActivity : AppCompatActivity() {
         target: ImageView,
         images: List<String>,
         imageViews: List<ImageView>) {
-        viewer = StfalconImageViewer.Builder<String>(this, images, ::loadImage)
+        viewer = StfalconImageViewer.Builder<String>(this, images, ::loadImage, ::getImageType)
             .withStartPosition(startPosition)
             .withTransitionFrom(target)
             .withImageChangeListener { viewer.updateTransitionImage(imageViews.getOrNull(it)) }
             .show()
     }
 
-    private fun loadImage(imageView: ImageView, url: String?) {
-        imageView.apply {
+    private fun loadImage(view: View, url: String?) {
+        view.apply {
             background = getDrawableCompat(R.drawable.shape_placeholder)
-            loadImage(url)
+            var imageView = view as ImageView
+            imageView.loadImage(url)
         }
+    }
+
+    fun getImageType(position: Int): Int {
+        return  Demo.posters[position].imageType
     }
 }

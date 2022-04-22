@@ -8,17 +8,19 @@ import android.view.ViewGroup
 import androidx.viewpager.widget.PagerAdapter
 import com.stfalcon.imageviewer.common.extensions.forEach
 
-internal abstract class RecyclingPagerAdapter<VH : RecyclingPagerAdapter.ViewHolder>
+public abstract class RecyclingPagerAdapter<VH : RecyclingPagerAdapter.ViewHolder>
     : PagerAdapter() {
 
     companion object {
         private val STATE = RecyclingPagerAdapter::class.java.simpleName
-        private const val VIEW_TYPE_IMAGE = 0
+        public const val VIEW_TYPE_IMAGE = 0
+        public const val VIEW_TYPE_SUBSAMPLING_IMAGE = 1
     }
 
     internal abstract fun getItemCount(): Int
     internal abstract fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH
     internal abstract fun onBindViewHolder(holder: VH, position: Int)
+    internal abstract fun getViewType(position: Int):Int
 
     private val typeCaches = SparseArray<RecycleCache>()
     private var savedStates = SparseArray<Parcelable>()
@@ -35,14 +37,13 @@ internal abstract class RecyclingPagerAdapter<VH : RecyclingPagerAdapter.ViewHol
 
     @Suppress("UNCHECKED_CAST")
     override fun instantiateItem(parent: ViewGroup, position: Int): Any {
-        var cache = typeCaches.get(VIEW_TYPE_IMAGE)
-
+        var viewType = getViewType(position)
+        var cache = typeCaches.get(viewType)
         if (cache == null) {
             cache = RecycleCache(this)
-            typeCaches.put(VIEW_TYPE_IMAGE, cache)
+            typeCaches.put(viewType, cache)
         }
-
-        return cache.getFreeViewHolder(parent, VIEW_TYPE_IMAGE)
+        return cache.getFreeViewHolder(parent, viewType)
                 .apply {
                     attach(parent, position)
                     onBindViewHolder(this as VH, position)
@@ -107,7 +108,7 @@ internal abstract class RecyclingPagerAdapter<VH : RecyclingPagerAdapter.ViewHol
         }
     }
 
-    internal abstract class ViewHolder(internal val itemView: View) {
+    public abstract class ViewHolder(internal val itemView: View) {
 
         companion object {
             private val STATE = ViewHolder::class.java.simpleName

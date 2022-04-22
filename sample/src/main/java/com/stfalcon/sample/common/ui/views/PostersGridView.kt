@@ -11,9 +11,9 @@ import com.stfalcon.sample.common.models.Poster
 import kotlinx.android.synthetic.main.view_posters_grid.view.*
 
 class PostersGridView @JvmOverloads constructor(
-    context: Context,
-    attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
+        context: Context,
+        attrs: AttributeSet? = null,
+        defStyleAttr: Int = 0
 ) : ConstraintLayout(context, attrs, defStyleAttr) {
 
     var imageLoader: ((ImageView, Poster?) -> Unit)? = null
@@ -21,15 +21,15 @@ class PostersGridView @JvmOverloads constructor(
 
     val imageViews by lazy {
         mapOf<Int, ImageView>(
-            0 to postersFirstImage,
-            1 to postersSecondImage,
-            2 to postersThirdImage,
-            3 to postersFourthImage,
-            4 to postersFifthImage,
-            5 to postersSixthImage,
-            6 to postersSeventhImage,
-            7 to postersEighthImage,
-            8 to postersNinthImage)
+                0 to postersFirstImage,
+                1 to postersSecondImage,
+                2 to postersThirdImage,
+                3 to postersFourthImage,
+                4 to postersFifthImage,
+                5 to postersSixthImage,
+                6 to postersSeventhImage,
+                7 to postersEighthImage,
+                8 to postersNinthImage)
     }
 
     init {

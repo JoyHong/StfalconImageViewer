@@ -46,13 +46,15 @@ import com.stfalcon.imageviewer.common.gestures.direction.SwipeDirection.UP
 import com.stfalcon.imageviewer.common.gestures.direction.SwipeDirectionDetector
 import com.stfalcon.imageviewer.common.gestures.dismiss.SwipeToDismissHandler
 import com.stfalcon.imageviewer.common.pager.MultiTouchViewPager
+import com.stfalcon.imageviewer.common.pager.RecyclingPagerAdapter
+import com.stfalcon.imageviewer.loader.GetImageType
 import com.stfalcon.imageviewer.loader.ImageLoader
 import com.stfalcon.imageviewer.viewer.adapter.ImagesPagerAdapter
 
 internal class ImageViewerView<T> @JvmOverloads constructor(
-    context: Context,
-    attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
+        context: Context,
+        attrs: AttributeSet? = null,
+        defStyleAttr: Int = 0
 ) : RelativeLayout(context, attrs, defStyleAttr) {
 
     internal var isZoomingAllowed = true
@@ -107,6 +109,7 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
 
     private var images: List<T> = listOf()
     private var imageLoader: ImageLoader<T>? = null
+    private var getImageType: GetImageType? = null
     private lateinit var transitionImageAnimator: TransitionImageAnimator
 
     private var startPosition: Int = 0
@@ -117,8 +120,8 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
 
     private val shouldDismissToBottom: Boolean
         get() = externalTransitionImageView == null
-            || !externalTransitionImageView.isRectVisible
-            || !isAtStartPosition
+                || !externalTransitionImageView.isRectVisible
+                || !isAtStartPosition
 
     private val isAtStartPosition: Boolean
         get() = currentPosition == startPosition
@@ -135,12 +138,12 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
 
         imagesPager = findViewById(R.id.imagesPager)
         imagesPager.addOnPageChangeListener(
-            onPageSelected = {
-                externalTransitionImageView?.apply {
-                    if (isAtStartPosition) makeInvisible() else makeVisible()
-                }
-                onPageChange?.invoke(it)
-            })
+                onPageSelected = {
+                    externalTransitionImageView?.apply {
+                        if (isAtStartPosition) makeInvisible() else makeVisible()
+                    }
+                    onPageChange?.invoke(it)
+                })
 
         directionDetector = createSwipeDirectionDetector()
         gestureDetector = createGestureDetector()
@@ -158,8 +161,8 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
 
         //one more tiny kludge to prevent single tap a one-finger zoom which is broken by the SDK
         if (wasDoubleTapped &&
-            event.action == MotionEvent.ACTION_MOVE &&
-            event.pointerCount == 1) {
+                event.action == MotionEvent.ACTION_MOVE &&
+                event.pointerCount == 1) {
             return true
         }
 
@@ -177,10 +180,10 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
         findViewById<View>(R.id.backgroundView).setBackgroundColor(color)
     }
 
-    internal fun setImages(images: List<T>, startPosition: Int, imageLoader: ImageLoader<T>) {
+    internal fun setImages(images: List<T>, startPosition: Int, imageLoader: ImageLoader<T>, getImageType: GetImageType) {
         this.images = images
         this.imageLoader = imageLoader
-        this.imagesAdapter = ImagesPagerAdapter(context, images, imageLoader, isZoomingAllowed)
+        this.imagesAdapter = ImagesPagerAdapter(context, images, imageLoader, isZoomingAllowed, getImageType)
         this.imagesPager.adapter = imagesAdapter
         this.startPosition = startPosition
     }
@@ -229,12 +232,12 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
 
     private fun animateOpen() {
         transitionImageAnimator.animateOpen(
-            containerPadding = containerPadding,
-            onTransitionStart = { duration ->
-                backgroundView.animateAlpha(0f, 1f, duration)
-                overlayView?.animateAlpha(0f, 1f, duration)
-            },
-            onTransitionEnd = { prepareViewsForViewer() })
+                containerPadding = containerPadding,
+                onTransitionStart = { duration ->
+                    backgroundView.animateAlpha(0f, 1f, duration)
+                    overlayView?.animateAlpha(0f, 1f, duration)
+                },
+                onTransitionEnd = { prepareViewsForViewer() })
     }
 
     private fun animateClose() {
@@ -242,12 +245,12 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
         dismissContainer.applyMargin(0, 0, 0, 0)
 
         transitionImageAnimator.animateClose(
-            shouldDismissToBottom = shouldDismissToBottom,
-            onTransitionStart = { duration ->
-                backgroundView.animateAlpha(backgroundView.alpha, 0f, duration)
-                overlayView?.animateAlpha(overlayView?.alpha, 0f, duration)
-            },
-            onTransitionEnd = { onDismiss?.invoke() })
+                shouldDismissToBottom = shouldDismissToBottom,
+                onTransitionStart = { duration ->
+                    backgroundView.animateAlpha(backgroundView.alpha, 0f, duration)
+                    overlayView?.animateAlpha(overlayView?.alpha, 0f, duration)
+                },
+                onTransitionEnd = { onDismiss?.invoke() })
     }
 
     private fun prepareViewsForTransition() {
@@ -320,43 +323,44 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
     }
 
     private fun dispatchOverlayTouch(event: MotionEvent): Boolean =
-        overlayView
-            ?.let { it.isVisible && it.dispatchTouchEvent(event) }
-            ?: false
+            overlayView
+                    ?.let { it.isVisible && it.dispatchTouchEvent(event) }
+                    ?: false
 
     private fun calculateTranslationAlpha(translationY: Float, translationLimit: Int): Float =
-        1.0f - 1.0f / translationLimit.toFloat() / 4f * Math.abs(translationY)
+            1.0f - 1.0f / translationLimit.toFloat() / 4f * Math.abs(translationY)
 
     private fun createSwipeDirectionDetector() =
-        SwipeDirectionDetector(context) { swipeDirection = it }
+            SwipeDirectionDetector(context) { swipeDirection = it }
 
     private fun createGestureDetector() =
-        GestureDetectorCompat(context, SimpleOnGestureListener(
-            onSingleTap = {
-                if (imagesPager.isIdle) {
-                    handleSingleTap(it, isOverlayWasClicked)
-                }
-                false
-            },
-            onDoubleTap = {
-                wasDoubleTapped = !isScaled
-                false
-            }
-        ))
+            GestureDetectorCompat(context, SimpleOnGestureListener(
+                    onSingleTap = {
+                        if (imagesPager.isIdle) {
+                            handleSingleTap(it, isOverlayWasClicked)
+                        }
+                        false
+                    },
+                    onDoubleTap = {
+                        wasDoubleTapped = !isScaled
+                        false
+                    }
+            ))
 
     private fun createScaleGestureDetector() =
-        ScaleGestureDetector(context, ScaleGestureDetector.SimpleOnScaleGestureListener())
+            ScaleGestureDetector(context, ScaleGestureDetector.SimpleOnScaleGestureListener())
 
     private fun createSwipeToDismissHandler()
-        : SwipeToDismissHandler = SwipeToDismissHandler(
-        swipeView = dismissContainer,
-        shouldAnimateDismiss = { shouldDismissToBottom },
-        onDismiss = { animateClose() },
-        onSwipeViewMove = ::handleSwipeViewMove)
+            : SwipeToDismissHandler = SwipeToDismissHandler(
+            swipeView = dismissContainer,
+            shouldAnimateDismiss = { shouldDismissToBottom },
+            onDismiss = { animateClose() },
+            onSwipeViewMove = ::handleSwipeViewMove)
 
     private fun createTransitionImageAnimator(transitionImageView: ImageView?) =
-        TransitionImageAnimator(
-            externalImage = transitionImageView,
-            internalImage = this.transitionImageView,
-            internalImageContainer = this.transitionImageContainer)
+            TransitionImageAnimator(
+                    externalImage = transitionImageView,
+                    internalImage = this.transitionImageView,
+                    internalImageContainer = this.transitionImageContainer)
+
 }

@@ -51,7 +51,7 @@ class StylingDemoActivity : BaseActivity() {
     private fun openViewer(startPosition: Int, imageView: ImageView) {
         val posters = Demo.posters.toMutableList()
 
-        val builder = StfalconImageViewer.Builder<Poster>(this, posters, ::loadPosterImage)
+        val builder = StfalconImageViewer.Builder<Poster>(this, posters, ::loadPosterImage,::getImageType)
             .withStartPosition(startPosition)
             .withImageChangeListener { position ->
                 if (options.isPropertyEnabled(SHOW_TRANSITION)) {
@@ -110,5 +110,9 @@ class StylingDemoActivity : BaseActivity() {
     private fun getRandomColor(): Int {
         val random = java.util.Random()
         return android.graphics.Color.argb(255, random.nextInt(156), random.nextInt(156), random.nextInt(156))
+    }
+
+    fun getImageType(position: Int): Int {
+        return  Demo.posters[position].imageType
     }
 }

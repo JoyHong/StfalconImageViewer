@@ -1,6 +1,7 @@
 package com.stfalcon.sample.features.demo.rotation
 
 import android.os.Bundle
+import android.view.View
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import com.stfalcon.imageviewer.StfalconImageViewer
@@ -55,7 +56,7 @@ class RotationDemoActivity : AppCompatActivity() {
     }
 
     private fun openViewer(startPosition: Int) {
-        viewer = StfalconImageViewer.Builder<Poster>(this, Demo.posters, ::loadPosterImage)
+        viewer = StfalconImageViewer.Builder<Poster>(this, Demo.posters, ::loadPosterImage,::getImageType)
             .withTransitionFrom(getTransitionTarget(startPosition))
             .withStartPosition(startPosition)
             .withImageChangeListener {
@@ -69,13 +70,19 @@ class RotationDemoActivity : AppCompatActivity() {
         isDialogShown = true
     }
 
-    private fun loadPosterImage(imageView: ImageView, poster: Poster?) {
-        imageView.apply {
+    private fun loadPosterImage(view: View, poster: Poster?) {
+        view.apply {
             background = getDrawableCompat(R.drawable.shape_placeholder)
-            loadImage(poster?.url)
+            view as ImageView
+            view.loadImage(poster?.url)
         }
     }
 
     private fun getTransitionTarget(position: Int) =
         if (position == 0) rotationDemoImage else null
+
+
+    fun getImageType(position: Int): Int {
+        return  Demo.posters[position].imageType
+    }
 }

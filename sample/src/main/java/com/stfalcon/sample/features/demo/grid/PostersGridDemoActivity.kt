@@ -1,9 +1,12 @@
 package com.stfalcon.sample.features.demo.grid
 
 import android.os.Bundle
+import android.view.View
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
+import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
 import com.stfalcon.imageviewer.StfalconImageViewer
+import com.stfalcon.imageviewer.common.pager.RecyclingPagerAdapter
 import com.stfalcon.sample.R
 import com.stfalcon.sample.common.extensions.getDrawableCompat
 import com.stfalcon.sample.common.extensions.loadImage
@@ -26,7 +29,7 @@ class PostersGridDemoActivity : AppCompatActivity() {
     }
 
     private fun openViewer(startPosition: Int, target: ImageView) {
-        viewer = StfalconImageViewer.Builder<Poster>(this, Demo.posters, ::loadPosterImage)
+        viewer = StfalconImageViewer.Builder<Poster>(this, Demo.posters, ::loadPosterImage,::getImageType)
             .withStartPosition(startPosition)
             .withTransitionFrom(target)
             .withImageChangeListener {
@@ -35,10 +38,27 @@ class PostersGridDemoActivity : AppCompatActivity() {
             .show()
     }
 
-    private fun loadPosterImage(imageView: ImageView, poster: Poster?) {
-        imageView.apply {
+    private fun loadPosterImage(view: View, poster: Poster?) {
+        view.apply {
             background = getDrawableCompat(R.drawable.shape_placeholder)
-            loadImage(poster?.url)
+            when (poster?.imageType) {
+                RecyclingPagerAdapter.VIEW_TYPE_IMAGE -> {
+                    val imageView = view as ImageView
+                    imageView.loadImage(poster?.url)
+                }
+
+                RecyclingPagerAdapter.VIEW_TYPE_SUBSAMPLING_IMAGE -> {
+                    val subsamplingScaleImageView = view as SubsamplingScaleImageView
+                    subsamplingScaleImageView.loadImage(poster?.url)
+                }
+            }
+
         }
     }
+
+    fun getImageType(position: Int): Int {
+        return  Demo.posters[position].imageType
+    }
 }
+
+
