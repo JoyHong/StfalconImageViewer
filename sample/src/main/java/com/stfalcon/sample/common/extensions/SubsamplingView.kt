@@ -7,7 +7,6 @@ import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
 import com.stfalcon.imageviewer.Util.Logger
-import java.lang.Exception
 
 fun SubsamplingScaleImageView.loadImage(url: String?){
 
@@ -18,17 +17,18 @@ fun SubsamplingScaleImageView.loadImage(url: String?){
 class downLoad(subsamplingScaleImageView: SubsamplingScaleImageView) :Target{
     var imageView = subsamplingScaleImageView
     override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
-        TODO("Not yet implemented")
-        imageView.setImage(ImageSource.bitmap(bitmap!!))
+        imageView.setImage(ImageSource.cachedBitmap(bitmap!!))
+
+//        imageView.setImage(ImageSource.asset("longImage.jpg"))
+//        imageView.setImage(ImageSource.asset("sanmartino.jpg"))
     }
 
     override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
-        TODO("Not yet implemented")
         Logger.i(e?.message ?: "no message")
     }
 
     override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
-        TODO("Not yet implemented")
+        imageView.setImageDrawable(placeHolderDrawable)
     }
 
 }

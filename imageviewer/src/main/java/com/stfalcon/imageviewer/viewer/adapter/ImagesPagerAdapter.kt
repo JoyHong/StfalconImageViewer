@@ -17,10 +17,13 @@
 package com.stfalcon.imageviewer.viewer.adapter
 
 import android.content.Context
+import android.graphics.PointF
 import android.view.View
 import android.view.ViewGroup
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
+
 import com.github.chrisbanes.photoview.PhotoView
+import com.stfalcon.imageviewer.Util.Logger
 import com.stfalcon.imageviewer.common.extensions.resetScale
 import com.stfalcon.imageviewer.common.pager.RecyclingPagerAdapter
 import com.stfalcon.imageviewer.loader.GetImageType
@@ -52,11 +55,13 @@ internal class ImagesPagerAdapter<T>(
             }
 
             VIEW_TYPE_SUBSAMPLING_IMAGE -> {
+
                 itemView = SubsamplingScaleImageView(context).apply {
                     isEnabled = isZoomingAllowed
-                    // TODO: 这里还需要处理
 //                    setOnViewDragListener { _, _ -> setAllowParentInterceptOnEdge(scale == 1.0f) }
                 }
+
+
             }
         }
 
@@ -82,7 +87,6 @@ internal class ImagesPagerAdapter<T>(
         : RecyclingPagerAdapter.ViewHolder(itemView) {
 
         var isScaled: Boolean = false
-        private val photoView: PhotoView = itemView as PhotoView
         private var viewType: Int = viewType;
 
         fun bind(position: Int) {
@@ -98,9 +102,24 @@ internal class ImagesPagerAdapter<T>(
                 VIEW_TYPE_SUBSAMPLING_IMAGE -> {
                     val subsamplingScaleImageView: SubsamplingScaleImageView = itemView as SubsamplingScaleImageView
 
+
+//                    subsamplingScaleImageView.setOnStateChangedListener(object : SubsamplingScaleImageView.OnStateChangedListener{
+//                        override fun onScaleChanged(newScale: Float, origin: Int) {
+//                           Logger.i("newScale" + newScale)
+//
+//                        }
+//
+//                        override fun onCenterChanged(newCenter: PointF?, origin: Int) {
+//                            Logger.i("newCenter x ==" + newCenter!!.x)
+//                            Logger.i("newCenter y ==" + newCenter!!.y)
+//                        }
+//
+//                    })
                 }
             }
-            imageLoader.loadImage(photoView, images[position])
+            imageLoader.loadImage(itemView, images[position])
+
+
         }
 
         fun resetScale() {

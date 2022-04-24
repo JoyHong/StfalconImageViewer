@@ -37,7 +37,8 @@ class MainActivity : AppCompatActivity(),
                 startActivity(Intent(this, PostersGridDemoActivity::class.java))
             }
             ID_SCROLL -> {
-                startActivity(Intent(this, ScrollingImagesDemoActivity::class.java))
+//                startActivity(Intent(this, ScrollingImagesDemoActivity::class.java))
+                startActivity(Intent(this, TestActivity::class.java))
             }
             ID_STYLING -> {
                 startActivity(Intent(this, StylingDemoActivity::class.java))

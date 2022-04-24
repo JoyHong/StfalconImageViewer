@@ -1,10 +1,15 @@
 package com.stfalcon.sample.features.demo.grid
 
+import android.app.ActionBar
 import android.os.Bundle
 import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.RelativeLayout
 import androidx.appcompat.app.AppCompatActivity
+import com.davemorrissey.labs.subscaleview.ImageSource
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
+
 import com.stfalcon.imageviewer.StfalconImageViewer
 import com.stfalcon.imageviewer.Util.Logger
 import com.stfalcon.imageviewer.common.pager.RecyclingPagerAdapter
@@ -45,14 +50,13 @@ class PostersGridDemoActivity : AppCompatActivity() {
             when (poster?.imageType) {
                 RecyclingPagerAdapter.VIEW_TYPE_IMAGE -> {
                     val imageView = view as ImageView
-                    Logger.i("url==" + poster?.url)
                     imageView.loadImage(poster?.url)
                 }
 
                 RecyclingPagerAdapter.VIEW_TYPE_SUBSAMPLING_IMAGE -> {
                     val subsamplingScaleImageView = view as SubsamplingScaleImageView
-                    Logger.i("url==" + poster?.url)
                     subsamplingScaleImageView.loadImage(poster?.url)
+//                    subsamplingScaleImageView.setImage(ImageSource.asset("sanmartino.jpg"))
                 }
             }
 

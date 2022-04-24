@@ -27,6 +27,7 @@ import android.widget.ImageView
 import android.widget.RelativeLayout
 import androidx.core.view.GestureDetectorCompat
 import com.stfalcon.imageviewer.R
+import com.stfalcon.imageviewer.Util.Logger
 import com.stfalcon.imageviewer.common.extensions.addOnPageChangeListener
 import com.stfalcon.imageviewer.common.extensions.animateAlpha
 import com.stfalcon.imageviewer.common.extensions.applyMargin
@@ -165,7 +166,7 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
                 event.pointerCount == 1) {
             return true
         }
-
+        Logger.i("isScaled==" + isScaled)
         handleUpDownEvent(event)
 
         if (swipeDirection == null && (scaleDetector.isInProgress || event.pointerCount > 1 || wasScaled)) {

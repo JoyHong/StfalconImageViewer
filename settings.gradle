@@ -1,1 +1,1 @@
-include ':sample', ':imageviewer'
+include ':sample', ':imageviewer',':sublibrary'
