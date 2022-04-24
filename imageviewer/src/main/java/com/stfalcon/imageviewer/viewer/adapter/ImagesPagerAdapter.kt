@@ -18,6 +18,7 @@ package com.stfalcon.imageviewer.viewer.adapter
 
 import android.content.Context
 import android.graphics.PointF
+import android.graphics.Rect
 import android.view.View
 import android.view.ViewGroup
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
@@ -26,7 +27,7 @@ import com.github.chrisbanes.photoview.PhotoView
 import com.stfalcon.imageviewer.Util.Logger
 import com.stfalcon.imageviewer.common.extensions.resetScale
 import com.stfalcon.imageviewer.common.pager.RecyclingPagerAdapter
-import com.stfalcon.imageviewer.loader.GetImageType
+import com.stfalcon.imageviewer.loader.GetViewType
 import com.stfalcon.imageviewer.loader.ImageLoader
 
 internal class ImagesPagerAdapter<T>(
@@ -34,14 +35,24 @@ internal class ImagesPagerAdapter<T>(
         _images: List<T>,
         private val imageLoader: ImageLoader<T>,
         private val isZoomingAllowed: Boolean,
-        private var getImageType: GetImageType
+        private var getViewType: GetViewType
 ) : RecyclingPagerAdapter<ImagesPagerAdapter<T>.ViewHolder>() {
 
     private var images = _images
     private val holders = mutableListOf<ViewHolder>()
 
+    companion object {
+        public const val IMAGE_POSITION_DEFAULT = 0
+        public const val IMAGE_POSITION_TOP = 1
+        public const val IMAGE_POSITION_BOTTOM = 2
+    }
+
     fun isScaled(position: Int): Boolean =
             holders.firstOrNull { it.position == position }?.isScaled ?: false
+
+    fun isTopOrBottom(position: Int): Int =
+        holders.firstOrNull{it.position == position}?.topOrBottom ?: IMAGE_POSITION_DEFAULT;
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         var itemView = View(context)
@@ -55,7 +66,6 @@ internal class ImagesPagerAdapter<T>(
             }
 
             VIEW_TYPE_SUBSAMPLING_IMAGE -> {
-
                 itemView = SubsamplingScaleImageView(context).apply {
                     isEnabled = isZoomingAllowed
 //                    setOnViewDragListener { _, _ -> setAllowParentInterceptOnEdge(scale == 1.0f) }
@@ -72,7 +82,7 @@ internal class ImagesPagerAdapter<T>(
 
     override fun getItemCount() = images.size
 
-    override fun getViewType(position: Int) = getImageType.getViewType(position)
+    override fun getViewType(position: Int) = getViewType.getViewType(position)
 
     internal fun updateImages(images: List<T>) {
         this.images = images
@@ -87,8 +97,8 @@ internal class ImagesPagerAdapter<T>(
         : RecyclingPagerAdapter.ViewHolder(itemView) {
 
         var isScaled: Boolean = false
-        private var viewType: Int = viewType;
-
+        private var viewType: Int = viewType
+        var topOrBottom: Int = IMAGE_POSITION_DEFAULT
         fun bind(position: Int) {
             this.position = position
 
@@ -102,24 +112,35 @@ internal class ImagesPagerAdapter<T>(
                 VIEW_TYPE_SUBSAMPLING_IMAGE -> {
                     val subsamplingScaleImageView: SubsamplingScaleImageView = itemView as SubsamplingScaleImageView
 
+                    subsamplingScaleImageView.setOnStateChangedListener(object : SubsamplingScaleImageView.OnStateChangedListener{
+                        override fun onScaleChanged(newScale: Float, origin: Int) {
 
-//                    subsamplingScaleImageView.setOnStateChangedListener(object : SubsamplingScaleImageView.OnStateChangedListener{
-//                        override fun onScaleChanged(newScale: Float, origin: Int) {
-//                           Logger.i("newScale" + newScale)
-//
-//                        }
-//
-//                        override fun onCenterChanged(newCenter: PointF?, origin: Int) {
-//                            Logger.i("newCenter x ==" + newCenter!!.x)
-//                            Logger.i("newCenter y ==" + newCenter!!.y)
-//                        }
-//
-//                    })
+                        }
+
+                        override fun onCenterChanged(newCenter: PointF?, origin: Int) {
+                            val resouceWidth = subsamplingScaleImageView.sWidth   //源文件宽
+                            val resouceHeight = subsamplingScaleImageView.sHeight   //源文件高
+                            var rect  = Rect()
+                            subsamplingScaleImageView.visibleFileRect(rect)
+                            if (rect.top == 0 && rect.bottom == resouceHeight){
+                                topOrBottom = IMAGE_POSITION_DEFAULT
+                                isScaled = false
+                            }else if (rect.top == 0 && rect.bottom < resouceHeight){
+                                topOrBottom = IMAGE_POSITION_TOP
+                                isScaled = true
+                            }else if (rect.top > 0 && rect.bottom == resouceHeight){
+                                topOrBottom = IMAGE_POSITION_BOTTOM
+                                isScaled = true
+                            }else{
+                                topOrBottom = IMAGE_POSITION_DEFAULT
+                                isScaled = true
+                            }
+                        }
+
+                    })
                 }
             }
             imageLoader.loadImage(itemView, images[position])
-
-
         }
 
         fun resetScale() {
@@ -130,7 +151,8 @@ internal class ImagesPagerAdapter<T>(
                 }
 
                 VIEW_TYPE_SUBSAMPLING_IMAGE -> {
-
+                    val subsamplingScaleImageView: SubsamplingScaleImageView = itemView as SubsamplingScaleImageView
+                    subsamplingScaleImageView.reset(false)
                 }
             }
         }

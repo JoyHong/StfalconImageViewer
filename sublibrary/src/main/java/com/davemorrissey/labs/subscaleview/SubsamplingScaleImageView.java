@@ -352,7 +352,7 @@ public class SubsamplingScaleImageView extends AppCompatImageView {
     /**
      * Set a global preferred bitmap config shared by all view instances and applied to new instances
      * initialised after the call is made. This is a hint only; the bundled {@link ImageDecoder} and
-     * {@link ImageRegionDecoder} classes all respect this (except when they were constructed with
+     * {@link ImageRegionDecoder} classes all respect thisf (except when they were constructed with
      * an instance-specific config) but custom decoder classes will not.
      * @param preferredBitmapConfig the bitmap configuration to be used by future instances of the view. Pass null to restore the default.
      */
@@ -478,7 +478,7 @@ public class SubsamplingScaleImageView extends AppCompatImageView {
     /**
      * Reset all state before setting/changing image or setting new rotation.
      */
-    private void reset(boolean newImage) {
+    public void reset(boolean newImage) {
         debug("reset newImage=" + newImage);
         scale = 0f;
         scaleStart = 0f;
@@ -757,7 +757,7 @@ public class SubsamplingScaleImageView extends AppCompatImageView {
                                 vTranslateStart.set(vTranslate);
                             } else if (panEnabled) {
                                 // Translate to place the source image coordinate that was at the center of the pinch at the start
-                                // at the center of the pinch now, to give simultaneous pan + zoom.
+                                // at  // at the center of the pinch now, to give simultaneous pan + zoom. the center of the pinch now, to give simultaneous pan + zoom.
                                 float vLeftStart = vCenterStart.x - vTranslateStart.x;
                                 float vTopStart = vCenterStart.y - vTranslateStart.y;
                                 float vLeftNow = vLeftStart * (scale/scaleStart);

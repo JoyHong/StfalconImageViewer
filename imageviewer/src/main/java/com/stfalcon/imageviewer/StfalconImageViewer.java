@@ -23,7 +23,7 @@ import android.widget.ImageView;
 import androidx.annotation.*;
 import androidx.core.content.ContextCompat;
 import com.stfalcon.imageviewer.listeners.OnDismissListener;
-import com.stfalcon.imageviewer.loader.GetImageType;
+import com.stfalcon.imageviewer.loader.GetViewType;
 import com.stfalcon.imageviewer.listeners.OnImageChangeListener;
 import com.stfalcon.imageviewer.loader.ImageLoader;
 import com.stfalcon.imageviewer.viewer.builder.BuilderData;
@@ -124,14 +124,14 @@ public class StfalconImageViewer<T> {
         private Context context;
         private BuilderData<T> data;
 
-        public Builder(Context context, T[] images, ImageLoader<T> imageLoader,GetImageType getImageType) {
-            this(context, new ArrayList<>(Arrays.asList(images)), imageLoader,getImageType);
+        public Builder(Context context, T[] images, ImageLoader<T> imageLoader, GetViewType getViewType) {
+            this(context, new ArrayList<>(Arrays.asList(images)), imageLoader, getViewType);
         }
 
 
-        public Builder(Context context, List<T> images, ImageLoader<T> imageLoader,GetImageType getImageType) {
+        public Builder(Context context, List<T> images, ImageLoader<T> imageLoader, GetViewType getViewType) {
             this.context = context;
-            this.data = new BuilderData<>(images, imageLoader,getImageType);
+            this.data = new BuilderData<>(images, imageLoader, getViewType);
         }
 
         /**

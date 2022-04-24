@@ -20,7 +20,7 @@ package com.stfalcon.imageviewer.loader;
  * Interface definition for a callback to be invoked when current image position was changed.
  */
 //N.B.! This class is written in Java for convenient use of lambdas due to languages compatibility issues.
-public interface GetImageType {
+public interface GetViewType {
 
     int getViewType(int position);
 }

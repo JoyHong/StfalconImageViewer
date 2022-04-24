@@ -64,7 +64,6 @@ class PostersGridDemoActivity : AppCompatActivity() {
     }
 
     fun getImageType(position: Int): Int {
-        Logger.i("position= "+ position)
         return  Demo.posters[position].imageType
     }
 }
