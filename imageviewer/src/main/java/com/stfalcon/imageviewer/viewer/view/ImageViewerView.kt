@@ -113,6 +113,7 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
     private var images: List<T> = listOf()
     private var imageLoader: ImageLoader<T>? = null
     private lateinit var transitionImageAnimator: TransitionImageAnimator
+    private var trackEnable = false
 
     private var startPosition: Int = 0
         set(value) {
@@ -181,10 +182,10 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
                 topOrBottom = imagesAdapter?.isTopOrBottom(currentPosition)!!
                 trackEnable = handleEventAction(event, topOrBottom)
                 handleUpDownEvent(event)
-                if (!trackEnable) {
-//                    return imagesPager.dispatchTouchEvent(event)
-                    Logger.i("isScaled=" + isScaled)
-                    if (isScaled) super.dispatchTouchEvent(event) else handleTouchIfNotScaled(event)
+                return if (!trackEnable) {
+                    imagesPager.dispatchTouchEvent(event)
+                }else{
+                    handleTouchIfNotScaled(event)
                 }
             }
         }
@@ -193,7 +194,6 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
             wasScaled = true
             return imagesPager.dispatchTouchEvent(event)
         }
-
 
         return if (isScaled) super.dispatchTouchEvent(event) else handleTouchIfNotScaled(event)
     }
@@ -294,7 +294,6 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
 
     private fun handleTouchIfNotScaled(event: MotionEvent): Boolean {
         directionDetector.handleTouchEvent(event)
-
         return when (swipeDirection) {
             UP, DOWN -> {
                 if (isSwipeToDismissAllowed && !wasScaled && imagesPager.isIdle) {
@@ -308,7 +307,7 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
         }
     }
 
-    var trackEnable = false
+
     private fun handleUpDownEvent(event: MotionEvent) {
         if (event.action == MotionEvent.ACTION_UP) {
             handleEventActionUp(event)
@@ -326,7 +325,7 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
     private var startY: Float = 0f
 
     //    private var limitDistance = rootContainer.height / 20
-    private var limitDistance = 20
+    private var limitDistance = 20   //最小滑动距离
     /**
      * 判断是否已经到顶部或者底部
      * 顶部 + 下滑 = 取消
@@ -339,15 +338,8 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
             MotionEvent.ACTION_DOWN -> {
                 startY = event.y
             }
-            MotionEvent.ACTION_UP -> {
-                val distance = event.y - startY
-                if ((distance > 0 && Math.abs(distance) > limitDistance) && topOrBottom == ImagesPagerAdapter.IMAGE_POSITION_TOP) {  //下滑手势
-                    tarckEnable = true
-                } else if ((distance < 0 && Math.abs(distance) > limitDistance) && topOrBottom == ImagesPagerAdapter.IMAGE_POSITION_BOTTOM) {//上滑手势
-                    tarckEnable = true
-                }
-            }
-            MotionEvent.ACTION_MOVE -> {
+
+            MotionEvent.ACTION_UP,MotionEvent.ACTION_MOVE -> {
                 val distance = event.y - startY
                 if ((distance > 0 && Math.abs(distance) > limitDistance) && topOrBottom == ImagesPagerAdapter.IMAGE_POSITION_TOP) {  //下滑手势
                     tarckEnable = true
