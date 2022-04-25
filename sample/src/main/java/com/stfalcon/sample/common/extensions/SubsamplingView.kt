@@ -11,7 +11,7 @@ import com.stfalcon.imageviewer.Util.Logger
 fun SubsamplingScaleImageView.loadImage(url: String?){
 
     Picasso.get().load(url).into(downLoad(this))
-
+//        this.setImage(ImageSource.asset("longImage.jpg"))
 }
 
 class downLoad(subsamplingScaleImageView: SubsamplingScaleImageView) :Target{

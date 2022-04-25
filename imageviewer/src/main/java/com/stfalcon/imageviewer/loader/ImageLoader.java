@@ -33,4 +33,11 @@ public interface ImageLoader<T> {
      */
 //    void loadImage(ImageView imageView, T image);
     void loadImage(View imageView, T image);
+
+//    /**
+//     列表图片加载接口
+//     * @ *param imageView an {@link ImageView} 列表图片的ImageView
+//     * @param image     image data from which image should be loaded
+//     * */
+//    void loadTransitionImage(View imageView, T image);
 }

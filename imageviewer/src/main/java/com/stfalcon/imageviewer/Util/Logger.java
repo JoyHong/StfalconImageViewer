@@ -4,6 +4,8 @@ import android.os.Environment;
 import android.util.Log;
 
 
+import com.stfalcon.imageviewer.BuildConfig;
+
 import java.io.File;
 
 
@@ -20,7 +22,7 @@ public class Logger {
 
     public static void i(Object str) {
         try {
-            if (true) {
+            if (BuildConfig.DEBUG) {
                 String name = getFunctionName();
                 try {
                     if (name != null) {

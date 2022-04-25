@@ -13,8 +13,8 @@ public abstract class RecyclingPagerAdapter<VH : RecyclingPagerAdapter.ViewHolde
 
     companion object {
         private val STATE = RecyclingPagerAdapter::class.java.simpleName
-        public const val VIEW_TYPE_IMAGE = 0
-        public const val VIEW_TYPE_SUBSAMPLING_IMAGE = 1
+        const val VIEW_TYPE_IMAGE = 0
+        const val VIEW_TYPE_SUBSAMPLING_IMAGE = 1
     }
 
     internal abstract fun getItemCount(): Int
@@ -108,7 +108,7 @@ public abstract class RecyclingPagerAdapter<VH : RecyclingPagerAdapter.ViewHolde
         }
     }
 
-    public abstract class ViewHolder(internal val itemView: View) {
+     abstract class ViewHolder(internal val itemView: View) {
 
         companion object {
             private val STATE = ViewHolder::class.java.simpleName

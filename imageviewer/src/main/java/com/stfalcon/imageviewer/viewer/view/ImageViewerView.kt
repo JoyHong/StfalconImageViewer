@@ -188,7 +188,7 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
             RecyclingPagerAdapter.VIEW_TYPE_SUBSAMPLING_IMAGE -> {
                 topOrBottom = imagesAdapter?.isTopOrBottom(currentPosition)!!
                 trackEnable = handleEventAction(event, topOrBottom)
-                //放大情况下，或者
+                //放大情况下正常滑动预览
                 return if (!trackEnable && isScaled) {
                     imagesPager.dispatchTouchEvent(event)
                 }else{
@@ -224,6 +224,7 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
         externalTransitionImageView = transitionImageView
 
         imageLoader?.loadImage(this.transitionImageView, images[startPosition])
+//        imageLoader?.loadTransitionImage(this.transitionImageView, images[startPosition])
         this.transitionImageView.copyBitmapFrom(transitionImageView)
 
         transitionImageAnimator = createTransitionImageAnimator(transitionImageView)
@@ -254,6 +255,9 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
         startPosition = currentPosition
         transitionImageAnimator = createTransitionImageAnimator(imageView)
         imageLoader?.loadImage(transitionImageView, images[startPosition])
+//        imageLoader?.loadTransitionImage(transitionImageView, images[startPosition])
+
+
     }
 
     internal fun resetScale() {

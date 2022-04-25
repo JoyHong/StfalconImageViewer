@@ -22,6 +22,7 @@ import android.graphics.Rect
 import android.view.View
 import android.view.ViewGroup
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
+import com.github.chrisbanes.photoview.OnScaleChangedListener
 
 import com.github.chrisbanes.photoview.PhotoView
 import com.stfalcon.imageviewer.Util.Logger
@@ -29,6 +30,7 @@ import com.stfalcon.imageviewer.common.extensions.resetScale
 import com.stfalcon.imageviewer.common.pager.RecyclingPagerAdapter
 import com.stfalcon.imageviewer.loader.GetViewType
 import com.stfalcon.imageviewer.loader.ImageLoader
+import java.lang.Exception
 
 internal class ImagesPagerAdapter<T>(
         private val context: Context,
@@ -68,6 +70,7 @@ internal class ImagesPagerAdapter<T>(
             VIEW_TYPE_SUBSAMPLING_IMAGE -> {
                 itemView = SubsamplingScaleImageView(context).apply {
                     isEnabled = isZoomingAllowed
+                    setMinimumScaleType(SubsamplingScaleImageView.SCALE_TYPE_START)
 //                    setOnViewDragListener { _, _ -> setAllowParentInterceptOnEdge(scale == 1.0f) }
                 }
 
@@ -99,18 +102,56 @@ internal class ImagesPagerAdapter<T>(
         var isScaled: Boolean = false
         private var viewType: Int = viewType
         var topOrBottom: Int = IMAGE_POSITION_DEFAULT
+
+        var center : PointF? = null
+        var scale : Float = 0f
         fun bind(position: Int) {
             this.position = position
-
-
             when (viewType) {
                 VIEW_TYPE_IMAGE -> {
                     val photoView: PhotoView = itemView as PhotoView
-                    isScaled = photoView.scale > 1f
+                    photoView.setOnScaleChangeListener(object : OnScaleChangedListener{
+                        override fun onScaleChange(
+                            scaleFactor: Float,
+                            focusX: Float,
+                            focusY: Float
+                        ) {
+                            isScaled = scaleFactor > 1f
+                        }
+                    })
                 }
 
                 VIEW_TYPE_SUBSAMPLING_IMAGE -> {
                     val subsamplingScaleImageView: SubsamplingScaleImageView = itemView as SubsamplingScaleImageView
+                    isScaled = true
+                    subsamplingScaleImageView.setOnImageEventListener(object : SubsamplingScaleImageView.OnImageEventListener{
+                        override fun onReady() {
+                           center =  subsamplingScaleImageView.center
+                           scale =  subsamplingScaleImageView.scale
+                        }
+
+                        override fun onImageLoaded() {
+
+                        }
+
+                        override fun onPreviewLoadError(e: Exception?) {
+
+                        }
+
+                        override fun onImageLoadError(e: Exception?) {
+
+                        }
+
+                        override fun onTileLoadError(e: Exception?) {
+
+                        }
+
+                        override fun onPreviewReleased() {
+
+                        }
+
+
+                    })
 
                     subsamplingScaleImageView.setOnStateChangedListener(object : SubsamplingScaleImageView.OnStateChangedListener{
                         override fun onScaleChanged(newScale: Float, origin: Int) {
@@ -151,8 +192,13 @@ internal class ImagesPagerAdapter<T>(
                 }
 
                 VIEW_TYPE_SUBSAMPLING_IMAGE -> {
-                    val subsamplingScaleImageView: SubsamplingScaleImageView = itemView as SubsamplingScaleImageView
-                    subsamplingScaleImageView.reset(false)
+                    val subsamplingScaleImageView = itemView as SubsamplingScaleImageView
+                    if (scale != 0f && center != null){
+                        subsamplingScaleImageView.setScaleAndCenter(scale,center)
+                    }else{
+                        subsamplingScaleImageView.resetScaleAndCenter()
+                    }
+                    isScaled = false
                 }
             }
         }

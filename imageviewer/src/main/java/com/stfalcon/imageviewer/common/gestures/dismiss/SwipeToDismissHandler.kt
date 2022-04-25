@@ -20,6 +20,7 @@ import android.annotation.SuppressLint
 import android.view.MotionEvent
 import android.view.View
 import android.view.animation.AccelerateInterpolator
+import com.stfalcon.imageviewer.Util.Logger
 import com.stfalcon.imageviewer.common.extensions.hitRect
 import com.stfalcon.imageviewer.common.extensions.setAnimatorListener
 

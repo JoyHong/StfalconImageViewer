@@ -21,6 +21,7 @@ import android.view.KeyEvent
 import android.widget.ImageView
 import androidx.appcompat.app.AlertDialog
 import com.stfalcon.imageviewer.R
+import com.stfalcon.imageviewer.Util.Logger
 import com.stfalcon.imageviewer.viewer.builder.BuilderData
 import com.stfalcon.imageviewer.viewer.view.ImageViewerView
 
