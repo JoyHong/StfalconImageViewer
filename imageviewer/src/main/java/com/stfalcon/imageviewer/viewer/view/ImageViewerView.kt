@@ -169,30 +169,32 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
         ) {
             return true
         }
+        handleUpDownEvent(event)
+
+
+        if (swipeDirection == null && (scaleDetector.isInProgress || event.pointerCount > 1 || wasScaled)) {
+            wasScaled = true
+            return imagesPager.dispatchTouchEvent(event)
+        }
 
         val viewType = imagesAdapter?.getViewType(currentPosition)
         when (viewType) {
             //普通视图
             RecyclingPagerAdapter.VIEW_TYPE_IMAGE -> {
-                handleUpDownEvent(event)
+
             }
 
             //subsamplingView需要单独处理长图滑动状态
             RecyclingPagerAdapter.VIEW_TYPE_SUBSAMPLING_IMAGE -> {
                 topOrBottom = imagesAdapter?.isTopOrBottom(currentPosition)!!
                 trackEnable = handleEventAction(event, topOrBottom)
-                handleUpDownEvent(event)
-                return if (!trackEnable) {
+                //放大情况下，或者
+                return if (!trackEnable && isScaled) {
                     imagesPager.dispatchTouchEvent(event)
                 }else{
                     handleTouchIfNotScaled(event)
                 }
             }
-        }
-
-        if (swipeDirection == null && (scaleDetector.isInProgress || event.pointerCount > 1 || wasScaled)) {
-            wasScaled = true
-            return imagesPager.dispatchTouchEvent(event)
         }
 
         return if (isScaled) super.dispatchTouchEvent(event) else handleTouchIfNotScaled(event)
