@@ -222,11 +222,8 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
         prepareViewsForTransition()
 
         externalTransitionImageView = transitionImageView
-
-        imageLoader?.loadImage(this.transitionImageView, images[startPosition])
-//        imageLoader?.loadTransitionImage(this.transitionImageView, images[startPosition])
+        imageLoader?.loadImage(this.transitionImageView, images[startPosition], ImageLoader.OPENTYPE_IMAGE_VIEW)
         this.transitionImageView.copyBitmapFrom(transitionImageView)
-
         transitionImageAnimator = createTransitionImageAnimator(transitionImageView)
         swipeDismissHandler = createSwipeToDismissHandler()
         rootContainer.setOnTouchListener(swipeDismissHandler)
@@ -254,9 +251,7 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
         externalTransitionImageView = imageView
         startPosition = currentPosition
         transitionImageAnimator = createTransitionImageAnimator(imageView)
-        imageLoader?.loadImage(transitionImageView, images[startPosition])
-//        imageLoader?.loadTransitionImage(transitionImageView, images[startPosition])
-
+        imageLoader?.loadImage(transitionImageView, images[startPosition], ImageLoader.OPENTYPE_IMAGE_VIEW)
 
     }
 

@@ -119,6 +119,7 @@ internal class ImagesPagerAdapter<T>(
                             isScaled = scaleFactor > 1f
                         }
                     })
+                    imageLoader.loadImage(itemView, images[position], ImageLoader.OPENTYPE_IMAGE_VIEW)
                 }
 
                 VIEW_TYPE_SUBSAMPLING_IMAGE -> {
@@ -179,9 +180,11 @@ internal class ImagesPagerAdapter<T>(
                         }
 
                     })
+                    imageLoader.loadImage(itemView, images[position], ImageLoader.OPENTYPE_SUBSAMPLINGSCALEIMAGEVIEW)
                 }
             }
-            imageLoader.loadImage(itemView, images[position])
+
+
         }
 
         fun resetScale() {
@@ -202,24 +205,5 @@ internal class ImagesPagerAdapter<T>(
                 }
             }
         }
-
     }
-
-
-//    internal inner class ViewHolder(itemView: View , viewType: Int)
-//        : RecyclingPagerAdapter.ViewHolder(itemView) {
-//
-//        internal var isScaled: Boolean = false
-//            get() = photoView.scale > 1f
-//
-//        private val photoView: PhotoView = itemView as PhotoView
-//
-//        fun bind(position: Int) {
-//            this.position = position
-//            imageLoader.loadImage(photoView, images[position])
-//        }
-//
-//        fun resetScale() = photoView.resetScale(animate = true)
-//    }
-
 }

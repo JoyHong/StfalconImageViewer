@@ -7,7 +7,6 @@ object Demo {
     private const val MISC_PATH = "https://raw.githubusercontent.com/stfalcon-studio/StfalconImageViewer/master/images/misc"
 
 
-
     val posters = listOf(
         Poster(url = "https://img.zcool.cn/community/013f995ade9eb7a801214a6187d430.jpg?x-oss-process=image/auto-orient,1/resize,m_lfit,w_1280,limit_1/sharpen,100/format,webp/quality,Q_100", description = "Vincent Vega is a hitman and associate of Marsellus Wallace. He had a brother named Vic Vega who was shot and killed by an undercover cop while on a job. He worked in Amsterdam for over three years and recently returned to Los Angeles, where he has been partnered with Jules Winnfield.",imageType = 1),
 //        Poster(url = "$POSTERS_PATH/VCG41N1278720325.jpg", description = "Vincent Vega is a hitman and associate of Marsellus Wallace. He had a brother named Vic Vega who was shot and killed by an undercover cop while on a job. He worked in Amsterdam for over three years and recently returned to Los Angeles, where he has been partnered with Jules Winnfield.",imageType = 1),

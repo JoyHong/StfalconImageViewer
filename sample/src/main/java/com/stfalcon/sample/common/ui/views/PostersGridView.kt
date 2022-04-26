@@ -5,6 +5,7 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
+import com.stfalcon.imageviewer.loader.ImageLoader
 import com.stfalcon.sample.R
 import com.stfalcon.sample.common.models.Demo
 import com.stfalcon.sample.common.models.Poster
@@ -16,7 +17,7 @@ class PostersGridView @JvmOverloads constructor(
         defStyleAttr: Int = 0
 ) : ConstraintLayout(context, attrs, defStyleAttr) {
 
-    var imageLoader: ((ImageView, Poster?) -> Unit)? = null
+    var imageLoader: ((ImageView, Poster?,Int) -> Unit)? = null
     var onPosterClick: ((Int, ImageView) -> Unit)? = null
 
     val imageViews by lazy {
@@ -40,7 +41,7 @@ class PostersGridView @JvmOverloads constructor(
         super.onAttachedToWindow()
 
         imageViews.values.forEachIndexed { index, imageView ->
-            imageLoader?.invoke(imageView, Demo.posters.getOrNull(index))
+            imageLoader?.invoke(imageView, Demo.posters.getOrNull(index),ImageLoader.OPENTYPE_IMAGE_VIEW)
             imageView.setOnClickListener { onPosterClick?.invoke(index, imageView) }
         }
     }

@@ -5,6 +5,7 @@ import android.view.View
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import com.stfalcon.imageviewer.StfalconImageViewer
+import com.stfalcon.imageviewer.loader.ImageLoader
 import com.stfalcon.sample.R
 import com.stfalcon.sample.common.extensions.getDrawableCompat
 import com.stfalcon.sample.common.extensions.loadImage
@@ -36,14 +37,14 @@ class ScrollingImagesDemoActivity : AppCompatActivity() {
         setContentView(R.layout.activity_demo_scrolling_images)
 
         horizontalImageViews.forEachIndexed { index, imageView ->
-            loadImage(imageView, Demo.horizontalImages.getOrNull(index))
+            loadImage(imageView, Demo.horizontalImages.getOrNull(index), ImageLoader.OPENTYPE_IMAGE_VIEW)
             imageView.setOnClickListener {
                 openViewer(index, imageView, Demo.horizontalImages, horizontalImageViews)
             }
         }
 
         verticalImageViews.forEachIndexed { index, imageView ->
-            loadImage(imageView, Demo.verticalImages.getOrNull(index))
+            loadImage(imageView, Demo.verticalImages.getOrNull(index),ImageLoader.OPENTYPE_IMAGE_VIEW)
             imageView.setOnClickListener {
                 openViewer(index, imageView, Demo.verticalImages, verticalImageViews)
             }
@@ -62,7 +63,7 @@ class ScrollingImagesDemoActivity : AppCompatActivity() {
             .show()
     }
 
-    private fun loadImage(view: View, url: String?) {
+    private fun loadImage(view: View, url: String?, openType : Int) {
         view.apply {
             background = getDrawableCompat(R.drawable.shape_placeholder)
             var imageView = view as ImageView

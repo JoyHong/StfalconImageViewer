@@ -4,4 +4,5 @@ data class Poster(
     val url: String,
     val description: String,
     var imageType:Int
+
 )

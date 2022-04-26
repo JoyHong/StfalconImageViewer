@@ -87,11 +87,7 @@ internal class ImageViewerDialog<T>(
             event.action == KeyEvent.ACTION_UP &&
             !event.isCanceled
         ) {
-            if (viewerView.isScaled) {
-                viewerView.resetScale()
-            } else {
-                viewerView.close()
-            }
+            viewerView.close()
             return true
         }
         return false

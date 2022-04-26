@@ -24,20 +24,15 @@ import android.widget.ImageView;
  */
 //N.B.! This class is written in Java for convenient use of lambdas due to languages compatibility issues.
 public interface ImageLoader<T> {
-
+    int OPENTYPE_IMAGE_VIEW = 0;
+    int OPENTYPE_SUBSAMPLINGSCALEIMAGEVIEW = 1;
     /**
      * Fires every time when image object should be displayed in a provided {@link ImageView}
      *
      * @param imageView an {@link ImageView} object where the image should be loaded
      * @param image     image data from which image should be loaded
+     * @param openViewType  Type of open view
      */
-//    void loadImage(ImageView imageView, T image);
-    void loadImage(View imageView, T image);
+    void loadImage(View imageView, T image, int openViewType);
 
-//    /**
-//     列表图片加载接口
-//     * @ *param imageView an {@link ImageView} 列表图片的ImageView
-//     * @param image     image data from which image should be loaded
-//     * */
-//    void loadTransitionImage(View imageView, T image);
 }
