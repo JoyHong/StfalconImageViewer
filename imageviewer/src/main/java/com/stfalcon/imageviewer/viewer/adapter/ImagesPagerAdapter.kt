@@ -25,7 +25,6 @@ import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
 import com.github.chrisbanes.photoview.OnScaleChangedListener
 
 import com.github.chrisbanes.photoview.PhotoView
-import com.stfalcon.imageviewer.Util.Logger
 import com.stfalcon.imageviewer.common.extensions.resetScale
 import com.stfalcon.imageviewer.common.pager.RecyclingPagerAdapter
 import com.stfalcon.imageviewer.loader.GetViewType
@@ -55,8 +54,8 @@ internal class ImagesPagerAdapter<T>(
     fun isTopOrBottom(position: Int): Int =
         holders.firstOrNull{it.position == position}?.topOrBottom ?: IMAGE_POSITION_DEFAULT;
 
-    fun isScrolled(position: Int) =
-        holders.firstOrNull{it.position == position}?.isScrolled ?: true;
+    fun isInitState(position: Int) =
+        holders.firstOrNull{it.position == position}?.isInitState ?: true;
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -75,7 +74,6 @@ internal class ImagesPagerAdapter<T>(
                     isEnabled = isZoomingAllowed
                     setMinimumScaleType(SubsamplingScaleImageView.SCALE_TYPE_START)
                     maxScale = 8F
-//                    setOnViewDragListener { _, _ -> setAllowParentInterceptOnEdge(scale == 1.0f) }
                 }
 
 
@@ -104,7 +102,7 @@ internal class ImagesPagerAdapter<T>(
         : RecyclingPagerAdapter.ViewHolder(itemView) {
 
         var isScaled: Boolean = false
-        var isScrolled: Boolean = true  //初次加载的状态
+        var isInitState: Boolean = true  //初次加载的状态
         private var viewType: Int = viewType
         var topOrBottom: Int = IMAGE_POSITION_DEFAULT
 
@@ -130,7 +128,7 @@ internal class ImagesPagerAdapter<T>(
                 VIEW_TYPE_SUBSAMPLING_IMAGE -> {
                     val subsamplingScaleImageView: SubsamplingScaleImageView = itemView as SubsamplingScaleImageView
                     isScaled = true
-                    isScrolled = false
+                    isInitState = true
                     subsamplingScaleImageView.setOnImageEventListener(object : SubsamplingScaleImageView.OnImageEventListener{
                         override fun onReady() {
                            center =  subsamplingScaleImageView.center
@@ -184,7 +182,7 @@ internal class ImagesPagerAdapter<T>(
                                 isScaled = true
                             }
 
-                            isScrolled = true
+                            isInitState = false
                         }
 
                     })

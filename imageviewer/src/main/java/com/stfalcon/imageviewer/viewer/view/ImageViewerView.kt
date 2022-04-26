@@ -27,7 +27,6 @@ import android.widget.ImageView
 import android.widget.RelativeLayout
 import androidx.core.view.GestureDetectorCompat
 import com.stfalcon.imageviewer.R
-import com.stfalcon.imageviewer.Util.Logger
 import com.stfalcon.imageviewer.common.extensions.addOnPageChangeListener
 import com.stfalcon.imageviewer.common.extensions.animateAlpha
 import com.stfalcon.imageviewer.common.extensions.applyMargin
@@ -51,7 +50,6 @@ import com.stfalcon.imageviewer.common.pager.RecyclingPagerAdapter
 import com.stfalcon.imageviewer.loader.GetViewType
 import com.stfalcon.imageviewer.loader.ImageLoader
 import com.stfalcon.imageviewer.viewer.adapter.ImagesPagerAdapter
-import com.stfalcon.imageviewer.viewer.adapter.ImagesPagerAdapter.Companion.IMAGE_POSITION_TOP
 
 internal class ImageViewerView<T> @JvmOverloads constructor(
     context: Context,
@@ -76,8 +74,8 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
 
     internal var topOrBottom: Int = ImagesPagerAdapter.IMAGE_POSITION_DEFAULT
 
-    internal val isScrolled
-         get() = imagesAdapter?.isScrolled(currentPosition)?:true
+    internal val isInitState
+         get() = imagesAdapter?.isInitState(currentPosition)?:true
 
     internal var containerPadding = intArrayOf(0, 0, 0, 0)
 
@@ -175,7 +173,6 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
         }
         handleUpDownEvent(event)
 
-
         if (swipeDirection == null && (scaleDetector.isInProgress || event.pointerCount > 1 || wasScaled)) {
             wasScaled = true
             return imagesPager.dispatchTouchEvent(event)
@@ -183,7 +180,7 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
 
         val viewType = imagesAdapter?.getViewType(currentPosition)
         when (viewType) {
-            //普通视图
+            //普通视图无需处理
             RecyclingPagerAdapter.VIEW_TYPE_IMAGE -> {
 
             }
@@ -350,7 +347,7 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
                     tarckEnable = true
                 } else if ((distance < 0 && Math.abs(distance) > limitDistance) && topOrBottom == ImagesPagerAdapter.IMAGE_POSITION_BOTTOM) {//上滑手势
                     tarckEnable = true
-                }else if ((distance > 0 && Math.abs(distance) > limitDistance) && !isScrolled){ //初始状态，往下滑可以退出
+                }else if ((distance > 0 && Math.abs(distance) > limitDistance) && isInitState){ //初始状态，往下滑可以退出
                     tarckEnable = true
                 }
             }

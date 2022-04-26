@@ -74,7 +74,6 @@ class PostersGridDemoActivity : AppCompatActivity() {
                     }
                 }
             }
-
         }
     }
 

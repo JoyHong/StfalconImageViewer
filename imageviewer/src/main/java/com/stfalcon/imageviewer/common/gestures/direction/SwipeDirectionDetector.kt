@@ -19,7 +19,6 @@ package com.stfalcon.imageviewer.common.gestures.direction
 import android.content.Context
 import android.view.MotionEvent
 import android.view.ViewConfiguration
-import com.stfalcon.imageviewer.Util.Logger
 
 internal class SwipeDirectionDetector(
     context: Context,

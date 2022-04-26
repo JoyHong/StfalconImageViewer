@@ -9,7 +9,6 @@ import com.davemorrissey.labs.subscaleview.ImageSource
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
-import com.stfalcon.imageviewer.Util.Logger
 import java.io.IOException
 import java.io.InputStream
 
@@ -36,7 +35,7 @@ class downLoad(subsamplingScaleImageView: SubsamplingScaleImageView) :Target{
     }
 
     override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
-        Logger.i(e?.message ?: "no message")
+
     }
 
     override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
