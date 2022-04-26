@@ -55,6 +55,9 @@ internal class ImagesPagerAdapter<T>(
     fun isTopOrBottom(position: Int): Int =
         holders.firstOrNull{it.position == position}?.topOrBottom ?: IMAGE_POSITION_DEFAULT;
 
+    fun isScrolled(position: Int) =
+        holders.firstOrNull{it.position == position}?.isScrolled ?: true;
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         var itemView = View(context)
@@ -71,6 +74,7 @@ internal class ImagesPagerAdapter<T>(
                 itemView = SubsamplingScaleImageView(context).apply {
                     isEnabled = isZoomingAllowed
                     setMinimumScaleType(SubsamplingScaleImageView.SCALE_TYPE_START)
+                    maxScale = 8F
 //                    setOnViewDragListener { _, _ -> setAllowParentInterceptOnEdge(scale == 1.0f) }
                 }
 
@@ -100,6 +104,7 @@ internal class ImagesPagerAdapter<T>(
         : RecyclingPagerAdapter.ViewHolder(itemView) {
 
         var isScaled: Boolean = false
+        var isScrolled: Boolean = true  //初次加载的状态
         private var viewType: Int = viewType
         var topOrBottom: Int = IMAGE_POSITION_DEFAULT
 
@@ -125,6 +130,7 @@ internal class ImagesPagerAdapter<T>(
                 VIEW_TYPE_SUBSAMPLING_IMAGE -> {
                     val subsamplingScaleImageView: SubsamplingScaleImageView = itemView as SubsamplingScaleImageView
                     isScaled = true
+                    isScrolled = false
                     subsamplingScaleImageView.setOnImageEventListener(object : SubsamplingScaleImageView.OnImageEventListener{
                         override fun onReady() {
                            center =  subsamplingScaleImageView.center
@@ -177,6 +183,8 @@ internal class ImagesPagerAdapter<T>(
                                 topOrBottom = IMAGE_POSITION_DEFAULT
                                 isScaled = true
                             }
+
+                            isScrolled = true
                         }
 
                     })

@@ -280,6 +280,17 @@ public class StfalconImageViewer<T> {
             return this;
         }
 
+
+        /**
+         * Sets a target {@link Boolean} Whether dialog uses the theme of the parent class
+         *
+         * @return This Builder object to allow calls chaining
+         */
+        public Builder<T> withUseDialogStyle(Boolean useDialogStyle) {
+            this.data.setUseDialogStyle(useDialogStyle);
+            return this;
+        }
+
         /**
          * Sets {@link OnImageChangeListener} for the viewer.
          *

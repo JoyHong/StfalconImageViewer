@@ -51,6 +51,7 @@ import com.stfalcon.imageviewer.common.pager.RecyclingPagerAdapter
 import com.stfalcon.imageviewer.loader.GetViewType
 import com.stfalcon.imageviewer.loader.ImageLoader
 import com.stfalcon.imageviewer.viewer.adapter.ImagesPagerAdapter
+import com.stfalcon.imageviewer.viewer.adapter.ImagesPagerAdapter.Companion.IMAGE_POSITION_TOP
 
 internal class ImageViewerView<T> @JvmOverloads constructor(
     context: Context,
@@ -74,6 +75,9 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
         get() = imagesAdapter?.isScaled(currentPosition) ?: false
 
     internal var topOrBottom: Int = ImagesPagerAdapter.IMAGE_POSITION_DEFAULT
+
+    internal val isScrolled
+         get() = imagesAdapter?.isScrolled(currentPosition)?:true
 
     internal var containerPadding = intArrayOf(0, 0, 0, 0)
 
@@ -345,6 +349,8 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
                 if ((distance > 0 && Math.abs(distance) > limitDistance) && topOrBottom == ImagesPagerAdapter.IMAGE_POSITION_TOP) {  //下滑手势
                     tarckEnable = true
                 } else if ((distance < 0 && Math.abs(distance) > limitDistance) && topOrBottom == ImagesPagerAdapter.IMAGE_POSITION_BOTTOM) {//上滑手势
+                    tarckEnable = true
+                }else if ((distance > 0 && Math.abs(distance) > limitDistance) && !isScrolled){ //初始状态，往下滑可以退出
                     tarckEnable = true
                 }
             }

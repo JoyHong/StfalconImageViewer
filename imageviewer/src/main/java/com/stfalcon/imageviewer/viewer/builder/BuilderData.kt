@@ -33,7 +33,6 @@ internal class BuilderData<T>(
     var startPosition: Int = 0
     var imageChangeListener: OnImageChangeListener? = null
     var onDismissListener: OnDismissListener? = null
-    var onGetViewTypeListener: GetViewType? = null
     var overlayView: View? = null
     var imageMarginPixels: Int = 0
     var containerPaddingPixels = IntArray(4)
@@ -41,5 +40,5 @@ internal class BuilderData<T>(
     var isZoomingAllowed = true
     var isSwipeToDismissAllowed = true
     var transitionView: ImageView? = null
-
+    var useDialogStyle = false
 }

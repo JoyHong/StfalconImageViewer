@@ -21,7 +21,6 @@ import android.view.KeyEvent
 import android.widget.ImageView
 import androidx.appcompat.app.AlertDialog
 import com.stfalcon.imageviewer.R
-import com.stfalcon.imageviewer.Util.Logger
 import com.stfalcon.imageviewer.viewer.builder.BuilderData
 import com.stfalcon.imageviewer.viewer.view.ImageViewerView
 
@@ -42,8 +41,13 @@ internal class ImageViewerDialog<T>(
 
     init {
         setupViewerView()
-        dialog = AlertDialog
-            .Builder(context, dialogStyle)
+
+        val builder : AlertDialog.Builder = if (builderData.useDialogStyle){
+            AlertDialog.Builder(context,dialogStyle)
+        }else{
+            AlertDialog.Builder(context)
+        }
+        dialog = builder
             .setView(viewerView)
             .setOnKeyListener { _, keyCode, event -> onDialogKeyEvent(keyCode, event) }
             .create()
