@@ -1,13 +1,16 @@
 package com.stfalcon.sample.features.demo.styled
 
 import android.content.Context
+import android.graphics.Color
 import android.graphics.PointF
 import android.graphics.Rect
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.TextView
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
 import com.github.chrisbanes.photoview.OnScaleChangedListener
 import com.github.chrisbanes.photoview.PhotoView
@@ -38,7 +41,8 @@ class StylingDemoActivity : BaseActivity() {
     private var options = StylingOptions()
     private var overlayView: PosterOverlayView? = null
     private var viewer: StfalconImageViewer<Poster>? = null
-
+    //删除的时候注意数据集同步变化
+    val posters : MutableList<Poster> = Demo.posters.toMutableList()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_demo_styling)
@@ -60,7 +64,8 @@ class StylingDemoActivity : BaseActivity() {
     }
 
     private fun openViewer(startPosition: Int, imageView: ImageView) {
-        val posters = Demo.posters.toMutableList()
+//        var posters = Demo.posters.toMutableList()
+//        var posters = Demo.posters.toMutableList()
 
         val builder = StfalconImageViewer.Builder<Poster>(this, posters, ::loadPosterImage,::getItemViewType,::createItemView,::bindItemView)
             .withStartPosition(startPosition)
@@ -102,13 +107,13 @@ class StylingDemoActivity : BaseActivity() {
         viewer = builder.show()
     }
 
+    //删除按钮回调位置
     private fun setupOverlayView(posters: MutableList<Poster>, startPosition: Int) {
         overlayView = PosterOverlayView(this).apply {
             update(posters[startPosition])
 
             onDeleteClick = {
                 val currentPosition = viewer?.currentPosition() ?: 0
-
                 posters.removeAt(currentPosition)
                 viewer?.updateImages(posters)
 
@@ -124,7 +129,7 @@ class StylingDemoActivity : BaseActivity() {
     }
 
     fun getItemViewType(position: Int): Int {
-        return  Demo.posters[position].viewType
+        return  posters[position].viewType
     }
 
     fun createItemView (context : Context, viewType: Int, isZoomingAllowed : Boolean): View {
@@ -143,6 +148,15 @@ class StylingDemoActivity : BaseActivity() {
                     maxScale = 8F
                 }
             }
+
+            RecyclingPagerAdapter.VIEW_TYPE_TEXT->{
+                itemView = TextView(context).apply {
+                    textSize = 20F
+                    setTextColor(Color.WHITE)
+                    width = ViewGroup.LayoutParams.MATCH_PARENT
+                    height = ViewGroup.LayoutParams.MATCH_PARENT
+                }
+            }
         }
         return itemView
     }
@@ -152,7 +166,6 @@ class StylingDemoActivity : BaseActivity() {
         var isScaled = false
         var isInitState = true  //初次加载的状态
         var topOrBottom: Int = ImagesPagerAdapter.IMAGE_POSITION_DEFAULT
-
         when (viewType) {
             RecyclingPagerAdapter.VIEW_TYPE_IMAGE -> {
                 val photoView: PhotoView = itemView as PhotoView
@@ -165,7 +178,7 @@ class StylingDemoActivity : BaseActivity() {
                         isScaled = scaleFactor > 1f
                     }
                 })
-                imageLoader.loadImage(itemView, Demo.posters[position], ImageLoader.OPENTYPE_IMAGE_VIEW)
+                imageLoader.loadImage(itemView, posters[position], ImageLoader.OPENTYPE_IMAGE_VIEW)
             }
 
             RecyclingPagerAdapter.VIEW_TYPE_SUBSAMPLING_IMAGE -> {
@@ -200,7 +213,12 @@ class StylingDemoActivity : BaseActivity() {
                     }
 
                 })
-                imageLoader.loadImage(itemView, Demo.posters[position], ImageLoader.OPENTYPE_SUBSAMPLINGSCALEIMAGEVIEW)
+
+                imageLoader.loadImage(itemView, posters[position], ImageLoader.OPENTYPE_SUBSAMPLINGSCALEIMAGEVIEW)
+            }
+
+            RecyclingPagerAdapter.VIEW_TYPE_TEXT->{
+                imageLoader.loadImage(itemView,posters[position], ImageLoader.OPENTYPE_TEXT_VIEW)
             }
         }
         val itemViewStateBean = ItemViewStateBean()

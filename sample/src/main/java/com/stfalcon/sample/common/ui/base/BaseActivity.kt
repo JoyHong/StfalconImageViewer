@@ -2,6 +2,7 @@ package com.stfalcon.sample.common.ui.base
 
 import android.view.View
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
 import com.stfalcon.imageviewer.common.pager.RecyclingPagerAdapter
@@ -37,8 +38,19 @@ abstract class BaseActivity : AppCompatActivity() {
                             imageView.loadImage(poster?.url)
                         }
                     }
-
                 }
+
+                RecyclingPagerAdapter.VIEW_TYPE_TEXT ->{
+                    if (openType == ImageLoader.OPENTYPE_TEXT_VIEW){  //是原图，用SubsamplingScaleImageView加载
+                        val textView = view as TextView
+                        textView.text = poster.description
+                    }else{  //缩略图用普通imageview加载
+                        val imageView = view as ImageView
+                        imageView.loadImage(poster?.url)
+                    }
+                }
+
+
             }
         }
     }

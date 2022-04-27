@@ -39,11 +39,6 @@
             android:layout_height="match_parent"
             tools:ignore="UselessParent">
 
-<!--            <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView-->
-<!--                android:id="@+id/transitionImageView"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="match_parent"-->
-<!--                tools:ignore="ContentDescription"/>-->
 
             <ImageView
                 android:id="@+id/transitionImageView"

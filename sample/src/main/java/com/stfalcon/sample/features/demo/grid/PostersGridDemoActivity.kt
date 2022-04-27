@@ -1,11 +1,14 @@
 package com.stfalcon.sample.features.demo.grid
 
 import android.content.Context
+import android.graphics.Color
 import android.graphics.PointF
 import android.graphics.Rect
 import android.os.Bundle
 import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
 import com.github.chrisbanes.photoview.OnScaleChangedListener
@@ -50,6 +53,8 @@ class PostersGridDemoActivity : AppCompatActivity() {
 
     }
 
+
+    //itemView 加载数据的回调方法
     private fun loadPosterImage(view: View, poster: Poster?, openType : Int) {
         view.apply {
             background = getDrawableCompat(R.drawable.shape_placeholder)
@@ -72,6 +77,16 @@ class PostersGridDemoActivity : AppCompatActivity() {
                         }else{
                             imageView.loadImage(poster?.url)
                         }
+                    }
+                }
+
+                RecyclingPagerAdapter.VIEW_TYPE_TEXT ->{
+                    if (openType == ImageLoader.OPENTYPE_TEXT_VIEW){  //是原图，用SubsamplingScaleImageView加载
+                        val textView = view as TextView
+                        textView.text = poster.description
+                    }else{  //缩略图用普通imageview加载
+                        val imageView = view as ImageView
+                        imageView.loadImage(poster?.url)
                     }
                 }
             }
@@ -100,6 +115,16 @@ class PostersGridDemoActivity : AppCompatActivity() {
                     maxScale = 8F
                 }
             }
+
+            RecyclingPagerAdapter.VIEW_TYPE_TEXT->{
+                itemView = TextView(context).apply {
+                    textSize = 20F
+                    setTextColor(Color.WHITE)
+                    width = ViewGroup.LayoutParams.MATCH_PARENT
+                    height = ViewGroup.LayoutParams.MATCH_PARENT
+                }
+            }
+
         }
         return itemView
     }
@@ -160,6 +185,10 @@ class PostersGridDemoActivity : AppCompatActivity() {
 
                 })
                 imageLoader.loadImage(itemView, Demo.posters[position], ImageLoader.OPENTYPE_SUBSAMPLINGSCALEIMAGEVIEW)
+            }
+
+            RecyclingPagerAdapter.VIEW_TYPE_TEXT->{
+                imageLoader.loadImage(itemView,Demo.posters[position], ImageLoader.OPENTYPE_TEXT_VIEW)
             }
         }
         val itemViewStateBean = ItemViewStateBean()
