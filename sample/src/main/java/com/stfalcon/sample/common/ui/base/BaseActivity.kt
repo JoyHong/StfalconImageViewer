@@ -17,7 +17,7 @@ abstract class BaseActivity : AppCompatActivity() {
     protected fun loadPosterImage(view: View, poster: Poster?,openType: Int) {
         view.apply {
             background = getDrawableCompat(R.drawable.shape_placeholder)
-            when (poster?.imageType) {
+            when (poster?.viewType) {
                 RecyclingPagerAdapter.VIEW_TYPE_IMAGE -> {
                     val imageView = view as ImageView
                     imageView.loadImage(poster?.url)
@@ -29,7 +29,7 @@ abstract class BaseActivity : AppCompatActivity() {
                         subsamplingScaleImageView.loadImage(poster?.url)
                     }else{
                         val imageView = view as ImageView
-                        if (poster.imageType == 1){
+                        if (poster.viewType == 1){
                             val imageBitmap =  getImageFromAssetsFile(view.context, "WechatIMG6.jpg")
                             imageView.setImageBitmap(imageBitmap)
                             imageView.scaleType = ImageView.ScaleType.CENTER_CROP
@@ -49,4 +49,6 @@ abstract class BaseActivity : AppCompatActivity() {
             loadImage(url)
         }
     }
+
+
 }

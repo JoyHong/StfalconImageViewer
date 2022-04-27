@@ -4,11 +4,9 @@ import android.content.Context
 import android.content.res.AssetManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.drawable.Drawable
 import com.davemorrissey.labs.subscaleview.ImageSource
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
-import com.squareup.picasso.Picasso
-import com.squareup.picasso.Target
+
 import java.io.IOException
 import java.io.InputStream
 
@@ -26,21 +24,6 @@ fun SubsamplingScaleImageView.loadImage(url: String?){
         .dimensions(imageFromAssetsFileBig!!.width, imageFromAssetsFileBig.height)
 
     this.setImage(imageSource,imageSourcePreview)
-}
-
-class downLoad(subsamplingScaleImageView: SubsamplingScaleImageView) :Target{
-    var imageView = subsamplingScaleImageView
-    override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
-        imageView.setImage(ImageSource.cachedBitmap(bitmap!!))
-    }
-
-    override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
-
-    }
-
-    override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
-
-    }
 }
 
 fun getImageFromAssetsFile(context: Context,fileName: String?): Bitmap? {

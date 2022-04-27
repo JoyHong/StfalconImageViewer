@@ -3,11 +3,11 @@ apply plugin: 'kotlin-android'
 apply plugin: 'maven-publish'
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 32
 
     defaultConfig {
         minSdkVersion 19
-        targetSdkVersion 29
+        targetSdkVersion 32
         versionCode 1
         versionName "1.0"
     }
@@ -41,7 +41,7 @@ android {
 dependencies {
     api 'androidx.appcompat:appcompat:1.1.0'
     api 'androidx.transition:transition:1.2.0'
-    implementation 'com.github.chrisbanes:PhotoView:2.2.0'
+    api 'com.github.chrisbanes:PhotoView:2.2.0'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     api 'com.davemorrissey.labs:subsampling-scale-image-view-androidx:3.10.0'
 

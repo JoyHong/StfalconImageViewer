@@ -22,12 +22,16 @@ import android.widget.ImageView
 import com.stfalcon.imageviewer.listeners.OnDismissListener
 import com.stfalcon.imageviewer.loader.GetViewType
 import com.stfalcon.imageviewer.listeners.OnImageChangeListener
+import com.stfalcon.imageviewer.loader.BindItemView
+import com.stfalcon.imageviewer.loader.CreateItemView
 import com.stfalcon.imageviewer.loader.ImageLoader
 
 internal class BuilderData<T>(
     val images: List<T>,
     val imageLoader: ImageLoader<T>,
-    var getViewType: GetViewType
+    var getViewType: GetViewType,
+    var createItemView: CreateItemView,
+    var bindItemView: BindItemView<T>
 ) {
     var backgroundColor = Color.BLACK
     var startPosition: Int = 0

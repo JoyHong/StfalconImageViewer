@@ -107,7 +107,7 @@ internal class ImageViewerDialog<T>(
             overlayView = builderData.overlayView
 
             setBackgroundColor(builderData.backgroundColor)
-            setImages(builderData.images, builderData.startPosition, builderData.imageLoader, builderData.getViewType)
+            setImages(builderData.images, builderData.startPosition, builderData.imageLoader, builderData.getViewType,builderData.createItemView,builderData.bindItemView)
 
             onPageChange = { position -> builderData.imageChangeListener?.onImageChange(position) }
             onDismiss = { dialog.dismiss() }

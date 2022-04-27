@@ -22,5 +22,5 @@ package com.stfalcon.imageviewer.loader;
 //N.B.! This class is written in Java for convenient use of lambdas due to languages compatibility issues.
 public interface GetViewType {
 
-    int getViewType(int position);
+    int getItemViewType(int position);
 }

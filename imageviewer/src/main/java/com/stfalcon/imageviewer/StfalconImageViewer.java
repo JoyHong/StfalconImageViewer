@@ -23,6 +23,8 @@ import android.widget.ImageView;
 import androidx.annotation.*;
 import androidx.core.content.ContextCompat;
 import com.stfalcon.imageviewer.listeners.OnDismissListener;
+import com.stfalcon.imageviewer.loader.BindItemView;
+import com.stfalcon.imageviewer.loader.CreateItemView;
 import com.stfalcon.imageviewer.loader.GetViewType;
 import com.stfalcon.imageviewer.listeners.OnImageChangeListener;
 import com.stfalcon.imageviewer.loader.ImageLoader;
@@ -124,14 +126,14 @@ public class StfalconImageViewer<T> {
         private Context context;
         private BuilderData<T> data;
 
-        public Builder(Context context, T[] images, ImageLoader<T> imageLoader, GetViewType getViewType) {
-            this(context, new ArrayList<>(Arrays.asList(images)), imageLoader, getViewType);
+        public Builder(Context context, T[] images, ImageLoader<T> imageLoader, GetViewType getViewType, CreateItemView createItemView, BindItemView<T> bindItemView) {
+            this(context, new ArrayList<>(Arrays.asList(images)), imageLoader, getViewType,createItemView,bindItemView);
         }
 
 
-        public Builder(Context context, List<T> images, ImageLoader<T> imageLoader, GetViewType getViewType) {
+        public Builder(Context context, List<T> images, ImageLoader<T> imageLoader, GetViewType getViewType, CreateItemView createItemView,BindItemView<T> bindItemView) {
             this.context = context;
-            this.data = new BuilderData<>(images, imageLoader, getViewType);
+            this.data = new BuilderData<>(images, imageLoader, getViewType,createItemView,bindItemView);
         }
 
         /**
