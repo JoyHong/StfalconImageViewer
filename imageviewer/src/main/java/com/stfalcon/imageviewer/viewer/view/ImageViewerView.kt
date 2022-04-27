@@ -27,23 +27,10 @@ import android.widget.ImageView
 import android.widget.RelativeLayout
 import androidx.core.view.GestureDetectorCompat
 import com.stfalcon.imageviewer.R
-import com.stfalcon.imageviewer.Util.Logger
-import com.stfalcon.imageviewer.common.extensions.addOnPageChangeListener
-import com.stfalcon.imageviewer.common.extensions.animateAlpha
-import com.stfalcon.imageviewer.common.extensions.applyMargin
-import com.stfalcon.imageviewer.common.extensions.copyBitmapFrom
-import com.stfalcon.imageviewer.common.extensions.isRectVisible
-import com.stfalcon.imageviewer.common.extensions.isVisible
-import com.stfalcon.imageviewer.common.extensions.makeGone
-import com.stfalcon.imageviewer.common.extensions.makeInvisible
-import com.stfalcon.imageviewer.common.extensions.makeVisible
-import com.stfalcon.imageviewer.common.extensions.switchVisibilityWithAnimation
+import com.stfalcon.imageviewer.common.extensions.*
 import com.stfalcon.imageviewer.common.gestures.detector.SimpleOnGestureListener
 import com.stfalcon.imageviewer.common.gestures.direction.SwipeDirection
-import com.stfalcon.imageviewer.common.gestures.direction.SwipeDirection.DOWN
-import com.stfalcon.imageviewer.common.gestures.direction.SwipeDirection.LEFT
-import com.stfalcon.imageviewer.common.gestures.direction.SwipeDirection.RIGHT
-import com.stfalcon.imageviewer.common.gestures.direction.SwipeDirection.UP
+import com.stfalcon.imageviewer.common.gestures.direction.SwipeDirection.*
 import com.stfalcon.imageviewer.common.gestures.direction.SwipeDirectionDetector
 import com.stfalcon.imageviewer.common.gestures.dismiss.SwipeToDismissHandler
 import com.stfalcon.imageviewer.common.pager.MultiTouchViewPager
@@ -51,7 +38,7 @@ import com.stfalcon.imageviewer.common.pager.RecyclingPagerAdapter
 import com.stfalcon.imageviewer.loader.GetViewType
 import com.stfalcon.imageviewer.loader.ImageLoader
 import com.stfalcon.imageviewer.viewer.adapter.ImagesPagerAdapter
-import com.stfalcon.imageviewer.viewer.adapter.ImagesPagerAdapter.Companion.IMAGE_POSITION_TOP
+import kotlin.math.abs
 
 internal class ImageViewerView<T> @JvmOverloads constructor(
     context: Context,
@@ -195,7 +182,7 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
                 //放大情况下正常滑动预览
                 return if (!trackEnable && isScaled) {
                     imagesPager.dispatchTouchEvent(event)
-                }else{
+                } else {
                     handleTouchIfNotScaled(event)
                 }
             }
@@ -257,10 +244,6 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
         transitionImageAnimator = createTransitionImageAnimator(imageView)
         imageLoader?.loadImage(transitionImageView, images[startPosition], ImageLoader.OPENTYPE_IMAGE_VIEW)
 
-    }
-
-    internal fun resetScale() {
-        imagesAdapter?.resetScale(currentPosition)
     }
 
     private fun animateOpen() {
@@ -346,11 +329,11 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
 
             MotionEvent.ACTION_UP,MotionEvent.ACTION_MOVE -> {
                 val distance = event.y - startY
-                if ((distance > 0 && Math.abs(distance) > limitDistance) && topOrBottom == ImagesPagerAdapter.IMAGE_POSITION_TOP) {  //下滑手势
+                if ((distance > 0 && distance > limitDistance) && topOrBottom == ImagesPagerAdapter.IMAGE_POSITION_TOP) {  //下滑手势
                     tarckEnable = true
-                } else if ((distance < 0 && Math.abs(distance) > limitDistance) && topOrBottom == ImagesPagerAdapter.IMAGE_POSITION_BOTTOM) {//上滑手势
+                } else if ((distance < 0 && abs(distance) > limitDistance) && topOrBottom == ImagesPagerAdapter.IMAGE_POSITION_BOTTOM) {//上滑手势
                     tarckEnable = true
-                }else if ((distance > 0 && Math.abs(distance) > limitDistance) && !isScrolled){ //初始状态，往下滑可以退出
+                }else if ((distance > 0 && distance > limitDistance) && !isScrolled){ //初始状态，往下滑可以退出
                     tarckEnable = true
                 }
             }

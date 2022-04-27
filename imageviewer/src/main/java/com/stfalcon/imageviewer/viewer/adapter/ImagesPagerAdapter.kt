@@ -23,14 +23,10 @@ import android.view.View
 import android.view.ViewGroup
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
 import com.github.chrisbanes.photoview.OnScaleChangedListener
-
 import com.github.chrisbanes.photoview.PhotoView
-import com.stfalcon.imageviewer.Util.Logger
-import com.stfalcon.imageviewer.common.extensions.resetScale
 import com.stfalcon.imageviewer.common.pager.RecyclingPagerAdapter
 import com.stfalcon.imageviewer.loader.GetViewType
 import com.stfalcon.imageviewer.loader.ImageLoader
-import java.lang.Exception
 
 internal class ImagesPagerAdapter<T>(
         private val context: Context,
@@ -44,16 +40,16 @@ internal class ImagesPagerAdapter<T>(
     private val holders = mutableListOf<ViewHolder>()
 
     companion object {
-        public const val IMAGE_POSITION_DEFAULT = 0
-        public const val IMAGE_POSITION_TOP = 1
-        public const val IMAGE_POSITION_BOTTOM = 2
+        const val IMAGE_POSITION_DEFAULT = 0
+        const val IMAGE_POSITION_TOP = 1
+        const val IMAGE_POSITION_BOTTOM = 2
     }
 
     fun isScaled(position: Int): Boolean =
             holders.firstOrNull { it.position == position }?.isScaled ?: false
 
     fun isTopOrBottom(position: Int): Int =
-        holders.firstOrNull{it.position == position}?.topOrBottom ?: IMAGE_POSITION_DEFAULT;
+        holders.firstOrNull{it.position == position}?.topOrBottom ?: IMAGE_POSITION_DEFAULT
 
     fun isScrolled(position: Int) =
         holders.firstOrNull{it.position == position}?.isScrolled ?: true;
@@ -95,10 +91,6 @@ internal class ImagesPagerAdapter<T>(
         this.images = images
         notifyDataSetChanged()
     }
-
-    internal fun resetScale(position: Int) =
-            holders.firstOrNull { it.position == position }?.resetScale()
-
 
     internal inner class ViewHolder(itemView: View, viewType: Int)
         : RecyclingPagerAdapter.ViewHolder(itemView) {
@@ -195,23 +187,5 @@ internal class ImagesPagerAdapter<T>(
 
         }
 
-        fun resetScale() {
-            when (viewType) {
-                VIEW_TYPE_IMAGE -> {
-                    val photoView: PhotoView = itemView as PhotoView
-                    photoView.resetScale(animate = true)
-                }
-
-                VIEW_TYPE_SUBSAMPLING_IMAGE -> {
-                    val subsamplingScaleImageView = itemView as SubsamplingScaleImageView
-                    if (scale != 0f && center != null){
-                        subsamplingScaleImageView.setScaleAndCenter(scale,center)
-                    }else{
-                        subsamplingScaleImageView.resetScaleAndCenter()
-                    }
-                    isScaled = false
-                }
-            }
-        }
     }
 }
