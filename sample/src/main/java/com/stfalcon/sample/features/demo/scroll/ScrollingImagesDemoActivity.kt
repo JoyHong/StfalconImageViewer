@@ -46,14 +46,14 @@ class ScrollingImagesDemoActivity : AppCompatActivity() {
         setContentView(R.layout.activity_demo_scrolling_images)
 
         horizontalImageViews.forEachIndexed { index, imageView ->
-            loadImage(imageView, Demo.horizontalImages.getOrNull(index), ImageLoader.OPENTYPE_IMAGE_VIEW)
+            loadImage(imageView, Demo.horizontalImages.getOrNull(index), ImageLoader.OPENTYPE_FROM_IMAGE_VIEW)
             imageView.setOnClickListener {
                 openViewer(index, imageView, Demo.horizontalImages, horizontalImageViews)
             }
         }
 
         verticalImageViews.forEachIndexed { index, imageView ->
-            loadImage(imageView, Demo.verticalImages.getOrNull(index),ImageLoader.OPENTYPE_IMAGE_VIEW)
+            loadImage(imageView, Demo.verticalImages.getOrNull(index),ImageLoader.OPENTYPE_FROM_IMAGE_VIEW)
             imageView.setOnClickListener {
                 openViewer(index, imageView, Demo.verticalImages, verticalImageViews)
             }
@@ -122,7 +122,7 @@ class ScrollingImagesDemoActivity : AppCompatActivity() {
                         isScaled = scaleFactor > 1f
                     }
                 })
-                imageLoader.loadImage(itemView, Demo.verticalImages.getOrNull(position), ImageLoader.OPENTYPE_IMAGE_VIEW)
+                imageLoader.loadImage(itemView, Demo.verticalImages.getOrNull(position), ImageLoader.OPENTYPE_FROM_IMAGE_VIEW)
             }
 
             RecyclingPagerAdapter.VIEW_TYPE_SUBSAMPLING_IMAGE -> {
@@ -157,7 +157,7 @@ class ScrollingImagesDemoActivity : AppCompatActivity() {
                     }
 
                 })
-                imageLoader.loadImage(itemView, Demo.verticalImages.getOrNull(position), ImageLoader.OPENTYPE_SUBSAMPLINGSCALEIMAGEVIEW)
+                imageLoader.loadImage(itemView, Demo.verticalImages.getOrNull(position), ImageLoader.OPENTYPE_FROM_ITEM_VIEW)
             }
         }
         val itemViewStateBean = ItemViewStateBean()

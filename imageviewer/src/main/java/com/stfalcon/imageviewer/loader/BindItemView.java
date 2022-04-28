@@ -12,6 +12,7 @@ public interface BindItemView<T> {
      * @param itemView 需要加载的itemView
      * @param viewType  itemView的类型
      * @param position  itemView的position
+     * @param imageLoader  itemView的加载数据的回调接口
      * @return  ItemViewStateBean  itemVIew 的状态封装对象
      */
     ItemViewStateBean bindItemView(View itemView, int viewType,int position,ImageLoader<T> imageLoader);

@@ -38,7 +38,6 @@ import com.stfalcon.imageviewer.common.extensions.makeGone
 import com.stfalcon.imageviewer.common.extensions.makeInvisible
 import com.stfalcon.imageviewer.common.extensions.makeVisible
 import com.stfalcon.imageviewer.common.extensions.switchVisibilityWithAnimation
-import com.stfalcon.imageviewer.common.extensions.*
 import com.stfalcon.imageviewer.common.gestures.detector.SimpleOnGestureListener
 import com.stfalcon.imageviewer.common.gestures.direction.SwipeDirection
 import com.stfalcon.imageviewer.common.gestures.direction.SwipeDirection.*
@@ -228,7 +227,7 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
         prepareViewsForTransition()
 
         externalTransitionImageView = transitionImageView
-        imageLoader?.loadImage(this.transitionImageView, images[startPosition], ImageLoader.OPENTYPE_IMAGE_VIEW)
+        imageLoader?.loadImage(this.transitionImageView, images[startPosition], ImageLoader.OPENTYPE_FROM_IMAGE_VIEW)
         this.transitionImageView.copyBitmapFrom(transitionImageView)
         transitionImageAnimator = createTransitionImageAnimator(transitionImageView)
         swipeDismissHandler = createSwipeToDismissHandler()
@@ -257,7 +256,7 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
         externalTransitionImageView = imageView
         startPosition = currentPosition
         transitionImageAnimator = createTransitionImageAnimator(imageView)
-        imageLoader?.loadImage(transitionImageView, images[startPosition], ImageLoader.OPENTYPE_IMAGE_VIEW)
+        imageLoader?.loadImage(transitionImageView, images[startPosition], ImageLoader.OPENTYPE_FROM_IMAGE_VIEW)
 
     }
 
@@ -272,7 +271,7 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
     }
 
     private fun animateClose() {
-        prepareViewsForTransition()
+        transitionImageView.makeGone()
         dismissContainer.applyMargin(0, 0, 0, 0)
 
         transitionImageAnimator.animateClose(
@@ -291,7 +290,7 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
 
     private fun prepareViewsForViewer() {
         backgroundView.alpha = 1f
-        transitionImageContainer.makeGone()
+        transitionImageView.makeGone()
         imagesPager.makeVisible()
     }
 

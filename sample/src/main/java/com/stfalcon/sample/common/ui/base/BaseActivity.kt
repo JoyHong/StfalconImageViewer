@@ -25,7 +25,7 @@ abstract class BaseActivity : AppCompatActivity() {
                 }
 
                 RecyclingPagerAdapter.VIEW_TYPE_SUBSAMPLING_IMAGE -> {
-                    if (openType == ImageLoader.OPENTYPE_SUBSAMPLINGSCALEIMAGEVIEW){  //是原图，用SubsamplingScaleImageView加载
+                    if (openType == ImageLoader.OPENTYPE_FROM_ITEM_VIEW){  //是原图，用SubsamplingScaleImageView加载
                         val subsamplingScaleImageView = view as SubsamplingScaleImageView
                         subsamplingScaleImageView.loadImage(poster?.url)
                     }else{
@@ -41,7 +41,7 @@ abstract class BaseActivity : AppCompatActivity() {
                 }
 
                 RecyclingPagerAdapter.VIEW_TYPE_TEXT ->{
-                    if (openType == ImageLoader.OPENTYPE_TEXT_VIEW){  //是原图，用SubsamplingScaleImageView加载
+                    if (openType == ImageLoader.OPENTYPE_FROM_ITEM_VIEW){  //是原图，用SubsamplingScaleImageView加载
                         val textView = view as TextView
                         textView.text = poster.description
                     }else{  //缩略图用普通imageview加载

@@ -24,9 +24,8 @@ import android.widget.ImageView;
  */
 //N.B.! This class is written in Java for convenient use of lambdas due to languages compatibility issues.
 public interface ImageLoader<T> {
-    int OPENTYPE_IMAGE_VIEW = 0;   //用普通imageview加载
-    int OPENTYPE_SUBSAMPLINGSCALEIMAGEVIEW = 1;  //使用subsamplingscaleimageview加载
-    int OPENTYPE_TEXT_VIEW = 2;  //使用TextView加载
+    int OPENTYPE_FROM_IMAGE_VIEW = 0;   //用普通imageview加载
+    int OPENTYPE_FROM_ITEM_VIEW = 1;  //使用itemview加载的控件加载
     /**
      * Fires every time when image object should be displayed in a provided {@link ImageView}
      *

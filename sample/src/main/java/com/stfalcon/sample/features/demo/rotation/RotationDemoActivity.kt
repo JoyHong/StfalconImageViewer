@@ -40,7 +40,7 @@ class RotationDemoActivity : AppCompatActivity() {
         setContentView(R.layout.activity_demo_rotation)
 
         rotationDemoImage.setOnClickListener { openViewer(0) }
-        loadPosterImage(rotationDemoImage, Demo.posters[0],ImageLoader.OPENTYPE_IMAGE_VIEW)
+        loadPosterImage(rotationDemoImage, Demo.posters[0],ImageLoader.OPENTYPE_FROM_IMAGE_VIEW)
     }
 
     override fun onPause() {
@@ -91,7 +91,7 @@ class RotationDemoActivity : AppCompatActivity() {
                 }
 
                 RecyclingPagerAdapter.VIEW_TYPE_SUBSAMPLING_IMAGE -> {
-                    if (openType == ImageLoader.OPENTYPE_SUBSAMPLINGSCALEIMAGEVIEW){  //是原图，用SubsamplingScaleImageView加载
+                    if (openType == ImageLoader.OPENTYPE_FROM_ITEM_VIEW){  //是原图，用SubsamplingScaleImageView加载
                         val subsamplingScaleImageView = view as SubsamplingScaleImageView
                         subsamplingScaleImageView.loadImage(poster?.url)
                     }else{
@@ -156,7 +156,7 @@ class RotationDemoActivity : AppCompatActivity() {
                         isScaled = scaleFactor > 1f
                     }
                 })
-                imageLoader.loadImage(itemView, Demo.posters[position], ImageLoader.OPENTYPE_IMAGE_VIEW)
+                imageLoader.loadImage(itemView, Demo.posters[position], ImageLoader.OPENTYPE_FROM_IMAGE_VIEW)
             }
 
             RecyclingPagerAdapter.VIEW_TYPE_SUBSAMPLING_IMAGE -> {
@@ -191,7 +191,7 @@ class RotationDemoActivity : AppCompatActivity() {
                     }
 
                 })
-                imageLoader.loadImage(itemView, Demo.posters[position], ImageLoader.OPENTYPE_SUBSAMPLINGSCALEIMAGEVIEW)
+                imageLoader.loadImage(itemView, Demo.posters[position], ImageLoader.OPENTYPE_FROM_ITEM_VIEW)
             }
         }
         val itemViewStateBean = ItemViewStateBean()

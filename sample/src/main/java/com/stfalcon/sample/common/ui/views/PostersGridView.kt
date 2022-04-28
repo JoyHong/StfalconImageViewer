@@ -41,7 +41,7 @@ class PostersGridView @JvmOverloads constructor(
         super.onAttachedToWindow()
 
         imageViews.values.forEachIndexed { index, imageView ->
-            imageLoader?.invoke(imageView, Demo.posters.getOrNull(index),ImageLoader.OPENTYPE_IMAGE_VIEW)
+            imageLoader?.invoke(imageView, Demo.posters.getOrNull(index),ImageLoader.OPENTYPE_FROM_IMAGE_VIEW)
             imageView.setOnClickListener { onPosterClick?.invoke(index, imageView) }
         }
     }

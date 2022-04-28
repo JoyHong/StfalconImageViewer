@@ -65,7 +65,7 @@ class PostersGridDemoActivity : AppCompatActivity() {
                 }
 
                 RecyclingPagerAdapter.VIEW_TYPE_SUBSAMPLING_IMAGE -> { //长图的view
-                    if (openType == ImageLoader.OPENTYPE_SUBSAMPLINGSCALEIMAGEVIEW){  //是原图，用SubsamplingScaleImageView加载
+                    if (openType == ImageLoader.OPENTYPE_FROM_ITEM_VIEW){  //是原图，用SubsamplingScaleImageView加载
                         val subsamplingScaleImageView = view as SubsamplingScaleImageView
                         subsamplingScaleImageView.loadImage(poster?.url)
                     }else{  //缩略图用普通imageview加载
@@ -81,7 +81,7 @@ class PostersGridDemoActivity : AppCompatActivity() {
                 }
 
                 RecyclingPagerAdapter.VIEW_TYPE_TEXT ->{
-                    if (openType == ImageLoader.OPENTYPE_TEXT_VIEW){  //是原图，用SubsamplingScaleImageView加载
+                    if (openType == ImageLoader.OPENTYPE_FROM_ITEM_VIEW){  //是原图，用itemView的控件加载
                         val textView = view as TextView
                         textView.text = poster.description
                     }else{  //缩略图用普通imageview加载
@@ -149,7 +149,7 @@ class PostersGridDemoActivity : AppCompatActivity() {
                         isScaled = scaleFactor > 1f
                     }
                 })
-                imageLoader.loadImage(itemView, Demo.posters[position], ImageLoader.OPENTYPE_IMAGE_VIEW)
+                imageLoader.loadImage(itemView, Demo.posters[position], ImageLoader.OPENTYPE_FROM_IMAGE_VIEW)
             }
 
             RecyclingPagerAdapter.VIEW_TYPE_SUBSAMPLING_IMAGE -> {
@@ -184,11 +184,11 @@ class PostersGridDemoActivity : AppCompatActivity() {
                     }
 
                 })
-                imageLoader.loadImage(itemView, Demo.posters[position], ImageLoader.OPENTYPE_SUBSAMPLINGSCALEIMAGEVIEW)
+                imageLoader.loadImage(itemView, Demo.posters[position], ImageLoader.OPENTYPE_FROM_ITEM_VIEW)
             }
 
             RecyclingPagerAdapter.VIEW_TYPE_TEXT->{
-                imageLoader.loadImage(itemView,Demo.posters[position], ImageLoader.OPENTYPE_TEXT_VIEW)
+                imageLoader.loadImage(itemView,Demo.posters[position], ImageLoader.OPENTYPE_FROM_ITEM_VIEW)
             }
         }
         val itemViewStateBean = ItemViewStateBean()
