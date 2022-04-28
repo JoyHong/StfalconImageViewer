@@ -50,7 +50,6 @@ class PostersGridDemoActivity : AppCompatActivity() {
                 viewer.updateTransitionImage(postersGridView.imageViews[it])
             }
             .show()
-
     }
 
 
