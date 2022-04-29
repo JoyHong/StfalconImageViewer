@@ -25,6 +25,7 @@ import android.widget.TextView
 import androidx.transition.AutoTransition
 import androidx.transition.Transition
 import androidx.transition.TransitionManager
+import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
 import com.stfalcon.imageviewer.common.extensions.*
 import com.stfalcon.imageviewer.common.pager.RecyclingPagerAdapter
 import com.stfalcon.imageviewer.viewer.adapter.ImagesPagerAdapter
@@ -128,6 +129,12 @@ internal class TransitionImageAnimator(
                         val textView = internalImage as TextView
                         var size = textView.textSize
                         textView.textSize = it.width*1f / internalImage.width * size / 4f
+                    }
+
+                    if (viewType == RecyclingPagerAdapter.VIEW_TYPE_SUBSAMPLING_IMAGE){
+                        val subsamplingScaleImageView = internalImage as SubsamplingScaleImageView
+                        subsamplingScaleImageView.maxScale = 1f
+                        subsamplingScaleImageView.setMinimumScaleType(SubsamplingScaleImageView.SCALE_TYPE_START)
                     }
 
                 }

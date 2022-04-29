@@ -40,7 +40,7 @@ internal class BuilderData<T>(
     var overlayView: View? = null
     var imageMarginPixels: Int = 0
     var containerPaddingPixels = IntArray(4)
-    var shouldStatusBarHide = true
+    var shouldStatusBarHide = false
     var isZoomingAllowed = true
     var isSwipeToDismissAllowed = true
     var transitionView: ImageView? = null
