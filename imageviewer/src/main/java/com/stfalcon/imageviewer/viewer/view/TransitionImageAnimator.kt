@@ -21,14 +21,17 @@ import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
 import android.widget.FrameLayout
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.transition.AutoTransition
 import androidx.transition.Transition
 import androidx.transition.TransitionManager
 import com.stfalcon.imageviewer.common.extensions.*
+import com.stfalcon.imageviewer.common.pager.RecyclingPagerAdapter
+import com.stfalcon.imageviewer.viewer.adapter.ImagesPagerAdapter
 
 internal class TransitionImageAnimator(
     private val externalImage: ImageView?,
-    private val internalImage: ImageView,
+    private var internalImage: View,
     private val internalImageContainer: FrameLayout
 ) {
 
@@ -40,6 +43,7 @@ internal class TransitionImageAnimator(
     internal var isAnimating = false
 
     private var isClosing = false
+    private var viewType = RecyclingPagerAdapter.VIEW_TYPE_IMAGE
 
     private val transitionDuration: Long
         get() = if (isClosing) TRANSITION_DURATION_CLOSE else TRANSITION_DURATION_OPEN
@@ -119,6 +123,13 @@ internal class TransitionImageAnimator(
                 with(externalImage.localVisibleRect) {
                     internalImage.requestNewSize(it.width, it.height)
                     internalImage.applyMargin(top = -top, start = -left)
+
+                    if (viewType == RecyclingPagerAdapter.VIEW_TYPE_TEXT){
+                        val textView = internalImage as TextView
+                        var size = textView.textSize
+                        textView.textSize = it.width*1f / internalImage.width * size / 4f
+                    }
+
                 }
                 with(externalImage.globalVisibleRect) {
                     internalImageContainer.requestNewSize(width(), height())
@@ -149,4 +160,9 @@ internal class TransitionImageAnimator(
             .setDuration(transitionDuration)
             .setInterpolator(DecelerateInterpolator())
             .addListener(onTransitionEnd = { onTransitionEnd?.invoke() })
+
+    fun updateTransitionView(itemView: View?, viewType: Int?) {
+        this.internalImage = itemView!!
+        this.viewType = viewType!!
+    }
 }

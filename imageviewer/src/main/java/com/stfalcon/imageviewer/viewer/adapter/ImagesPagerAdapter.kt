@@ -17,8 +17,13 @@
 package com.stfalcon.imageviewer.viewer.adapter
 
 import android.content.Context
+import android.graphics.PointF
+import android.graphics.Rect
 import android.view.View
 import android.view.ViewGroup
+import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
+import com.github.chrisbanes.photoview.OnScaleChangedListener
+import com.github.chrisbanes.photoview.PhotoView
 import com.stfalcon.imageviewer.common.pager.RecyclingPagerAdapter
 import com.stfalcon.imageviewer.loader.BindItemView
 import com.stfalcon.imageviewer.loader.CreateItemView
@@ -37,7 +42,7 @@ class ImagesPagerAdapter<T>(
 
     private var images = _images
     private val holders = mutableListOf<ViewHolder>()
-
+    var itemView :View = View(context)
     companion object {
         const val IMAGE_POSITION_DEFAULT = 0
         const val IMAGE_POSITION_TOP = 1
@@ -53,9 +58,13 @@ class ImagesPagerAdapter<T>(
     fun isInitState(position: Int) =
         holders.firstOrNull{it.position == position}?.isInitState ?: true;
 
+    override fun setPrimaryItem(container: ViewGroup, position: Int, `object`: Any) {
+        itemView = container.findViewWithTag(position)
+    }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int, position: Int): ViewHolder {
         var itemView = createItemView.createItemView(context,viewType,isZoomingAllowed)
+        itemView.tag = position
         return ViewHolder(itemView, viewType).also { holders.add(it) }
     }
 
@@ -80,10 +89,54 @@ class ImagesPagerAdapter<T>(
 
         fun bind(position: Int) {
             this.position = position
-            val bindItemViewBean = bindItemView.bindItemView(itemView, viewType, position,imageLoader)
-            isInitState = bindItemViewBean.isInitState
-            isScaled = bindItemViewBean.isScaled
-            topOrBottom = bindItemViewBean.topOrBottom
+            bindItemView.bindItemView(itemView, viewType, position,imageLoader)
+
+            when (viewType) {
+                VIEW_TYPE_IMAGE -> {
+                    val photoView: PhotoView = itemView as PhotoView
+                    photoView.setOnScaleChangeListener(object : OnScaleChangedListener {
+                        override fun onScaleChange(
+                            scaleFactor: Float,
+                            focusX: Float,
+                            focusY: Float
+                        ) {
+                            isScaled = scaleFactor > 1f
+                        }
+                    })
+                }
+
+               VIEW_TYPE_SUBSAMPLING_IMAGE -> {
+                    val subsamplingScaleImageView: SubsamplingScaleImageView = itemView as SubsamplingScaleImageView
+                    isScaled = true
+                    isInitState = true
+                    subsamplingScaleImageView.setOnStateChangedListener(object : SubsamplingScaleImageView.OnStateChangedListener{
+                        override fun onScaleChanged(newScale: Float, origin: Int) {
+
+                        }
+
+                        override fun onCenterChanged(newCenter: PointF?, origin: Int) {
+                            val resouceWidth = subsamplingScaleImageView.sWidth   //源文件宽
+                            val resouceHeight = subsamplingScaleImageView.sHeight   //源文件高
+                            var rect  = Rect()
+                            subsamplingScaleImageView.visibleFileRect(rect)
+                            if (rect.top == 0 && rect.bottom == resouceHeight){
+                                topOrBottom = ImagesPagerAdapter.IMAGE_POSITION_DEFAULT
+                                isScaled = false
+                            }else if (rect.top == 0 && rect.bottom < resouceHeight){
+                                topOrBottom = ImagesPagerAdapter.IMAGE_POSITION_TOP
+                                isScaled = true
+                            }else if (rect.top > 0 && rect.bottom == resouceHeight){
+                                topOrBottom = ImagesPagerAdapter.IMAGE_POSITION_BOTTOM
+                                isScaled = true
+                            }else{
+                                topOrBottom = ImagesPagerAdapter.IMAGE_POSITION_DEFAULT
+                                isScaled = true
+                            }
+                            isInitState = false
+                        }
+                    })
+                }
+            }
         }
 
     }

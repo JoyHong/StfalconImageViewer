@@ -15,7 +15,6 @@ import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
 import com.github.chrisbanes.photoview.OnScaleChangedListener
 import com.github.chrisbanes.photoview.PhotoView
 import com.stfalcon.imageviewer.StfalconImageViewer
-import com.stfalcon.imageviewer.common.bean.ItemViewStateBean
 import com.stfalcon.imageviewer.common.pager.RecyclingPagerAdapter
 import com.stfalcon.imageviewer.loader.ImageLoader
 import com.stfalcon.imageviewer.viewer.adapter.ImagesPagerAdapter
@@ -165,59 +164,13 @@ class StylingDemoActivity : BaseActivity() {
         return itemView
     }
 
-    private fun bindItemView (itemView : View, viewType: Int, position: Int, imageLoader: ImageLoader<Poster>): ItemViewStateBean {
-
-        var isScaled = false
-        var isInitState = true  //初次加载的状态
-        var topOrBottom: Int = ImagesPagerAdapter.IMAGE_POSITION_DEFAULT
+    private fun bindItemView (itemView : View, viewType: Int, position: Int, imageLoader: ImageLoader<Poster>){
         when (viewType) {
             RecyclingPagerAdapter.VIEW_TYPE_IMAGE -> {
-                val photoView: PhotoView = itemView as PhotoView
-                photoView.setOnScaleChangeListener(object : OnScaleChangedListener {
-                    override fun onScaleChange(
-                        scaleFactor: Float,
-                        focusX: Float,
-                        focusY: Float
-                    ) {
-                        isScaled = scaleFactor > 1f
-                    }
-                })
                 imageLoader.loadImage(itemView, posters[position], ImageLoader.OPENTYPE_FROM_IMAGE_VIEW)
             }
 
             RecyclingPagerAdapter.VIEW_TYPE_SUBSAMPLING_IMAGE -> {
-                val subsamplingScaleImageView: SubsamplingScaleImageView = itemView as SubsamplingScaleImageView
-                isScaled = true
-                isInitState = true
-                subsamplingScaleImageView.setOnStateChangedListener(object : SubsamplingScaleImageView.OnStateChangedListener{
-                    override fun onScaleChanged(newScale: Float, origin: Int) {
-
-                    }
-
-                    override fun onCenterChanged(newCenter: PointF?, origin: Int) {
-                        val resouceWidth = subsamplingScaleImageView.sWidth   //源文件宽
-                        val resouceHeight = subsamplingScaleImageView.sHeight   //源文件高
-                        var rect  = Rect()
-                        subsamplingScaleImageView.visibleFileRect(rect)
-                        if (rect.top == 0 && rect.bottom == resouceHeight){
-                            topOrBottom = ImagesPagerAdapter.IMAGE_POSITION_DEFAULT
-                            isScaled = false
-                        }else if (rect.top == 0 && rect.bottom < resouceHeight){
-                            topOrBottom = ImagesPagerAdapter.IMAGE_POSITION_TOP
-                            isScaled = true
-                        }else if (rect.top > 0 && rect.bottom == resouceHeight){
-                            topOrBottom = ImagesPagerAdapter.IMAGE_POSITION_BOTTOM
-                            isScaled = true
-                        }else{
-                            topOrBottom = ImagesPagerAdapter.IMAGE_POSITION_DEFAULT
-                            isScaled = true
-                        }
-
-                        isInitState = false
-                    }
-
-                })
-
                 imageLoader.loadImage(itemView, posters[position], ImageLoader.OPENTYPE_FROM_ITEM_VIEW)
             }
 
@@ -225,10 +178,5 @@ class StylingDemoActivity : BaseActivity() {
                 imageLoader.loadImage(itemView,posters[position], ImageLoader.OPENTYPE_FROM_ITEM_VIEW)
             }
         }
-        val itemViewStateBean = ItemViewStateBean()
-        itemViewStateBean.isInitState = isInitState
-        itemViewStateBean.topOrBottom = topOrBottom
-        itemViewStateBean.isScaled = isScaled
-        return itemViewStateBean
     }
 }

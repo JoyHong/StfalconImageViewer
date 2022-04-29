@@ -25,6 +25,7 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.RelativeLayout
+import android.widget.TextView
 import androidx.core.view.GestureDetectorCompat
 import com.stfalcon.imageviewer.R
 
@@ -191,6 +192,8 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
             RecyclingPagerAdapter.VIEW_TYPE_SUBSAMPLING_IMAGE -> {
                 topOrBottom = imagesAdapter?.isTopOrBottom(currentPosition)!!
                 trackEnable = handleEventAction(event, topOrBottom)
+                System.out.println("topOrBottom=" + topOrBottom)
+                System.out.println("trackEnable=" + trackEnable)
                 //放大情况下正常滑动预览
                 return if (!trackEnable && isScaled) {
                     imagesPager.dispatchTouchEvent(event)
@@ -273,7 +276,9 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
     private fun animateClose() {
         transitionImageView.makeGone()
         dismissContainer.applyMargin(0, 0, 0, 0)
-
+        val currentView = imagesPager.findViewWithTag<View>(currentPosition)
+        var viewType = imagesAdapter?.getViewType(currentPosition)
+        transitionImageAnimator.updateTransitionView(currentView,viewType)
         transitionImageAnimator.animateClose(
             shouldDismissToBottom = shouldDismissToBottom,
             onTransitionStart = { duration ->
@@ -348,6 +353,7 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
                 } else if ((distance < 0 && abs(distance) > limitDistance) && topOrBottom == ImagesPagerAdapter.IMAGE_POSITION_BOTTOM) {//上滑手势
                     tarckEnable = true
                 }else if ((distance > 0 && distance > limitDistance) && isInitState){ //初始状态，往下滑可以退出
+                    System.out.println("这里..........")
                     tarckEnable = true
                 }
             }

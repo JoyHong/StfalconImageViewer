@@ -19,7 +19,7 @@ public abstract class RecyclingPagerAdapter<VH : RecyclingPagerAdapter.ViewHolde
     }
 
     internal abstract fun getItemCount(): Int
-    internal abstract fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH
+    internal abstract fun onCreateViewHolder(parent: ViewGroup, viewType: Int, position: Int): VH
     internal abstract fun onBindViewHolder(holder: VH, position: Int)
     internal abstract fun getViewType(position: Int):Int
 
@@ -44,7 +44,7 @@ public abstract class RecyclingPagerAdapter<VH : RecyclingPagerAdapter.ViewHolde
             cache = RecycleCache(this)
             typeCaches.put(viewType, cache)
         }
-        return cache.getFreeViewHolder(parent, viewType)
+        return cache.getFreeViewHolder(parent, viewType,position)
                 .apply {
                     attach(parent, position)
                     onBindViewHolder(this as VH, position)
@@ -93,7 +93,7 @@ public abstract class RecyclingPagerAdapter<VH : RecyclingPagerAdapter.ViewHolde
 
         internal val caches = mutableListOf<ViewHolder>()
 
-        internal fun getFreeViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        internal fun getFreeViewHolder(parent: ViewGroup, viewType: Int, position: Int): ViewHolder {
             var iterationsCount = 0
             var viewHolder: ViewHolder
 
@@ -105,7 +105,7 @@ public abstract class RecyclingPagerAdapter<VH : RecyclingPagerAdapter.ViewHolde
                 iterationsCount++
             }
 
-            return adapter.onCreateViewHolder(parent, viewType).also { caches.add(it) }
+            return adapter.onCreateViewHolder(parent, viewType,position).also { caches.add(it) }
         }
     }
 
