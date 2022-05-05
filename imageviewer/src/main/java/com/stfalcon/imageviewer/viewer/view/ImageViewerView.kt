@@ -16,7 +16,9 @@
 
 package com.stfalcon.imageviewer.viewer.view
 
+import android.app.Activity
 import android.content.Context
+import android.graphics.Point
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
@@ -156,6 +158,7 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
         directionDetector = createSwipeDirectionDetector()
         gestureDetector = createGestureDetector()
         scaleDetector = createScaleGestureDetector()
+
     }
 
     override fun dispatchTouchEvent(event: MotionEvent): Boolean {
@@ -192,8 +195,6 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
             RecyclingPagerAdapter.VIEW_TYPE_SUBSAMPLING_IMAGE -> {
                 topOrBottom = imagesAdapter?.isTopOrBottom(currentPosition)!!
                 trackEnable = handleEventAction(event, topOrBottom)
-                System.out.println("topOrBottom=" + topOrBottom)
-                System.out.println("trackEnable=" + trackEnable)
                 //放大情况下正常滑动预览
                 return if (!trackEnable && isScaled) {
                     imagesPager.dispatchTouchEvent(event)
@@ -201,8 +202,8 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
                     handleTouchIfNotScaled(event)
                 }
             }
-        }
 
+        }
         return if (isScaled) super.dispatchTouchEvent(event) else handleTouchIfNotScaled(event)
     }
 
@@ -238,6 +239,7 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
 
         if (animate) animateOpen() else prepareViewsForViewer()
     }
+
 
     internal fun close() {
         if (shouldDismissToBottom) {
@@ -276,8 +278,8 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
     private fun animateClose() {
         transitionImageView.makeGone()
         dismissContainer.applyMargin(0, 0, 0, 0)
-        val currentView = imagesPager.findViewWithTag<View>(currentPosition)
-        var viewType = imagesAdapter?.getViewType(currentPosition)
+        val currentView = imagesAdapter?.getPrimaryItem()
+        val viewType = imagesAdapter?.getViewType(currentPosition)
         transitionImageAnimator.updateTransitionView(currentView,viewType)
         transitionImageAnimator.animateClose(
             shouldDismissToBottom = shouldDismissToBottom,
@@ -429,8 +431,17 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
 
     private fun createTransitionImageAnimator(transitionImageView: ImageView?) =
         TransitionImageAnimator(
+            context = context,
             externalImage = transitionImageView,
             internalImage = this.transitionImageView,
+            internalImageContainer = this.transitionImageContainer
+        )
+
+    private fun createTransitionImageAnimator(transitionImageView: ImageView?,internalImage: View?) =
+        TransitionImageAnimator(
+            context = context,
+            externalImage = transitionImageView,
+            internalImage = internalImage,
             internalImageContainer = this.transitionImageContainer
         )
 

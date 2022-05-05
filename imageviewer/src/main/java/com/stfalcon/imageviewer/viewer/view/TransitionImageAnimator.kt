@@ -16,9 +16,13 @@
 
 package com.stfalcon.imageviewer.viewer.view
 
+import android.app.Activity
+import android.content.Context
+import android.graphics.Point
+import android.graphics.Rect
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.DecelerateInterpolator
+import android.view.animation.*
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
@@ -28,11 +32,11 @@ import androidx.transition.TransitionManager
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
 import com.stfalcon.imageviewer.common.extensions.*
 import com.stfalcon.imageviewer.common.pager.RecyclingPagerAdapter
-import com.stfalcon.imageviewer.viewer.adapter.ImagesPagerAdapter
 
 internal class TransitionImageAnimator(
+    private val context: Context,
     private val externalImage: ImageView?,
-    private var internalImage: View,
+    private var internalImage: View?,
     private val internalImageContainer: FrameLayout
 ) {
 
@@ -81,8 +85,8 @@ internal class TransitionImageAnimator(
 
     private fun doOpenTransition(containerPadding: IntArray, onTransitionEnd: () -> Unit) {
         isAnimating = true
-        prepareTransitionLayout()
 
+        prepareTransitionLayout()
         internalRoot.postApply {
             //ain't nothing but a kludge to prevent blinking when transition is starting
             externalImage?.postDelayed(50) { visibility = View.INVISIBLE }
@@ -95,7 +99,7 @@ internal class TransitionImageAnimator(
             })
 
             internalImageContainer.makeViewMatchParent()
-            internalImage.makeViewMatchParent()
+            internalImage?.makeViewMatchParent()
 
             internalRoot.applyMargin(
                 containerPadding[0],
@@ -105,30 +109,35 @@ internal class TransitionImageAnimator(
 
             internalImageContainer.requestLayout()
         }
+
+
     }
+
+
 
     private fun doCloseTransition(onTransitionEnd: () -> Unit) {
         isAnimating = true
         isClosing = true
 
-        TransitionManager.beginDelayedTransition(
-            internalRoot, createTransition { handleCloseTransitionEnd(onTransitionEnd) })
+//        TransitionManager.beginDelayedTransition(
+//            internalRoot, createTransition { handleCloseTransitionEnd(onTransitionEnd) })
+//
+//        prepareTransitionLayout()
+//        internalImageContainer.requestLayout()
 
-        prepareTransitionLayout()
-        internalImageContainer.requestLayout()
+        startCloseAnimation(internalImage,externalImage,onTransitionEnd)
     }
 
     private fun prepareTransitionLayout() {
         externalImage?.let {
             if (externalImage.isRectVisible) {
                 with(externalImage.localVisibleRect) {
-                    internalImage.requestNewSize(it.width, it.height)
-                    internalImage.applyMargin(top = -top, start = -left)
-
+                    internalImage?.requestNewSize(it.width, it.height)
+                    internalImage?.applyMargin(top = -top, start = -left)
                     if (viewType == RecyclingPagerAdapter.VIEW_TYPE_TEXT){
                         val textView = internalImage as TextView
-                        var size = textView.textSize
-                        textView.textSize = it.width*1f / internalImage.width * size / 4f
+                        val size = textView.textSize
+                        textView.textSize = it.width*1f / textView.width * size / 4f
                     }
 
                     if (viewType == RecyclingPagerAdapter.VIEW_TYPE_SUBSAMPLING_IMAGE){
@@ -150,7 +159,7 @@ internal class TransitionImageAnimator(
 
     private fun handleCloseTransitionEnd(onTransitionEnd: () -> Unit) {
         externalImage?.visibility = View.VISIBLE
-        internalImage.post { onTransitionEnd() }
+        internalImage?.post { onTransitionEnd() }
         isAnimating = false
     }
 
@@ -171,5 +180,140 @@ internal class TransitionImageAnimator(
     fun updateTransitionView(itemView: View?, viewType: Int?) {
         this.internalImage = itemView!!
         this.viewType = viewType!!
+    }
+
+    fun startCloseAnimation(itemView : View?, externalImage: ImageView?,onTransitionEnd: (() -> Unit)? = null){
+        //缩放动画
+        val toX = externalImage!!.width * 1f/ itemView!!.width
+        var toY = externalImage!!.height * 1f/ itemView!!.height
+
+        //以自己为中心进行缩放
+        val scaleAnimation = ScaleAnimation(1f,toX,1f,toX,Animation.RELATIVE_TO_SELF,0.5f,Animation.RELATIVE_TO_SELF,0.5f)
+        //平移到外部imageView的中心点
+        val location = IntArray(2)
+        externalImage?.getLocationOnScreen(location)
+
+        val externalCenterX = (location[0] + externalImage.width /2)
+        val externalCenterY = (location[1] + externalImage.height /2)
+
+        val activity = context as Activity
+        val display = activity.windowManager.defaultDisplay
+        val point = Point()
+        with(display) {
+            getSize(point)
+        }
+
+        //获取状态栏高度
+        val resources = context.getResources()
+        val resourceId = resources.getIdentifier("status_bar_height", "dimen", "android")
+        val height = resources.getDimensionPixelSize(resourceId)
+
+        //获取屏幕中心点
+        val centerX = point.x / 2
+        val centerY = (point.y + height)/ 2
+
+        val toXValue = (externalCenterX - centerX) * 1f
+        val toYValue= (externalCenterY - centerY) * 1f
+
+        val translateAnimation = TranslateAnimation(Animation.ABSOLUTE,0f,Animation.ABSOLUTE,toXValue,Animation.ABSOLUTE,0f,Animation.ABSOLUTE,toYValue)
+        val animationSet = AnimationSet(true)
+        animationSet.addAnimation(scaleAnimation)
+        animationSet.addAnimation(translateAnimation)
+        animationSet.setDuration(TRANSITION_DURATION_CLOSE);
+        animationSet.setFillAfter(true);
+        itemView.startAnimation(animationSet)
+
+        animationSet.setAnimationListener(object : Animation.AnimationListener{
+            override fun onAnimationStart(p0: Animation?) {
+
+            }
+
+            override fun onAnimationEnd(p0: Animation?) {
+                //结束以后关闭dialog即可
+                externalImage.makeVisible()
+                onTransitionEnd?.invoke()
+            }
+
+            override fun onAnimationRepeat(p0: Animation?) {
+
+            }
+
+        })
+    }
+
+    private fun startOpenTransition(
+        itemView : View?,
+        externalImage: ImageView?,
+        onTransitionEnd: () -> Unit
+    ) {
+        //缩放动画,从外部ImageView大小到正常大小
+        val activity = context as Activity
+        val display = activity.windowManager.defaultDisplay
+        val point = Point()
+        with(display) {
+            getSize(point)
+        }
+        val fromX = externalImage!!.width * 1f/ point.x
+        System.out.println("externalImage!!.width=" + externalImage!!.width)
+        System.out.println("itemView.width=" + point.x)
+        System.out.println("fromX=" + fromX)
+
+        //以自己为中心进行缩放
+        val scaleAnimation = ScaleAnimation(1f,2f,1f,2f,Animation.RELATIVE_TO_SELF,0.5f,Animation.RELATIVE_TO_SELF,0.5f)
+
+        scaleAnimation.setDuration(1000);
+        scaleAnimation.setFillAfter(true);
+        itemView?.startAnimation(scaleAnimation)
+        System.out.println("itemView=" + itemView?.width)
+        //平移动画,itemView从外部ImageView中心到屏幕中心
+//        val location = IntArray(2)
+//        externalImage?.getLocationOnScreen(location)
+//
+//        val externalCenterX = (location[0] + externalImage.width /2)
+//        val externalCenterY = (location[1] + externalImage.height /2)
+//        val activity = context as Activity
+//        val display = activity.windowManager.defaultDisplay
+//        val point = Point()
+//        with(display) {
+//            getSize(point)
+//        }
+//
+//        //获取状态栏高度
+//        val resources = context.getResources()
+//        val resourceId = resources.getIdentifier("status_bar_height", "dimen", "android")
+//        val height = resources.getDimensionPixelSize(resourceId)
+//
+//        //获取屏幕中心点
+//        val centerX = point.x / 2
+//        val centerY = (point.y + height)/ 2
+//
+//        val fromXValue = (externalCenterX - centerX) * 1f
+//        val fromYValue= (externalCenterY - centerY) * 1f
+//
+//        val translateAnimation = TranslateAnimation(Animation.ABSOLUTE,fromXValue,Animation.ABSOLUTE,0f,Animation.ABSOLUTE,fromYValue,Animation.ABSOLUTE,0f)
+//        val animationSet = AnimationSet(true)
+//        animationSet.addAnimation(scaleAnimation)
+//        animationSet.addAnimation(translateAnimation)
+//        animationSet.setDuration(TRANSITION_DURATION_CLOSE);
+//        animationSet.setFillAfter(true);
+//        itemView.startAnimation(animationSet)
+
+        scaleAnimation.setAnimationListener(object : Animation.AnimationListener{
+            override fun onAnimationStart(p0: Animation?) {
+
+            }
+
+            override fun onAnimationEnd(p0: Animation?) {
+                //结束以后关闭dialog即可
+                System.out.println("开启动画结束")
+//                onTransitionEnd?.invoke()
+            }
+
+            override fun onAnimationRepeat(p0: Animation?) {
+
+            }
+
+        })
+
     }
 }

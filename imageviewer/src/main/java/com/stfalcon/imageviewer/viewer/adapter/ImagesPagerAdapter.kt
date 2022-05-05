@@ -58,13 +58,16 @@ class ImagesPagerAdapter<T>(
     fun isInitState(position: Int) =
         holders.firstOrNull{it.position == position}?.isInitState ?: true;
 
+    fun getPrimaryItem() : View{
+       return itemView
+    }
+
     override fun setPrimaryItem(container: ViewGroup, position: Int, `object`: Any) {
-        itemView = container.findViewWithTag(position)
+        itemView = container
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int, position: Int): ViewHolder {
-        var itemView = createItemView.createItemView(context,viewType,isZoomingAllowed)
-        itemView.tag = position
+        val itemView = createItemView.createItemView(context,viewType,isZoomingAllowed)
         return ViewHolder(itemView, viewType).also { holders.add(it) }
     }
 
@@ -100,7 +103,7 @@ class ImagesPagerAdapter<T>(
                             focusX: Float,
                             focusY: Float
                         ) {
-                            isScaled = scaleFactor > 1f
+                            isScaled = photoView.scale > 1
                         }
                     })
                 }
@@ -117,7 +120,7 @@ class ImagesPagerAdapter<T>(
                         override fun onCenterChanged(newCenter: PointF?, origin: Int) {
                             val resouceWidth = subsamplingScaleImageView.sWidth   //源文件宽
                             val resouceHeight = subsamplingScaleImageView.sHeight   //源文件高
-                            var rect  = Rect()
+                            val rect  = Rect()
                             subsamplingScaleImageView.visibleFileRect(rect)
                             if (rect.top == 0 && rect.bottom == resouceHeight){
                                 topOrBottom = ImagesPagerAdapter.IMAGE_POSITION_DEFAULT
