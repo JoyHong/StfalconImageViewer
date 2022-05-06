@@ -225,7 +225,6 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
                     handleTouchIfNotScaled(event)
                 }
             }
-
         }
         return if (isScaled) super.dispatchTouchEvent(event) else handleTouchIfNotScaled(event)
     }

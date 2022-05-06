@@ -83,7 +83,6 @@ internal class TransitionImageAnimator(
     }
 
     private fun startAnimation(itemView : View?, externalImage: ImageView?,onTransitionEnd: (() -> Unit)? = null, isOpen : Boolean){
-//        externalImage?.makeInvisible()
         //缩放动画
         val toX = externalImage!!.width * 1f/ itemView!!.width
 
@@ -134,7 +133,6 @@ internal class TransitionImageAnimator(
                 if (!isClosing) {
                     isAnimating = false
                 }
-//                externalImage.makeVisible()
                 onTransitionEnd?.invoke()
             }
 

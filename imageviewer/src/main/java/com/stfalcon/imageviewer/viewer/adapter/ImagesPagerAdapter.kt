@@ -102,7 +102,7 @@ class ImagesPagerAdapter<T>(
                             focusX: Float,
                             focusY: Float
                         ) {
-                            isScaled = photoView.scale > 1
+                            isScaled = photoView.scale >= 1.1f
                         }
                     })
                 }
