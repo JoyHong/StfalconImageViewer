@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import androidx.viewpager.widget.PagerAdapter
 import com.stfalcon.imageviewer.common.extensions.forEach
 
-public abstract class RecyclingPagerAdapter<VH : RecyclingPagerAdapter.ViewHolder>
+abstract class RecyclingPagerAdapter<VH : RecyclingPagerAdapter.ViewHolder>
     : PagerAdapter() {
 
     companion object {
@@ -38,7 +38,7 @@ public abstract class RecyclingPagerAdapter<VH : RecyclingPagerAdapter.ViewHolde
 
     @Suppress("UNCHECKED_CAST")
     override fun instantiateItem(parent: ViewGroup, position: Int): Any {
-        var viewType = getViewType(position)
+        val viewType = getViewType(position)
         var cache = typeCaches.get(viewType)
         if (cache == null) {
             cache = RecycleCache(this)
@@ -91,9 +91,9 @@ public abstract class RecyclingPagerAdapter<VH : RecyclingPagerAdapter.ViewHolde
             private val adapter: RecyclingPagerAdapter<*>
     ) {
 
-        internal val caches = mutableListOf<ViewHolder>()
+         val caches = mutableListOf<ViewHolder>()
 
-        internal fun getFreeViewHolder(parent: ViewGroup, viewType: Int, position: Int): ViewHolder {
+         fun getFreeViewHolder(parent: ViewGroup, viewType: Int, position: Int): ViewHolder {
             var iterationsCount = 0
             var viewHolder: ViewHolder
 

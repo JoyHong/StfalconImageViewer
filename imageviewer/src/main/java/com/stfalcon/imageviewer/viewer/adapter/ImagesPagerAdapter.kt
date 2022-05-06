@@ -82,12 +82,11 @@ class ImagesPagerAdapter<T>(
         notifyDataSetChanged()
     }
 
-    inner class ViewHolder(itemView: View, viewType: Int)
+    inner class ViewHolder(itemView: View, private var viewType: Int)
         : RecyclingPagerAdapter.ViewHolder(itemView) {
 
         var isScaled: Boolean = false
         var isInitState: Boolean = true  //初次加载的状态
-        private var viewType: Int = viewType
         var topOrBottom: Int = IMAGE_POSITION_DEFAULT
 
         fun bind(position: Int) {
@@ -118,21 +117,21 @@ class ImagesPagerAdapter<T>(
                         }
 
                         override fun onCenterChanged(newCenter: PointF?, origin: Int) {
-                            val resouceWidth = subsamplingScaleImageView.sWidth   //源文件宽
-                            val resouceHeight = subsamplingScaleImageView.sHeight   //源文件高
+                            val resourceWidth = subsamplingScaleImageView.sWidth   //源文件宽
+                            val resourceHeight = subsamplingScaleImageView.sHeight   //源文件高
                             val rect  = Rect()
                             subsamplingScaleImageView.visibleFileRect(rect)
-                            if (rect.top == 0 && rect.bottom == resouceHeight){
-                                topOrBottom = ImagesPagerAdapter.IMAGE_POSITION_DEFAULT
+                            if (rect.top == 0 && rect.bottom == resourceHeight){
+                                topOrBottom = IMAGE_POSITION_DEFAULT
                                 isScaled = false
-                            }else if (rect.top == 0 && rect.bottom < resouceHeight){
-                                topOrBottom = ImagesPagerAdapter.IMAGE_POSITION_TOP
+                            }else if (rect.top == 0 && rect.bottom < resourceHeight){
+                                topOrBottom = IMAGE_POSITION_TOP
                                 isScaled = true
-                            }else if (rect.top > 0 && rect.bottom == resouceHeight){
-                                topOrBottom = ImagesPagerAdapter.IMAGE_POSITION_BOTTOM
+                            }else if (rect.top > 0 && rect.bottom == resourceHeight){
+                                topOrBottom = IMAGE_POSITION_BOTTOM
                                 isScaled = true
                             }else{
-                                topOrBottom = ImagesPagerAdapter.IMAGE_POSITION_DEFAULT
+                                topOrBottom = IMAGE_POSITION_DEFAULT
                                 isScaled = true
                             }
                             isInitState = false

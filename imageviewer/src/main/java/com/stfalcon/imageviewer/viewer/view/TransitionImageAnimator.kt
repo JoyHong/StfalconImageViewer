@@ -16,22 +16,12 @@
 
 package com.stfalcon.imageviewer.viewer.view
 
-import android.app.Activity
-import android.content.Context
-import android.graphics.Point
-import android.graphics.Rect
+
 import android.view.View
-import android.view.ViewGroup
 import android.view.animation.*
-import android.widget.FrameLayout
 import android.widget.ImageView
-import android.widget.TextView
-import androidx.transition.AutoTransition
-import androidx.transition.Transition
-import androidx.transition.TransitionManager
-import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
 import com.stfalcon.imageviewer.common.extensions.*
-import com.stfalcon.imageviewer.common.pager.RecyclingPagerAdapter
+
 
 internal class TransitionImageAnimator(
     private val externalImage: ImageView?,
@@ -92,7 +82,8 @@ internal class TransitionImageAnimator(
         this.internalImage = itemView!!
     }
 
-    fun startAnimation(itemView : View?, externalImage: ImageView?,onTransitionEnd: (() -> Unit)? = null, isOpen : Boolean){
+    private fun startAnimation(itemView : View?, externalImage: ImageView?,onTransitionEnd: (() -> Unit)? = null, isOpen : Boolean){
+//        externalImage?.makeInvisible()
         //缩放动画
         val toX = externalImage!!.width * 1f/ itemView!!.width
 
@@ -132,7 +123,7 @@ internal class TransitionImageAnimator(
         animationSet.duration = TRANSITION_DURATION_CLOSE;
         animationSet.fillAfter = true;
         itemView.startAnimation(animationSet)
-        externalImage.makeInvisible()
+
         animationSet.setAnimationListener(object : Animation.AnimationListener{
             override fun onAnimationStart(p0: Animation?) {
 
@@ -143,7 +134,7 @@ internal class TransitionImageAnimator(
                 if (!isClosing) {
                     isAnimating = false
                 }
-                externalImage.makeVisible()
+//                externalImage.makeVisible()
                 onTransitionEnd?.invoke()
             }
 
