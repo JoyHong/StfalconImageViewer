@@ -117,8 +117,7 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
     private lateinit var transitionImageAnimator: TransitionImageAnimator
     private var trackEnable = false
     private var isStartInit = true
-    private val DISTANCE_LIMITED = 50
-    private val CLOSE_LIMITED = 200
+
     var viewType = RecyclingPagerAdapter.VIEW_TYPE_IMAGE
     private var startPosition: Int = 0
         set(value) {
@@ -203,17 +202,7 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
         trackEnable = handleEventAction(event, topOrBottom)
 
 
-        if (viewType == RecyclingPagerAdapter.VIEW_TYPE_SUBSAMPLING_IMAGE) {
-            handleDragEvent(event)
-//            handleUpDownEvent(event)
-            scaleDetector.onTouchEvent(event)
-            gestureDetector.onTouchEvent(event)
-        } else {
-            handleDragEvent(event)
-            scaleDetector.onTouchEvent(event)
-            gestureDetector.onTouchEvent(event)
-        }
-
+        handleUpDownEvent(event)
 
         if (swipeDirection == null && (scaleDetector.isInProgress || event.pointerCount > 1 || wasScaled)) {
             wasScaled = true
@@ -223,7 +212,7 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
 
         if (viewType == RecyclingPagerAdapter.VIEW_TYPE_SUBSAMPLING_IMAGE) { //subsamplingView需要单独处理长图滑动状态
             //放大情况下正常滑动预览
-            return if (!trackEnable && isScaled && !isMoving) {
+            return if (!trackEnable && isScaled) {
                 imagesPager.dispatchTouchEvent(event)
             } else {
                 handleTouchIfNotScaled(event)
@@ -453,9 +442,6 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
         onSwipeViewMove = ::handleSwipeViewMove
     )
 
-    private var startDragX: Float = 0f
-    private var startDragY: Float = 0f
-
     private fun createTransitionImageAnimator(
         transitionImageView: ImageView?,
         internalImage: View?
@@ -464,79 +450,5 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
             externalImage = transitionImageView,
             internalImage = internalImage
         )
-
-
-    //处理图片拖拽移动缩小效果
-    var itemView: View? = null
-    var startPositionX: Float = 0f
-    var startPositionY: Float = 0f
-
-    var isMoving = false
-    private fun handleDragEvent(event: MotionEvent) {
-        when (event.action) {
-            MotionEvent.ACTION_DOWN -> {
-                startDragX = event.x
-                startDragY = event.y
-                itemView = imagesAdapter?.getPrimaryItem()
-                startPositionX = startDragX
-                startPositionY = startDragY
-                isMoving = false
-            }
-
-            MotionEvent.ACTION_MOVE -> {
-                //移动过程中根据Y距离进行缩小
-//                val distanceX = event.x - startPositionX
-//                val distanceY = event.y - startPositionY
-
-                val distanceX = event.x - startDragX
-                val distanceY = event.y - startDragY
-                val moveDistanceY = event.y - startPositionY
-                if (viewType == RecyclingPagerAdapter.VIEW_TYPE_SUBSAMPLING_IMAGE) {
-                    if (trackEnable && abs(distanceY) > abs(distanceX) && abs(distanceY) > DISTANCE_LIMITED) {
-                        transitionImageAnimator.startDragAnimation(
-                            distanceX,
-                            distanceY,
-                            itemView,
-                            backgroundView,
-                            overlayView,
-                            context as Activity,
-                            moveDistanceY
-                        )
-                        startDragX = event.x
-                        startDragY = event.y
-                        isMoving = true
-                    }
-                } else {
-                    //普通视图
-                    if (!isScaled && abs(distanceY) > abs(distanceX) && abs(distanceY) > DISTANCE_LIMITED) {
-                        transitionImageAnimator.startDragAnimation(
-                            distanceX,
-                            distanceY,
-                            itemView,
-                            backgroundView,
-                            overlayView,
-                            context as Activity,
-                            moveDistanceY
-                        )
-                        startDragX = event.x
-                        startDragY = event.y
-                        isMoving = true
-                    }
-                }
-            }
-
-            MotionEvent.ACTION_UP -> {
-                val distanceX = event.x - startPositionX
-                val distanceY = event.y - startPositionY
-                val moveDistanceY = event.y - startPositionY
-                if ((isMoving || trackEnable)  && abs(moveDistanceY) > CLOSE_LIMITED ) {
-                    animateClose()
-                }else{
-                    transitionImageAnimator.startResetAnimation(event,itemView,backgroundView,overlayView)
-
-                }
-            }
-        }
-    }
 
 }

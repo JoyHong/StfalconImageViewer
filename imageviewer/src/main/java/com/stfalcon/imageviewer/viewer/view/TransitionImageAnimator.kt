@@ -110,14 +110,12 @@ internal class TransitionImageAnimator(
         itemView.getLocationOnScreen(itemViewLocation)
 
 
-//        val centerX = itemViewLocation[0] + itemView.width / 2 * itemView.scaleX  - itemView.translationX / 2
-//        val centerY = itemViewLocation[1] + itemView.height / 2 * itemView.scaleY - itemView.translationY / 2
+        val centerX = itemViewLocation[0] + itemView.width / 2 * itemView.scaleX  + itemView.translationX / 2
+        val centerY = itemViewLocation[1] + itemView.height / 2 * itemView.scaleY + itemView.translationY / 2
 
-        val centerX = itemViewLocation[0] + itemView.width / 2 * itemView.scaleX
-        val centerY = itemViewLocation[1] + itemView.height / 2 * itemView.scaleX
+//        val centerX = itemViewLocation[0] + itemView.width / 2 * itemView.scaleX
+//        val centerY = itemViewLocation[1] + itemView.height / 2 * itemView.scaleX
 
-        System.out.println("centerX==" + centerX + "itemView.scaleX==" + itemView.scaleX)
-        System.out.println("centerY==" + centerY)
         val toXValue = (externalCenterX - centerX ) * 1f
         val toYValue= (externalCenterY - centerY ) * 1f
 
@@ -151,70 +149,6 @@ internal class TransitionImageAnimator(
 
             }
         })
-    }
-
-    fun startDragAnimation(distanceX: Float, distanceY: Float, itemView: View?, backgroundView: View, overlayView: View?, activity: Activity,moveDistanceY:Float) {
-//        itemView?.translationX = distanceX
-//        itemView?.translationY = distanceY
-
-        itemView?.offsetTopAndBottom(distanceY.toInt())
-        itemView?.offsetLeftAndRight(distanceX.toInt())
-
-        val display: Display = activity.getWindowManager().getDefaultDisplay()
-        val point = Point()
-        display.getSize(point)
-        val screenHeight = point.y
-        val scale = (screenHeight - moveDistanceY) * 1f / screenHeight
-        itemView?.scaleX = scale
-        itemView?.scaleY = scale
-
-        backgroundView.alpha = scale
-        overlayView?.alpha = scale
-
-    }
-
-    fun startResetAnimation(
-        event: MotionEvent,
-        itemView: View?,
-        backgroundView: View,
-        overlayView: View?
-    ) {
-        itemView?.scaleX = 1f
-        itemView?.scaleY = 1f
-        backgroundView.alpha = 1f
-        overlayView?.alpha = 1f
-        //从现有位置重新移动屏幕左上角
-        itemView!!.x = 0f
-        itemView!!.y = 0f
-
-
-        //获取itemView中心点
-//        val itemViewLocation = IntArray(2)
-//        itemView?.getLocationOnScreen(itemViewLocation)
-//        val centerX = itemViewLocation[0] + itemView!!.width / 2 * itemView.scaleX
-//        val centerY = itemViewLocation[1] + itemView.height / 2 * itemView.scaleX
-//        val activity = itemView?.context as Activity
-//        val display: Display = activity.getWindowManager().getDefaultDisplay()
-//        val point = Point()
-//        display.getSize(point)
-//
-//        val toXValue = (point.x / 2 - centerX) * 1f
-//        val toYValue= (point.y / 2 - centerY) * 1f
-//
-//        val translateAnimation = TranslateAnimation(
-//            Animation.ABSOLUTE,
-//            0f,
-//            Animation.ABSOLUTE,
-//            toXValue,
-//            Animation.ABSOLUTE,
-//            0f,
-//            Animation.ABSOLUTE,
-//            toYValue
-//        )
-//        translateAnimation.duration = TRANSITION_DURATION_CLOSE;
-//        translateAnimation.fillAfter = true;
-//        itemView.startAnimation(translateAnimation)
-
     }
 
 }
