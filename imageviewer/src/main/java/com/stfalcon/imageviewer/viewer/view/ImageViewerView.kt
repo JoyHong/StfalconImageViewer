@@ -16,7 +16,7 @@
 
 package com.stfalcon.imageviewer.viewer.view
 
-import android.app.Activity
+
 import android.content.Context
 import android.util.AttributeSet
 import android.view.MotionEvent
@@ -412,7 +412,7 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
             ?: false
 
     private fun calculateTranslationAlpha(translationY: Float, translationLimit: Int): Float =
-        1.0f - 1.0f / translationLimit.toFloat() / 4f * Math.abs(translationY)
+        1.0f - 1.0f / translationLimit.toFloat() / 4f * abs(translationY)
 
     private fun createSwipeDirectionDetector() =
         SwipeDirectionDetector(context) { swipeDirection = it }

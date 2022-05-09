@@ -17,14 +17,9 @@
 package com.stfalcon.imageviewer.viewer.view
 
 
-import android.app.Activity
-import android.graphics.Point
-import android.view.Display
-import android.view.MotionEvent
 import android.view.View
 import android.view.animation.*
 import android.widget.ImageView
-import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
 import com.stfalcon.imageviewer.common.extensions.*
 
 
@@ -128,8 +123,8 @@ internal class TransitionImageAnimator(
         val animationSet = AnimationSet(true)
         animationSet.addAnimation(scaleAnimation)
         animationSet.addAnimation(translateAnimation)
-        animationSet.duration = TRANSITION_DURATION_CLOSE;
-        animationSet.fillAfter = true;
+        animationSet.duration = TRANSITION_DURATION_CLOSE
+        animationSet.fillAfter = true
         itemView.startAnimation(animationSet)
 
         animationSet.setAnimationListener(object : Animation.AnimationListener{

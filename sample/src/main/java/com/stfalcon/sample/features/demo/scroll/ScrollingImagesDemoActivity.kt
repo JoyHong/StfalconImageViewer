@@ -75,16 +75,16 @@ class ScrollingImagesDemoActivity : AppCompatActivity() {
     private fun loadImage(view: View, url: String?, openType : Int) {
         view.apply {
             background = getDrawableCompat(R.drawable.shape_placeholder)
-            var imageView = view as ImageView
+            val imageView = view as ImageView
             imageView.loadImage(url)
         }
     }
 
-    fun getItemViewType(position: Int): Int {
+    private fun getItemViewType(position: Int): Int {
         return  Demo.posters[position].viewType
     }
 
-    fun createItemView (context : Context, viewType: Int, isZoomingAllowed : Boolean): View{
+    private fun createItemView (context : Context, viewType: Int, isZoomingAllowed : Boolean): View{
         var itemView = View(context)
         when (viewType) {
             RecyclingPagerAdapter.VIEW_TYPE_IMAGE -> {
