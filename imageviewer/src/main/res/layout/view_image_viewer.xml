@@ -39,7 +39,6 @@
             android:layout_height="match_parent"
             tools:ignore="UselessParent">
 
-
             <com.stfalcon.imageviewer.common.pager.MultiTouchViewPager
                 android:id="@+id/imagesPager"
                 android:layout_width="match_parent"

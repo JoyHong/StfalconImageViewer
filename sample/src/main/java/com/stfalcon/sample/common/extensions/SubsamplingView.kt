@@ -1,30 +1,64 @@
 package com.stfalcon.sample.common.extensions
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.AssetManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.os.Bundle
+import android.os.Handler
+import android.os.Message
+
 import com.davemorrissey.labs.subscaleview.ImageSource
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
 
 import java.io.IOException
 import java.io.InputStream
 
+
 fun SubsamplingScaleImageView.loadImage(url: String?){
 
 //    Picasso.get().load(url).into(downLoad(this))
 
     this.setMinimumScaleType(SubsamplingScaleImageView.SCALE_TYPE_START)
-    val imageFromAssetsFile = getImageFromAssetsFile(this.context,"WechatIMG6.jpg")
-    val imageSourcePreview= ImageSource.bitmap(imageFromAssetsFile!!)
-        .dimensions(imageFromAssetsFile.width, imageFromAssetsFile.height)
 
-    val imageFromAssetsFileBig = getImageFromAssetsFile(this.context,"WechatIMG6_Big.jpg")
-    val imageSource = ImageSource.asset("WechatIMG6_Big.jpg")
-        .dimensions(imageFromAssetsFileBig!!.width, imageFromAssetsFileBig.height)
+    var myHandler : Handler =  MyHandler(this)
+    Thread {
+        val thumbnail_image = getImageFromAssetsFile(context, "WechatIMG6.jpg")
+        val big_image = getImageFromAssetsFile(context, "WechatIMG6_Big.jpg")
+        val message = Message()
+        val bundle = Bundle()
+        bundle.putParcelable("thumbnail_image", thumbnail_image)
+        bundle.putParcelable("big_image", big_image)
+        message.what = 101
+        message.data = bundle
+        myHandler.sendMessage(message)
+    }.start()
 
-    this.setImage(imageSource,imageSourcePreview)
 }
+
+private class MyHandler(subsamplingScaleImageView: SubsamplingScaleImageView) : Handler() {
+    val subsamplingView = subsamplingScaleImageView
+    override fun handleMessage(msg: Message) {
+        super.handleMessage(msg)
+        when (msg.what) {
+            101 -> {
+                var bundle : Bundle = msg.data
+                val thumbnail_image = bundle.get("thumbnail_image") as Bitmap
+                val imageSourcePreview= ImageSource.bitmap(thumbnail_image)
+                    .dimensions(thumbnail_image!!.width, thumbnail_image.height)
+
+                val big_image =bundle.get("big_image") as Bitmap
+                val imageSource = ImageSource.asset("WechatIMG6_Big.jpg")
+                    .dimensions(big_image!!.width, big_image.height)
+                subsamplingView.setImage(imageSource,imageSourcePreview)
+            }
+        }
+    }
+}
+
+
+
 
 fun getImageFromAssetsFile(context: Context,fileName: String?): Bitmap? {
     var image: Bitmap? = null
@@ -36,6 +70,7 @@ fun getImageFromAssetsFile(context: Context,fileName: String?): Bitmap? {
     } catch (e: IOException) {
         e.printStackTrace()
     }
+
     return image
 }
 
