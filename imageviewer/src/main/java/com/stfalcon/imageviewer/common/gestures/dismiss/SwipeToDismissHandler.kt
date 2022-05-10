@@ -16,6 +16,7 @@
 
 package com.stfalcon.imageviewer.common.gestures.dismiss
 
+
 import android.annotation.SuppressLint
 import android.view.MotionEvent
 import android.view.View
@@ -25,19 +26,20 @@ import com.stfalcon.imageviewer.common.extensions.setAnimatorListener
 
 internal class SwipeToDismissHandler(
     private val swipeView: View,
-    private val onDismiss: () -> Unit,
+    private val onDismiss: (translationX : Float,translationY : Float,scaleTemp : Float) -> Unit,
     private val onSwipeViewMove: (translationY: Float, translationLimit: Int) -> Unit,
     private val shouldAnimateDismiss: () -> Boolean
 ) : View.OnTouchListener {
-
     companion object {
         private const val ANIMATION_DURATION = 200L
     }
-
+    private var translationX = 0f
+    private var translationY = 0f
     private var translationLimit: Int = swipeView.height / 4
     private var isTracking = false
     private var startY: Float = 0f
     private var startX: Float = 0f
+    private var scaleTemp: Float = 0f
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouch(v: View, event: MotionEvent): Boolean {
         when (event.action) {
@@ -52,7 +54,12 @@ internal class SwipeToDismissHandler(
             MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                 if (isTracking) {
                     isTracking = false
+                    val translationX = event.x - startX
+                    val translationY = event.y - startY
+                    this.translationX = translationX
+                    this.translationY = translationY
                     onTrackingEnd(v.height,v.width)
+
                 }
                 return true
             }
@@ -62,10 +69,11 @@ internal class SwipeToDismissHandler(
                     val translationX = event.x - startX
                     swipeView.translationY = translationY
                     swipeView.translationX = translationX
+
                     val scaleTemp = (swipeView.height - translationY) * 1f / swipeView.height
                     swipeView.scaleX = scaleTemp
                     swipeView.scaleY = scaleTemp
-
+                    this.scaleTemp = scaleTemp
                     onSwipeViewMove(translationY, translationLimit)
                 }
                 return true
@@ -104,7 +112,7 @@ internal class SwipeToDismissHandler(
         }
 
         if ((animateToY != 0f || animateToX != 0f)  && !shouldAnimateDismiss()) {
-            onDismiss()
+            onDismiss(translationX,translationY,scaleTemp)
         } else {
             animateTranslation(animateToY,animateToX)
         }
@@ -123,7 +131,7 @@ internal class SwipeToDismissHandler(
             .setUpdateListener { onSwipeViewMove(swipeView.translationY, translationLimit) }
             .setAnimatorListener(onAnimationEnd = {
                 if (translationToY != 0f) {
-                    onDismiss()
+                    onDismiss(translationX,translationY,scaleTemp)
                 }
 
                 //remove the update listener, otherwise it will be saved on the next animation execution:

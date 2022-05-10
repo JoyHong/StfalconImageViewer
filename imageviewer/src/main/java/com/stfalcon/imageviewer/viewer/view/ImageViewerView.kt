@@ -150,10 +150,9 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
                 positionOffsetPixels: Int
             ) {
                 if (isStartInit) {
-                    val currentView = imagesAdapter?.getPrimaryItem()
                     isStartInit = false
                     transitionImageAnimator =
-                        createTransitionImageAnimator(externalTransitionImageView, currentView)
+                        createTransitionImageAnimator(externalTransitionImageView, dismissContainer)
                     animateOpen()
                     imagesPager.makeVisible()
                 }
@@ -277,8 +276,9 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
 
         externalTransitionImageView = imageView
         startPosition = currentPosition
-        val currentItem = imagesAdapter?.getPrimaryItem()
-        transitionImageAnimator = createTransitionImageAnimator(imageView, currentItem)
+        transitionImageAnimator = createTransitionImageAnimator(externalTransitionImageView, dismissContainer)
+        transitionImageAnimator.updateTransitionView(dismissContainer,externalTransitionImageView)
+
     }
 
     private fun animateOpen() {
@@ -290,10 +290,24 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
             onTransitionEnd = { prepareViewsForViewer() })
     }
 
+    private fun animateClose(translationX : Float,translationY : Float,scaleTemp : Float) {
+        dismissContainer.applyMargin(0, 0, 0, 0)
+        externalTransitionImageView!!.makeVisible()
+        transitionImageAnimator.transitionAnimateClose(
+            translationX = translationX,
+            translationY = translationY,
+            scaleTemp = scaleTemp,
+            shouldDismissToBottom = shouldDismissToBottom,
+            onTransitionStart = { duration ->
+                backgroundView.animateAlpha(backgroundView.alpha, 0f, duration)
+                overlayView?.animateAlpha(overlayView?.alpha, 0f, duration)
+            },
+            onTransitionEnd = { onDismiss?.invoke() })
+    }
+
     private fun animateClose() {
         dismissContainer.applyMargin(0, 0, 0, 0)
-        val currentView = imagesAdapter?.getPrimaryItem()
-        transitionImageAnimator.updateTransitionView(currentView)
+        transitionImageAnimator.updateTransitionView(dismissContainer,externalTransitionImageView)
         externalTransitionImageView!!.makeVisible()
         transitionImageAnimator.animateClose(
             shouldDismissToBottom = shouldDismissToBottom,
@@ -438,7 +452,7 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
             : SwipeToDismissHandler = SwipeToDismissHandler(
         swipeView = dismissContainer,
         shouldAnimateDismiss = { shouldDismissToBottom },
-        onDismiss = { animateClose() },
+        onDismiss = { fl: Float, fl1: Float, fl2: Float -> animateClose(fl,fl1,fl2) },
         onSwipeViewMove = ::handleSwipeViewMove
     )
 
