@@ -70,7 +70,11 @@ internal class SwipeToDismissHandler(
                     swipeView.translationY = translationY
                     swipeView.translationX = translationX
 
-                    val scaleTemp = (swipeView.height - translationY) * 1f / swipeView.height
+                    var scaleTemp = (swipeView.height - translationY) * 1f / swipeView.height
+                    if (scaleTemp > 1){
+                        scaleTemp = 1f
+                    }
+
                     swipeView.scaleX = scaleTemp
                     swipeView.scaleY = scaleTemp
                     this.scaleTemp = scaleTemp

@@ -307,7 +307,6 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
 
     private fun animateClose() {
         dismissContainer.applyMargin(0, 0, 0, 0)
-        transitionImageAnimator.updateTransitionView(dismissContainer,externalTransitionImageView)
         externalTransitionImageView!!.makeVisible()
         transitionImageAnimator.animateClose(
             shouldDismissToBottom = shouldDismissToBottom,
