@@ -54,15 +54,15 @@ repositories {
 }
 
 // Avoid Kotlin docs error
-tasks.withType(Javadoc) {
-    enabled = false
-}
-
-// Remove javadoc related tasks
-task javadoc(type: Javadoc) {
-    source = android.sourceSets.main.java.srcDirs
-    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
-}
+//tasks.withType(Javadoc) {
+//    enabled = false
+//}
+//
+//// Remove javadoc related tasks
+//task javadoc(type: Javadoc) {
+//    source = android.sourceSets.main.java.srcDirs
+//    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+//}
 
 
 sourceSets {
