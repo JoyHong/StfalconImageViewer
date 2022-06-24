@@ -2,6 +2,7 @@ package com.stfalcon.sample.features.main
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.WindowInsets
 import androidx.appcompat.app.AppCompatActivity
 import com.stfalcon.sample.R
 import com.stfalcon.sample.features.demo.grid.PostersGridDemoActivity
@@ -29,6 +30,7 @@ class MainActivity : AppCompatActivity(),
             offscreenPageLimit = 3
         }
         mainCardsPagerIndicator.setViewPager(mainCardsViewPager)
+
     }
 
     override fun onCardAction(actionId: Int) {

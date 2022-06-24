@@ -24,7 +24,6 @@ import android.view.ScaleGestureDetector
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
-import android.widget.ImageView
 import android.widget.RelativeLayout
 import androidx.core.view.GestureDetectorCompat
 import androidx.viewpager.widget.ViewPager
@@ -97,7 +96,7 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
     private var dismissContainer: ViewGroup
 
     private val transitionImageContainer: FrameLayout
-    private var externalTransitionImageView: ImageView? = null
+    private var externalTransitionImageView: View? = null
 
     private var imagesPager: MultiTouchViewPager
     private var imagesAdapter: ImagesPagerAdapter<T>? = null
@@ -134,7 +133,7 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
         get() = currentPosition == startPosition
 
     init {
-        View.inflate(context, R.layout.view_image_viewer, this)
+        View.inflate(context, R.layout.image_viewer_mage_viewer, this)
 
         rootContainer = findViewById(R.id.rootContainer)
         backgroundView = findViewById(R.id.backgroundView)
@@ -249,7 +248,7 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
         this.startPosition = startPosition
     }
 
-    internal fun open(transitionImageView: ImageView?, animate: Boolean) {
+    internal fun open(transitionImageView: View?, animate: Boolean) {
         prepareViewsForTransition()
         externalTransitionImageView = transitionImageView
         swipeDismissHandler = createSwipeToDismissHandler()
@@ -270,7 +269,7 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
         imagesAdapter?.updateImages(images)
     }
 
-    internal fun updateTransitionImage(imageView: ImageView?) {
+    internal fun updateTransitionImage(imageView: View?) {
         externalTransitionImageView?.makeVisible()
 //        imageView?.makeInvisible()
 
@@ -456,7 +455,7 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
     )
 
     private fun createTransitionImageAnimator(
-        transitionImageView: ImageView?,
+        transitionImageView: View?,
         internalImage: View?
     ) =
         TransitionImageAnimator(

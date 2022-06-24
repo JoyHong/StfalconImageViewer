@@ -18,6 +18,7 @@ package com.stfalcon.imageviewer.viewer.dialog
 
 import android.content.Context
 import android.view.KeyEvent
+import android.view.View
 import android.widget.ImageView
 import androidx.appcompat.app.AlertDialog
 import com.stfalcon.imageviewer.R
@@ -82,8 +83,8 @@ internal class ImageViewerDialog<T>(
         return viewerView.currentPosition
     }
 
-    fun updateTransitionImage(imageView: ImageView?) {
-        viewerView.updateTransitionImage(imageView)
+    fun updateTransitionImage(view: View?) {
+        viewerView.updateTransitionImage(view)
     }
 
     private fun onDialogKeyEvent(keyCode: Int, event: KeyEvent): Boolean {

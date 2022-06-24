@@ -22,13 +22,12 @@ import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
 import android.view.View
 import android.view.animation.*
-import android.widget.ImageView
 import com.stfalcon.imageviewer.common.extensions.*
 
 
 
 internal class TransitionImageAnimator(
-    private val externalImage: ImageView?,
+    private val externalImage: View?,
     private var internalImage: View?
 ) {
 
@@ -111,7 +110,7 @@ internal class TransitionImageAnimator(
         val p4: PropertyValuesHolder =
             PropertyValuesHolder.ofFloat("scaleY", scaleTemp, scaleNumber)
         val animator: ObjectAnimator =
-            ObjectAnimator.ofPropertyValuesHolder(internalImage, p1, p2, p3, p4);
+            ObjectAnimator.ofPropertyValuesHolder(internalImage, p1, p2, p3, p4)
         animator.duration = TRANSITION_DURATION_CLOSE
         animator.addListener(object : Animator.AnimatorListener {
             override fun onAnimationStart(p0: Animator?) {
@@ -148,7 +147,7 @@ internal class TransitionImageAnimator(
     }
 
 
-    fun updateTransitionView(itemView: View?, externalImage: ImageView?) {
+    fun updateTransitionView(itemView: View?, externalImage: View?) {
         this.internalImage = itemView!!
 
         //缩放动画
@@ -182,7 +181,7 @@ internal class TransitionImageAnimator(
 
     private fun startAnimation(
         itemView: View?,
-        externalImage: ImageView?,
+        externalImage: View?,
         onTransitionEnd: (() -> Unit)? = null,
         isOpen: Boolean
     ) {

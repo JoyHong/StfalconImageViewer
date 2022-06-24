@@ -43,6 +43,6 @@ internal class BuilderData<T>(
     var shouldStatusBarHide = false
     var isZoomingAllowed = true
     var isSwipeToDismissAllowed = true
-    var transitionView: ImageView? = null
+    var transitionView: View? = null
     var useDialogStyle = false
 }

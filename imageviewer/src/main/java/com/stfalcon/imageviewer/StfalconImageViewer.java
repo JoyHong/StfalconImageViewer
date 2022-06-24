@@ -22,6 +22,7 @@ import android.view.View;
 import android.widget.ImageView;
 import androidx.annotation.*;
 import androidx.core.content.ContextCompat;
+
 import com.stfalcon.imageviewer.listeners.OnDismissListener;
 import com.stfalcon.imageviewer.loader.BindItemView;
 import com.stfalcon.imageviewer.loader.CreateItemView;
@@ -39,9 +40,9 @@ import java.util.List;
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class StfalconImageViewer<T> {
 
-    private Context context;
-    private BuilderData<T> builderData;
-    private ImageViewerDialog<T> dialog;
+    private final Context context;
+    private final BuilderData<T> builderData;
+    private final ImageViewerDialog<T> dialog;
 
     protected StfalconImageViewer(@NonNull Context context, @NonNull BuilderData<T> builderData) {
         this.context = context;
@@ -65,7 +66,7 @@ public class StfalconImageViewer<T> {
         if (!builderData.getImages().isEmpty()) {
             dialog.show(animate);
         } else {
-            Log.w(context.getString(R.string.library_name),
+            Log.w(context.getString(R.string.image_viewer_library_name),
                     "Images list cannot be empty! Viewer ignored.");
         }
     }
@@ -95,9 +96,8 @@ public class StfalconImageViewer<T> {
      * Updates an existing images list if a new list is not empty, otherwise closes the viewer
      */
     public void updateImages(List<T> images) {
-        if (!images.isEmpty()) {
-            dialog.updateImages(images);
-        } else {
+        dialog.updateImages(images);
+        if (images.isEmpty()){
             dialog.close();
         }
     }
@@ -114,22 +114,20 @@ public class StfalconImageViewer<T> {
      * Updates transition image view.
      * Useful for a case when image position has changed and you want to update the transition animation target.
      */
-    public void updateTransitionImage(ImageView imageView) {
-        dialog.updateTransitionImage(imageView);
+    public void updateTransitionImage(View view) {
+        dialog.updateTransitionImage(view);
     }
 
     /**
      * Builder class for {@link StfalconImageViewer}
      */
     public static class Builder<T> {
-
-        private Context context;
-        private BuilderData<T> data;
+        private final Context context;
+        private final BuilderData<T> data;
 
         public Builder(Context context, T[] images, ImageLoader<T> imageLoader, GetViewType getViewType, CreateItemView createItemView, BindItemView<T> bindItemView) {
             this(context, new ArrayList<>(Arrays.asList(images)), imageLoader, getViewType,createItemView,bindItemView);
         }
-
 
         public Builder(Context context, List<T> images, ImageLoader<T> imageLoader, GetViewType getViewType, CreateItemView createItemView,BindItemView<T> bindItemView) {
             this.context = context;
@@ -277,8 +275,8 @@ public class StfalconImageViewer<T> {
          *
          * @return This Builder object to allow calls chaining
          */
-        public Builder<T> withTransitionFrom(ImageView imageView) {
-            this.data.setTransitionView(imageView);
+        public Builder<T> withTransitionFrom(View view) {
+            this.data.setTransitionView(view);
             return this;
         }
 

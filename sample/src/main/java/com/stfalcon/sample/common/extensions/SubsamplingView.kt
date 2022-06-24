@@ -33,7 +33,6 @@ fun SubsamplingScaleImageView.loadImage(url: String?){
         message.data = bundle
         myHandler.sendMessage(message)
     }.start()
-
 }
 
 private class MyHandler(subsamplingScaleImageView: SubsamplingScaleImageView) : Handler() {
