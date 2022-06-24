@@ -65,9 +65,6 @@ public class StfalconImageViewer<T> {
     public void show(boolean animate) {
         if (!builderData.getImages().isEmpty()) {
             dialog.show(animate);
-        } else {
-            Log.w(context.getString(R.string.image_viewer_library_name),
-                    "Images list cannot be empty! Viewer ignored.");
         }
     }
 
