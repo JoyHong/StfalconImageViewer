@@ -100,7 +100,6 @@ internal class ImageViewerDialog<T>(
 
     private fun setupViewerView() {
         viewerView.apply {
-            isZoomingAllowed = builderData.isZoomingAllowed
             isSwipeToDismissAllowed = builderData.isSwipeToDismissAllowed
 
             containerPadding = builderData.containerPaddingPixels

@@ -12,5 +12,5 @@ public interface CreateItemView {
      * @param viewType  itemView的类型
      * @return  View  创建的itemVIew
      */
-    View createItemView(Context context, int viewType,boolean isZoomingAllowed);
+    View createItemView(Context context, int viewType);
 }

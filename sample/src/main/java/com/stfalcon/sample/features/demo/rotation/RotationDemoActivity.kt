@@ -106,18 +106,15 @@ class RotationDemoActivity : AppCompatActivity() {
         return  Demo.posters[position].viewType
     }
 
-    fun createItemView (context : Context, viewType: Int, isZoomingAllowed : Boolean): View{
+    fun createItemView (context : Context, viewType: Int): View{
         var itemView = View(context)
         when (viewType) {
             RecyclingPagerAdapter.VIEW_TYPE_IMAGE -> {
-                itemView = PhotoView(context).apply {
-                    isEnabled = isZoomingAllowed
-                }
+                itemView = PhotoView(context)
             }
 
             RecyclingPagerAdapter.VIEW_TYPE_SUBSAMPLING_IMAGE -> {
                 itemView = SubsamplingScaleImageView(context).apply {
-                    isEnabled = isZoomingAllowed
                     setMinimumScaleType(SubsamplingScaleImageView.SCALE_TYPE_START)
                     maxScale = 8F
                 }

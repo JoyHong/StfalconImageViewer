@@ -34,7 +34,6 @@ class ImagesPagerAdapter<T>(
     private val context: Context,
     _images: List<T>,
     private val imageLoader: ImageLoader<T>,
-    private val isZoomingAllowed: Boolean,
     private var getViewType: GetViewType,
     private var createItemView: CreateItemView,
     private var bindItemView: BindItemView<T>
@@ -59,7 +58,7 @@ class ImagesPagerAdapter<T>(
         holders.firstOrNull { it.position == position }?.isInitState ?: true
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val itemView = createItemView.createItemView(context, viewType, isZoomingAllowed)
+        val itemView = createItemView.createItemView(context, viewType)
         return ViewHolder(itemView, viewType).also { holders.add(it) }
     }
 

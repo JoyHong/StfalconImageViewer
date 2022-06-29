@@ -52,7 +52,6 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : RelativeLayout(context, attrs, defStyleAttr) {
 
-    internal var isZoomingAllowed = true
     internal var isSwipeToDismissAllowed = true
 
     internal var currentPosition: Int
@@ -243,7 +242,6 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
                 context,
                 images,
                 imageLoader,
-                isZoomingAllowed,
                 getViewType,
                 createItemView,
                 bindItemView
