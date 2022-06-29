@@ -26,7 +26,6 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.RelativeLayout
 import androidx.core.view.GestureDetectorCompat
-import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
 import androidx.viewpager2.widget.ViewPager2
@@ -57,9 +56,10 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
     internal var currentPosition: Int
         get() = imagesPager.currentItem
         set(value) {
-            if (isStartInit){
-                imagesPager.setCurrentItem(value,false)
-            }else{
+            if (isStartInit || isUpdate) {
+                isUpdate = false
+                imagesPager.setCurrentItem(value, false)
+            } else {
                 imagesPager.currentItem = value
             }
         }
@@ -111,6 +111,7 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
     private var trackEnable = false
     private var isStartInit = true
     internal var isIdle = true
+    private var isUpdate = true
 
     var viewType = RecyclingPagerAdapter.VIEW_TYPE_IMAGE
     private var startPosition: Int = 0
@@ -135,7 +136,8 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
         transitionImageContainer = findViewById(R.id.transitionImageContainer)
         imagesPager = findViewById(R.id.imagesPager)
         val recyclerView = imagesPager.getChildAt(0) as RecyclerView
-        recyclerView.addOnChildAttachStateChangeListener(object : RecyclerView.OnChildAttachStateChangeListener{
+        recyclerView.addOnChildAttachStateChangeListener(object :
+            RecyclerView.OnChildAttachStateChangeListener {
             override fun onChildViewAttachedToWindow(view: View) {
                 onChildAttach?.invoke(view)
 
@@ -155,16 +157,7 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
         })
 
 
-        imagesPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback(){
-            override fun onPageScrolled(
-                position: Int,
-                positionOffset: Float,
-                positionOffsetPixels: Int
-            ) {
-                super.onPageScrolled(position, positionOffset, positionOffsetPixels)
-
-            }
-
+        imagesPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
                 externalTransitionImageView?.apply {
@@ -267,6 +260,7 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
 
     internal fun updateImages(images: List<T>) {
         this.images = images
+        isUpdate = true
         imagesAdapter?.updateImages(images)
     }
 
@@ -274,8 +268,9 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
         externalTransitionImageView?.makeVisible()
         externalTransitionImageView = imageView
         startPosition = currentPosition
-        transitionImageAnimator = createTransitionImageAnimator(externalTransitionImageView, dismissContainer)
-        transitionImageAnimator.updateTransitionView(dismissContainer,externalTransitionImageView)
+        transitionImageAnimator =
+            createTransitionImageAnimator(externalTransitionImageView, dismissContainer)
+        transitionImageAnimator.updateTransitionView(dismissContainer, externalTransitionImageView)
 
     }
 
@@ -288,7 +283,7 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
             onTransitionEnd = { prepareViewsForViewer() })
     }
 
-    private fun animateClose(translationX : Float,translationY : Float,scaleTemp : Float) {
+    private fun animateClose(translationX: Float, translationY: Float, scaleTemp: Float) {
         dismissContainer.applyMargin(0, 0, 0, 0)
         externalTransitionImageView!!.makeVisible()
         transitionImageAnimator.transitionAnimateClose(
@@ -448,7 +443,7 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
             : SwipeToDismissHandler = SwipeToDismissHandler(
         swipeView = dismissContainer,
         shouldAnimateDismiss = { shouldDismissToBottom },
-        onDismiss = { fl: Float, fl1: Float, fl2: Float -> animateClose(fl,fl1,fl2) },
+        onDismiss = { fl: Float, fl1: Float, fl2: Float -> animateClose(fl, fl1, fl2) },
         onSwipeViewMove = ::handleSwipeViewMove
     )
 

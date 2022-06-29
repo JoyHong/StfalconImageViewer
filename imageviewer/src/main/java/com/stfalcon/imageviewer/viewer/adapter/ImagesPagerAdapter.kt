@@ -21,9 +21,11 @@ import android.graphics.PointF
 import android.graphics.Rect
 import android.view.View
 import android.view.ViewGroup
+import android.widget.RelativeLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
 import com.github.chrisbanes.photoview.PhotoView
+import com.stfalcon.imageviewer.R
 import com.stfalcon.imageviewer.common.pager.RecyclingPagerAdapter
 import com.stfalcon.imageviewer.loader.BindItemView
 import com.stfalcon.imageviewer.loader.CreateItemView
@@ -85,15 +87,16 @@ class ImagesPagerAdapter<T>(
 
             when (viewType) {
                 VIEW_TYPE_IMAGE -> {
-                    val photoView: PhotoView = itemView as PhotoView
+                    val viewGroup = itemView as RelativeLayout
+                    val photoView = viewGroup.getChildAt(0) as PhotoView
                     photoView.setOnScaleChangeListener { _, _, _ ->
                         isScaled = photoView.scale >= 1.1f
                     }
                 }
 
                 VIEW_TYPE_SUBSAMPLING_IMAGE -> {
-                    val subsamplingScaleImageView: SubsamplingScaleImageView =
-                        itemView as SubsamplingScaleImageView
+                    val viewGroup = itemView as RelativeLayout
+                    val subsamplingScaleImageView = viewGroup.getChildAt(0) as SubsamplingScaleImageView
                     isScaled = true
                     isInitState = true
                     subsamplingScaleImageView.setOnStateChangedListener(object :

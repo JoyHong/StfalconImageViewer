@@ -5,6 +5,7 @@ import android.graphics.Color
 import android.graphics.PointF
 import android.graphics.Rect
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -76,12 +77,15 @@ class PostersGridDemoActivity : AppCompatActivity() {
             background = getDrawableCompat(R.drawable.shape_placeholder)
             when (poster?.viewType) {
                 RecyclingPagerAdapter.VIEW_TYPE_IMAGE -> { //普通类型的view
-                    val imageView = view as ImageView
+                    val imageView = view.findViewById<PhotoView>(R.id.photo_view)
+
                     imageView.loadImage(poster?.url)
                 }
 
                 RecyclingPagerAdapter.VIEW_TYPE_SUBSAMPLING_IMAGE -> { //长图的view
-                    val subsamplingScaleImageView = view as SubsamplingScaleImageView
+                    val subsamplingScaleImageView =
+                        view.findViewById<SubsamplingScaleImageView>(R.id.subsampling_scale_imageView)
+
                     subsamplingScaleImageView.loadImage(poster?.url)
 
                 }
@@ -111,14 +115,20 @@ class PostersGridDemoActivity : AppCompatActivity() {
         var itemView = View(context)
         when (viewType) {
             RecyclingPagerAdapter.VIEW_TYPE_IMAGE -> {
-                itemView = PhotoView(context)
+                itemView = LayoutInflater.from(context)
+                    .inflate(R.layout.imageview_image, null).apply {
+                    }
+
             }
 
             RecyclingPagerAdapter.VIEW_TYPE_SUBSAMPLING_IMAGE -> {
-                itemView = SubsamplingScaleImageView(context).apply {
-                    setMinimumScaleType(SubsamplingScaleImageView.SCALE_TYPE_START)
-                    maxScale = 8F
+               itemView =  LayoutInflater.from(context).inflate(R.layout.imageview_long_image,null).apply {
+                    val subsamplingScaleImageView =
+                        this.findViewById<SubsamplingScaleImageView>(R.id.subsampling_scale_imageView)
+                    subsamplingScaleImageView.setMinimumScaleType(SubsamplingScaleImageView.SCALE_TYPE_START)
+                    subsamplingScaleImageView.maxScale = 8F
                 }
+
             }
 
             RecyclingPagerAdapter.VIEW_TYPE_TEXT -> {
