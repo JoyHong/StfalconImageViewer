@@ -167,15 +167,15 @@ class StylingDemoActivity : BaseActivity() {
     private fun bindItemView (itemView : View, viewType: Int, position: Int, imageLoader: ImageLoader<Poster>){
         when (viewType) {
             RecyclingPagerAdapter.VIEW_TYPE_IMAGE -> {
-                imageLoader.loadImage(itemView, posters[position], ImageLoader.OPENTYPE_FROM_IMAGE_VIEW)
+                imageLoader.loadImage(itemView, posters[position])
             }
 
             RecyclingPagerAdapter.VIEW_TYPE_SUBSAMPLING_IMAGE -> {
-                imageLoader.loadImage(itemView, posters[position], ImageLoader.OPENTYPE_FROM_ITEM_VIEW)
+                imageLoader.loadImage(itemView, posters[position])
             }
 
             RecyclingPagerAdapter.VIEW_TYPE_TEXT->{
-                imageLoader.loadImage(itemView,posters[position], ImageLoader.OPENTYPE_FROM_ITEM_VIEW)
+                imageLoader.loadImage(itemView,posters[position])
             }
         }
     }

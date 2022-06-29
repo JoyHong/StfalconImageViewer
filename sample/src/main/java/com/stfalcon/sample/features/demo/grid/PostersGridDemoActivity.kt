@@ -16,6 +16,7 @@ import com.github.chrisbanes.photoview.PhotoView
 
 import com.stfalcon.imageviewer.StfalconImageViewer
 import com.stfalcon.imageviewer.common.pager.RecyclingPagerAdapter
+import com.stfalcon.imageviewer.listeners.OnChildAttachStateChangeListener
 import com.stfalcon.imageviewer.loader.ImageLoader
 import com.stfalcon.imageviewer.viewer.adapter.ImagesPagerAdapter
 import com.stfalcon.sample.R
@@ -35,25 +36,42 @@ class PostersGridDemoActivity : AppCompatActivity() {
         setContentView(R.layout.activity_demo_posters_grid)
 
         postersGridView.apply {
-            imageLoader = ::loadPosterImage
+            imageLoader = ::loadPosterImage2
             onPosterClick = ::openViewer
         }
     }
 
     private fun openViewer(startPosition: Int, target: ImageView) {
-        viewer = StfalconImageViewer.Builder<Poster>(this, Demo.posters, ::loadPosterImage,::getItemViewType,::createItemView,::bindItemView)
+
+        viewer = StfalconImageViewer.Builder<Poster>(
+            this,
+            Demo.posters,
+            ::loadPosterImage,
+            ::getItemViewType,
+            ::createItemView,
+            ::bindItemView
+        )
             .withStartPosition(startPosition)
             .withTransitionFrom(target)
             .withUseDialogStyle(true)
             .withImageChangeListener {
                 viewer.updateTransitionImage(postersGridView.imageViews[it])
             }
+            .withChildAttachStateChangeListener(object : OnChildAttachStateChangeListener {
+                override fun onChildViewAttachedToWindow(view: View?) {
+
+                }
+
+                override fun onChildViewDetachedFromWindow(view: View?) {
+
+                }
+            })
             .show()
     }
 
 
     //itemView 加载数据的回调方法
-    private fun loadPosterImage(view: View, poster: Poster?, openType : Int) {
+    private fun loadPosterImage(view: View, poster: Poster?) {
         view.apply {
             background = getDrawableCompat(R.drawable.shape_placeholder)
             when (poster?.viewType) {
@@ -63,41 +81,33 @@ class PostersGridDemoActivity : AppCompatActivity() {
                 }
 
                 RecyclingPagerAdapter.VIEW_TYPE_SUBSAMPLING_IMAGE -> { //长图的view
-                    if (openType == ImageLoader.OPENTYPE_FROM_ITEM_VIEW){  //是原图，用SubsamplingScaleImageView加载
-                        val subsamplingScaleImageView = view as SubsamplingScaleImageView
-                        subsamplingScaleImageView.loadImage(poster?.url)
-                    }else{  //缩略图用普通imageview加载
-                        val imageView = view as ImageView
-                        if (poster.viewType == 1){
-                            val imageBitmap =  getImageFromAssetsFile(view.context, "WechatIMG6.jpg")
-                            imageView.setImageBitmap(imageBitmap)
-                            imageView.scaleType = ImageView.ScaleType.CENTER_CROP
-                        }else{
-                            imageView.loadImage(poster?.url)
-                        }
-                    }
+                    val subsamplingScaleImageView = view as SubsamplingScaleImageView
+                    subsamplingScaleImageView.loadImage(poster?.url)
+
                 }
 
-                RecyclingPagerAdapter.VIEW_TYPE_TEXT ->{
-                    if (openType == ImageLoader.OPENTYPE_FROM_ITEM_VIEW){  //是原图，用itemView的控件加载
-                        val textView = view as TextView
-                        textView.text = poster.description
-                    }else{  //缩略图用普通imageview加载
-                        val imageView = view as ImageView
-                        imageView.loadImage(poster?.url)
-                    }
+                RecyclingPagerAdapter.VIEW_TYPE_TEXT -> {
+                    val textView = view as TextView
+                    textView.text = poster.description
                 }
             }
         }
     }
 
+    private fun loadPosterImage2(view: View, poster: Poster?) {
+        view.apply {
+            val imageView = view as ImageView
+            imageView.loadImage(poster?.url)
+        }
+    }
+
     //获取视图类型的回调方法
     fun getItemViewType(position: Int): Int {
-        return  Demo.posters[position].viewType
+        return Demo.posters[position].viewType
     }
 
     //根据需要加载控件的不同加载不同的itemView
-    private fun createItemView (context : Context, viewType: Int, isZoomingAllowed : Boolean): View{
+    private fun createItemView(context: Context, viewType: Int, isZoomingAllowed: Boolean): View {
         var itemView = View(context)
         when (viewType) {
             RecyclingPagerAdapter.VIEW_TYPE_IMAGE -> {
@@ -114,7 +124,7 @@ class PostersGridDemoActivity : AppCompatActivity() {
                 }
             }
 
-            RecyclingPagerAdapter.VIEW_TYPE_TEXT->{
+            RecyclingPagerAdapter.VIEW_TYPE_TEXT -> {
                 itemView = TextView(context).apply {
                     textSize = 20F
                     setTextColor(Color.WHITE)
@@ -124,26 +134,36 @@ class PostersGridDemoActivity : AppCompatActivity() {
             }
 
         }
+
+        itemView.layoutParams = ViewGroup.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.MATCH_PARENT
+        )
         return itemView
     }
 
 
     //绑定视图的操作,因不同适配加载方式不一样,因此在外部根据不同的视图进行不同的操作
-    private fun bindItemView (itemView : View, viewType: Int, position: Int, imageLoader: ImageLoader<Poster> ){
+    private fun bindItemView(
+        itemView: View,
+        viewType: Int,
+        position: Int,
+        imageLoader: ImageLoader<Poster>
+    ) {
 
         when (viewType) {
             RecyclingPagerAdapter.VIEW_TYPE_IMAGE -> {
 
-                imageLoader.loadImage(itemView, Demo.posters[position], ImageLoader.OPENTYPE_FROM_IMAGE_VIEW)
+                imageLoader.loadImage(itemView, Demo.posters[position])
             }
 
             RecyclingPagerAdapter.VIEW_TYPE_SUBSAMPLING_IMAGE -> {
 
-                imageLoader.loadImage(itemView, Demo.posters[position], ImageLoader.OPENTYPE_FROM_ITEM_VIEW)
+                imageLoader.loadImage(itemView, Demo.posters[position])
             }
 
-            RecyclingPagerAdapter.VIEW_TYPE_TEXT->{
-                imageLoader.loadImage(itemView,Demo.posters[position], ImageLoader.OPENTYPE_FROM_ITEM_VIEW)
+            RecyclingPagerAdapter.VIEW_TYPE_TEXT -> {
+                imageLoader.loadImage(itemView, Demo.posters[position])
             }
         }
     }

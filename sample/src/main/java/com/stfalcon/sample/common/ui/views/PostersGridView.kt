@@ -17,7 +17,7 @@ class PostersGridView @JvmOverloads constructor(
         defStyleAttr: Int = 0
 ) : ConstraintLayout(context, attrs, defStyleAttr) {
 
-    var imageLoader: ((ImageView, Poster?,Int) -> Unit)? = null
+    var imageLoader: ((ImageView, Poster?) -> Unit)? = null
     var onPosterClick: ((Int, ImageView) -> Unit)? = null
 
     val imageViews by lazy {
@@ -41,7 +41,7 @@ class PostersGridView @JvmOverloads constructor(
         super.onAttachedToWindow()
 
         imageViews.values.forEachIndexed { index, imageView ->
-            imageLoader?.invoke(imageView, Demo.posters.getOrNull(index),ImageLoader.OPENTYPE_FROM_IMAGE_VIEW)
+            imageLoader?.invoke(imageView, Demo.posters.getOrNull(index))
             imageView.setOnClickListener { onPosterClick?.invoke(index, imageView) }
         }
     }

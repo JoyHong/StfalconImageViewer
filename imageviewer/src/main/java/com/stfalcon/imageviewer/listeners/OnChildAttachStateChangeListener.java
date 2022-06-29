@@ -14,22 +14,17 @@
  * limitations under the License.
  */
 
-package com.stfalcon.imageviewer.loader;
+package com.stfalcon.imageviewer.listeners;
 
 import android.view.View;
-import android.widget.ImageView;
 
 /**
- * Interface definition for a callback to be invoked when image should be loaded
+ * itemView Attached or Detached ToWindow
  */
 //N.B.! This class is written in Java for convenient use of lambdas due to languages compatibility issues.
-public interface ImageLoader<T> {
-    /**
-     * Fires every time when image object should be displayed in a provided {@link ImageView}
-     *
-     * @param imageView an {@link ImageView} object where the image should be loaded
-     * @param image     image data from which image should be loaded
-     */
-    void loadImage(View imageView, T image);
+public interface OnChildAttachStateChangeListener {
 
+    void onChildViewAttachedToWindow(View view);
+
+    void onChildViewDetachedFromWindow(View view);
 }

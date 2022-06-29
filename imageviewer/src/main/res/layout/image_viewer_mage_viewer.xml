@@ -39,11 +39,17 @@
             android:layout_height="match_parent"
             tools:ignore="UselessParent">
 
-            <com.stfalcon.imageviewer.common.pager.MultiTouchViewPager
+            <androidx.viewpager2.widget.ViewPager2
                 android:id="@+id/imagesPager"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:visibility="gone"/>
+
+<!--            <com.stfalcon.imageviewer.common.pager.MultiTouchViewPager-->
+<!--                android:id="@+id/imagesPager"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="match_parent"-->
+<!--                android:visibility="gone"/>-->
 
         </FrameLayout>
 

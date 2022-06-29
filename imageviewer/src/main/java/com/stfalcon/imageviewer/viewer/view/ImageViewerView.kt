@@ -26,22 +26,17 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.RelativeLayout
 import androidx.core.view.GestureDetectorCompat
+import androidx.core.view.ViewCompat
+import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
+import androidx.viewpager2.widget.ViewPager2
 import com.stfalcon.imageviewer.R
-
-import com.stfalcon.imageviewer.common.extensions.animateAlpha
-import com.stfalcon.imageviewer.common.extensions.applyMargin
-import com.stfalcon.imageviewer.common.extensions.isRectVisible
-import com.stfalcon.imageviewer.common.extensions.isVisible
-import com.stfalcon.imageviewer.common.extensions.makeInvisible
-import com.stfalcon.imageviewer.common.extensions.makeVisible
-import com.stfalcon.imageviewer.common.extensions.switchVisibilityWithAnimation
+import com.stfalcon.imageviewer.common.extensions.*
 import com.stfalcon.imageviewer.common.gestures.detector.SimpleOnGestureListener
 import com.stfalcon.imageviewer.common.gestures.direction.SwipeDirection
 import com.stfalcon.imageviewer.common.gestures.direction.SwipeDirection.*
 import com.stfalcon.imageviewer.common.gestures.direction.SwipeDirectionDetector
 import com.stfalcon.imageviewer.common.gestures.dismiss.SwipeToDismissHandler
-import com.stfalcon.imageviewer.common.pager.MultiTouchViewPager
 import com.stfalcon.imageviewer.common.pager.RecyclingPagerAdapter
 import com.stfalcon.imageviewer.loader.BindItemView
 import com.stfalcon.imageviewer.loader.CreateItemView
@@ -63,12 +58,17 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
     internal var currentPosition: Int
         get() = imagesPager.currentItem
         set(value) {
-            imagesPager.currentItem = value
+            if (isStartInit){
+                imagesPager.setCurrentItem(value,false)
+            }else{
+                imagesPager.currentItem = value
+            }
         }
 
     internal var onDismiss: (() -> Unit)? = null
     internal var onPageChange: ((position: Int) -> Unit)? = null
-
+    internal var onChildAttach: ((view: View) -> Unit)? = null
+    internal var onChildDetached: ((view: View) -> Unit)? = null
     private val isScaled
         get() = imagesAdapter?.isScaled(currentPosition) ?: false
 
@@ -79,11 +79,6 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
 
     internal var containerPadding = intArrayOf(0, 0, 0, 0)
 
-    internal var imagesMargin
-        get() = imagesPager.pageMargin
-        set(value) {
-            imagesPager.pageMargin = value
-        }
 
     internal var overlayView: View? = null
         set(value) {
@@ -98,7 +93,7 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
     private val transitionImageContainer: FrameLayout
     private var externalTransitionImageView: View? = null
 
-    private var imagesPager: MultiTouchViewPager
+    private var imagesPager: ViewPager2
     private var imagesAdapter: ImagesPagerAdapter<T>? = null
 
     private var directionDetector: SwipeDirectionDetector
@@ -116,6 +111,7 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
     private lateinit var transitionImageAnimator: TransitionImageAnimator
     private var trackEnable = false
     private var isStartInit = true
+    internal var isIdle = true
 
     var viewType = RecyclingPagerAdapter.VIEW_TYPE_IMAGE
     private var startPosition: Int = 0
@@ -134,20 +130,16 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
 
     init {
         View.inflate(context, R.layout.image_viewer_mage_viewer, this)
-
         rootContainer = findViewById(R.id.rootContainer)
         backgroundView = findViewById(R.id.backgroundView)
         dismissContainer = findViewById(R.id.dismissContainer)
-
         transitionImageContainer = findViewById(R.id.transitionImageContainer)
-
         imagesPager = findViewById(R.id.imagesPager)
-        imagesPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
-            override fun onPageScrolled(
-                position: Int,
-                positionOffset: Float,
-                positionOffsetPixels: Int
-            ) {
+        val recyclerView = imagesPager.getChildAt(0) as RecyclerView
+        recyclerView.addOnChildAttachStateChangeListener(object : RecyclerView.OnChildAttachStateChangeListener{
+            override fun onChildViewAttachedToWindow(view: View) {
+                onChildAttach?.invoke(view)
+
                 if (isStartInit) {
                     isStartInit = false
                     transitionImageAnimator =
@@ -157,25 +149,39 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
                 }
             }
 
-            override fun onPageSelected(position: Int) {
-                externalTransitionImageView?.apply {
-                    if (isAtStartPosition) makeInvisible() else makeVisible()
-                }
-                onPageChange?.invoke(position)
-
-            }
-
-            override fun onPageScrollStateChanged(state: Int) {
-
+            override fun onChildViewDetachedFromWindow(view: View) {
+                onChildDetached?.invoke(view)
             }
 
         })
 
 
+        imagesPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback(){
+            override fun onPageScrolled(
+                position: Int,
+                positionOffset: Float,
+                positionOffsetPixels: Int
+            ) {
+                super.onPageScrolled(position, positionOffset, positionOffsetPixels)
+
+            }
+
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+                externalTransitionImageView?.apply {
+                    if (isAtStartPosition) makeInvisible() else makeVisible()
+                }
+                onPageChange?.invoke(position)
+            }
+
+            override fun onPageScrollStateChanged(state: Int) {
+                super.onPageScrollStateChanged(state)
+                isIdle = state == ViewPager.SCROLL_STATE_IDLE
+            }
+        })
         directionDetector = createSwipeDirectionDetector()
         gestureDetector = createGestureDetector()
         scaleDetector = createScaleGestureDetector()
-
     }
 
     override fun dispatchTouchEvent(event: MotionEvent): Boolean {
@@ -195,10 +201,9 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
             return true
         }
 
-        viewType = imagesAdapter?.getViewType(currentPosition)!!
+        viewType = imagesAdapter?.getItemViewType(currentPosition)!!
         topOrBottom = imagesAdapter?.isTopOrBottom(currentPosition)!!
         trackEnable = handleEventAction(event, topOrBottom)
-
 
         handleUpDownEvent(event)
 
@@ -206,7 +211,6 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
             wasScaled = true
             return imagesPager.dispatchTouchEvent(event)
         }
-
 
         if (viewType == RecyclingPagerAdapter.VIEW_TYPE_SUBSAMPLING_IMAGE) { //subsamplingView需要单独处理长图滑动状态
             //放大情况下正常滑动预览
@@ -248,13 +252,12 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
         this.startPosition = startPosition
     }
 
-    internal fun open(transitionImageView: View?, animate: Boolean) {
+    internal fun open(transitionImageView: View?) {
         prepareViewsForTransition()
         externalTransitionImageView = transitionImageView
         swipeDismissHandler = createSwipeToDismissHandler()
         rootContainer.setOnTouchListener(swipeDismissHandler)
     }
-
 
     internal fun close() {
         if (shouldDismissToBottom) {
@@ -271,8 +274,6 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
 
     internal fun updateTransitionImage(imageView: View?) {
         externalTransitionImageView?.makeVisible()
-//        imageView?.makeInvisible()
-
         externalTransitionImageView = imageView
         startPosition = currentPosition
         transitionImageAnimator = createTransitionImageAnimator(externalTransitionImageView, dismissContainer)
@@ -330,7 +331,7 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
         directionDetector.handleTouchEvent(event)
         return when (swipeDirection) {
             UP, DOWN -> {
-                if (isSwipeToDismissAllowed && !wasScaled && imagesPager.isIdle) {
+                if (isSwipeToDismissAllowed && !wasScaled && isIdle) {
                     swipeDismissHandler.onTouch(rootContainer, event)
                 } else true
             }
@@ -387,7 +388,6 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
 
         }
         return tarckEnable
-
     }
 
     private fun handleEventActionDown(event: MotionEvent) {
@@ -432,7 +432,7 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
     private fun createGestureDetector() =
         GestureDetectorCompat(context, SimpleOnGestureListener(
             onSingleTap = {
-                if (imagesPager.isIdle) {
+                if (isIdle) {
                     handleSingleTap(it, isOverlayWasClicked)
                 }
                 false

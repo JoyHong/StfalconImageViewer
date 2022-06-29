@@ -39,7 +39,7 @@ class RotationDemoActivity : AppCompatActivity() {
         setContentView(R.layout.activity_demo_rotation)
 
         rotationDemoImage.setOnClickListener { openViewer(0) }
-        loadPosterImage(rotationDemoImage, Demo.posters[0],ImageLoader.OPENTYPE_FROM_IMAGE_VIEW)
+        loadPosterImage(rotationDemoImage, Demo.posters[0])
     }
 
     override fun onPause() {
@@ -80,7 +80,7 @@ class RotationDemoActivity : AppCompatActivity() {
         isDialogShown = true
     }
 
-    private fun loadPosterImage(view: View, poster: Poster?, openType : Int) {
+    private fun loadPosterImage(view: View, poster: Poster?) {
         view.apply {
             background = getDrawableCompat(R.drawable.shape_placeholder)
             when (poster?.viewType) {
@@ -90,19 +90,8 @@ class RotationDemoActivity : AppCompatActivity() {
                 }
 
                 RecyclingPagerAdapter.VIEW_TYPE_SUBSAMPLING_IMAGE -> {
-                    if (openType == ImageLoader.OPENTYPE_FROM_ITEM_VIEW){  //是原图，用SubsamplingScaleImageView加载
                         val subsamplingScaleImageView = view as SubsamplingScaleImageView
                         subsamplingScaleImageView.loadImage(poster?.url)
-                    }else{
-                        val imageView = view as ImageView
-                        if (poster.viewType == 1){
-                            val imageBitmap =  getImageFromAssetsFile(view.context, "WechatIMG6.jpg")
-                            imageView.setImageBitmap(imageBitmap)
-                            imageView.scaleType = ImageView.ScaleType.CENTER_CROP
-                        }else{
-                            imageView.loadImage(poster?.url)
-                        }
-                    }
 
                 }
             }
@@ -140,11 +129,11 @@ class RotationDemoActivity : AppCompatActivity() {
     private fun bindItemView (itemView : View, viewType: Int, position: Int, imageLoader: ImageLoader<Poster> ){
         when (viewType) {
             RecyclingPagerAdapter.VIEW_TYPE_IMAGE -> {
-                imageLoader.loadImage(itemView, Demo.posters[position], ImageLoader.OPENTYPE_FROM_IMAGE_VIEW)
+                imageLoader.loadImage(itemView, Demo.posters[position])
             }
 
             RecyclingPagerAdapter.VIEW_TYPE_SUBSAMPLING_IMAGE -> {
-                imageLoader.loadImage(itemView, Demo.posters[position], ImageLoader.OPENTYPE_FROM_ITEM_VIEW)
+                imageLoader.loadImage(itemView, Demo.posters[position])
             }
         }
     }

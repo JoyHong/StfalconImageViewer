@@ -53,7 +53,7 @@ internal class ImageViewerDialog<T>(
             .setOnKeyListener { _, keyCode, event -> onDialogKeyEvent(keyCode, event) }
             .create()
             .apply {
-                setOnShowListener { viewerView.open(builderData.transitionView, animateOpen) }
+                setOnShowListener { viewerView.open(builderData.transitionView) }
                 setOnDismissListener { builderData.onDismissListener?.onDismiss() }
             }
     }
@@ -104,13 +104,14 @@ internal class ImageViewerDialog<T>(
             isSwipeToDismissAllowed = builderData.isSwipeToDismissAllowed
 
             containerPadding = builderData.containerPaddingPixels
-            imagesMargin = builderData.imageMarginPixels
             overlayView = builderData.overlayView
 
             setBackgroundColor(builderData.backgroundColor)
             setImages(builderData.images, builderData.startPosition, builderData.imageLoader, builderData.getViewType,builderData.createItemView,builderData.bindItemView)
 
             onPageChange = { position -> builderData.imageChangeListener?.onImageChange(position) }
+            onChildAttach = { view -> builderData.onChildAttachStateChangeListener?.onChildViewAttachedToWindow(view) }
+            onChildDetached = { view -> builderData.onChildAttachStateChangeListener?.onChildViewDetachedFromWindow(view) }
             onDismiss = { dialog.dismiss() }
         }
     }

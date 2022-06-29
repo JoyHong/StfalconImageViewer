@@ -21,6 +21,7 @@ import android.graphics.PointF
 import android.graphics.Rect
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
 import com.github.chrisbanes.photoview.PhotoView
 import com.stfalcon.imageviewer.common.pager.RecyclingPagerAdapter
@@ -37,11 +38,10 @@ class ImagesPagerAdapter<T>(
     private var getViewType: GetViewType,
     private var createItemView: CreateItemView,
     private var bindItemView: BindItemView<T>
-) : RecyclingPagerAdapter<ImagesPagerAdapter<T>.ViewHolder>() {
+) : RecyclingPagerAdapter<T,ImagesPagerAdapter<T>.ViewHolder>() {
 
     private var images = _images
     private val holders = mutableListOf<ViewHolder>()
-    var itemView: View = View(context)
 
     companion object {
         const val IMAGE_POSITION_DEFAULT = 0
@@ -58,11 +58,7 @@ class ImagesPagerAdapter<T>(
     fun isInitState(position: Int) =
         holders.firstOrNull { it.position == position }?.isInitState ?: true
 
-    override fun setPrimaryItem(container: ViewGroup, position: Int, `object`: Any) {
-        itemView = container
-    }
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int, position: Int): ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val itemView = createItemView.createItemView(context, viewType, isZoomingAllowed)
         return ViewHolder(itemView, viewType).also { holders.add(it) }
     }
@@ -71,7 +67,7 @@ class ImagesPagerAdapter<T>(
 
     override fun getItemCount() = images.size
 
-    override fun getViewType(position: Int) = getViewType.getItemViewType(position)
+    override fun getItemViewType(position: Int) = getViewType.getItemViewType(position)
 
     internal fun updateImages(images: List<T>) {
         this.images = images
@@ -79,14 +75,13 @@ class ImagesPagerAdapter<T>(
     }
 
     inner class ViewHolder(itemView: View, private var viewType: Int) :
-        RecyclingPagerAdapter.ViewHolder(itemView) {
+        RecyclerView.ViewHolder(itemView) {
 
         var isScaled: Boolean = false
         var isInitState: Boolean = true  //初次加载的状态
         var topOrBottom: Int = IMAGE_POSITION_DEFAULT
 
         fun bind(position: Int) {
-            this.position = position
             bindItemView.bindItemView(itemView, viewType, position, imageLoader)
 
             when (viewType) {

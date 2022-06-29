@@ -46,14 +46,14 @@ class ScrollingImagesDemoActivity : AppCompatActivity() {
         setContentView(R.layout.activity_demo_scrolling_images)
 
         horizontalImageViews.forEachIndexed { index, imageView ->
-            loadImage(imageView, Demo.horizontalImages.getOrNull(index), ImageLoader.OPENTYPE_FROM_IMAGE_VIEW)
+            loadImage(imageView, Demo.horizontalImages.getOrNull(index))
             imageView.setOnClickListener {
                 openViewer(index, imageView, Demo.horizontalImages, horizontalImageViews)
             }
         }
 
         verticalImageViews.forEachIndexed { index, imageView ->
-            loadImage(imageView, Demo.verticalImages.getOrNull(index),ImageLoader.OPENTYPE_FROM_IMAGE_VIEW)
+            loadImage(imageView, Demo.verticalImages.getOrNull(index))
             imageView.setOnClickListener {
                 openViewer(index, imageView, Demo.verticalImages, verticalImageViews)
             }
@@ -72,7 +72,7 @@ class ScrollingImagesDemoActivity : AppCompatActivity() {
             .show()
     }
 
-    private fun loadImage(view: View, url: String?, openType : Int) {
+    private fun loadImage(view: View, url: String?) {
         view.apply {
             background = getDrawableCompat(R.drawable.shape_placeholder)
             val imageView = view as ImageView
@@ -107,11 +107,11 @@ class ScrollingImagesDemoActivity : AppCompatActivity() {
     private fun bindItemView (itemView : View, viewType: Int, position: Int, imageLoader: ImageLoader<String> ) {
         when (viewType) {
             RecyclingPagerAdapter.VIEW_TYPE_IMAGE -> {
-                imageLoader.loadImage(itemView, Demo.verticalImages.getOrNull(position), ImageLoader.OPENTYPE_FROM_IMAGE_VIEW)
+                imageLoader.loadImage(itemView, Demo.verticalImages.getOrNull(position))
             }
 
             RecyclingPagerAdapter.VIEW_TYPE_SUBSAMPLING_IMAGE -> {
-                imageLoader.loadImage(itemView, Demo.verticalImages.getOrNull(position), ImageLoader.OPENTYPE_FROM_ITEM_VIEW)
+                imageLoader.loadImage(itemView, Demo.verticalImages.getOrNull(position))
             }
         }
     }

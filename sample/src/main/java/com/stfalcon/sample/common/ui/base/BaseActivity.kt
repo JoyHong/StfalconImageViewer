@@ -15,7 +15,7 @@ import com.stfalcon.sample.common.models.Poster
 
 abstract class BaseActivity : AppCompatActivity() {
 
-    protected fun loadPosterImage(view: View, poster: Poster?,openType: Int) {
+    protected fun loadPosterImage(view: View, poster: Poster?) {
         view.apply {
             background = getDrawableCompat(R.drawable.shape_placeholder)
             when (poster?.viewType) {
@@ -25,29 +25,15 @@ abstract class BaseActivity : AppCompatActivity() {
                 }
 
                 RecyclingPagerAdapter.VIEW_TYPE_SUBSAMPLING_IMAGE -> {
-                    if (openType == ImageLoader.OPENTYPE_FROM_ITEM_VIEW){  //是原图，用SubsamplingScaleImageView加载
-                        val subsamplingScaleImageView = view as SubsamplingScaleImageView
-                        subsamplingScaleImageView.loadImage(poster.url)
-                    }else{
-                        val imageView = view as ImageView
-                        if (poster.viewType == 1){
-                            val imageBitmap =  getImageFromAssetsFile(view.context, "WechatIMG6.jpg")
-                            imageView.setImageBitmap(imageBitmap)
-                            imageView.scaleType = ImageView.ScaleType.CENTER_CROP
-                        }else{
-                            imageView.loadImage(poster.url)
-                        }
-                    }
+                    val subsamplingScaleImageView = view as SubsamplingScaleImageView
+                    subsamplingScaleImageView.loadImage(poster.url)
+
                 }
 
-                RecyclingPagerAdapter.VIEW_TYPE_TEXT ->{
-                    if (openType == ImageLoader.OPENTYPE_FROM_ITEM_VIEW){  //是原图，用SubsamplingScaleImageView加载
-                        val textView = view as TextView
-                        textView.text = poster.description
-                    }else{  //缩略图用普通imageview加载
-                        val imageView = view as ImageView
-                        imageView.loadImage(poster.url)
-                    }
+                RecyclingPagerAdapter.VIEW_TYPE_TEXT -> {
+                    val textView = view as TextView
+                    textView.text = poster.description
+
                 }
 
 
@@ -55,7 +41,7 @@ abstract class BaseActivity : AppCompatActivity() {
         }
     }
 
-    protected fun loadImage(imageView: ImageView, url: String?,openType: Int) {
+    protected fun loadImage(imageView: ImageView, url: String?, openType: Int) {
         imageView.apply {
             background = getDrawableCompat(R.drawable.shape_placeholder)
             loadImage(url)

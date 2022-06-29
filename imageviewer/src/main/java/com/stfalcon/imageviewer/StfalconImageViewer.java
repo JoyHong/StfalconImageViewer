@@ -23,6 +23,7 @@ import android.widget.ImageView;
 import androidx.annotation.*;
 import androidx.core.content.ContextCompat;
 
+import com.stfalcon.imageviewer.listeners.OnChildAttachStateChangeListener;
 import com.stfalcon.imageviewer.listeners.OnDismissListener;
 import com.stfalcon.imageviewer.loader.BindItemView;
 import com.stfalcon.imageviewer.loader.CreateItemView;
@@ -305,6 +306,16 @@ public class StfalconImageViewer<T> {
          */
         public Builder<T> withDismissListener(OnDismissListener onDismissListener) {
             this.data.setOnDismissListener(onDismissListener);
+            return this;
+        }
+
+        /**
+         * Sets {@link OnChildAttachStateChangeListener} for viewer.
+         *
+         * @return This Builder object to allow calls chaining
+         */
+        public Builder<T> withChildAttachStateChangeListener(OnChildAttachStateChangeListener onChildAttachStateChangeListener) {
+            this.data.setOnChildAttachStateChangeListener(onChildAttachStateChangeListener);
             return this;
         }
 
