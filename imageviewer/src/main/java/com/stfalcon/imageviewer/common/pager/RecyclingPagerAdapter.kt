@@ -19,6 +19,9 @@ abstract class RecyclingPagerAdapter<T, V : RecyclerView.ViewHolder>
         const val VIEW_TYPE_SUBSAMPLING_IMAGE = 2
         const val VIEW_TYPE_MEDIA = 3
         const val VIEW_TYPE_TEXT = 4
+
+        const val SCALE_DIRECTION_HORIZONTAL = 0
+        const val SCALE_DIRECTION_VERTICAL= 1
     }
 
     abstract override fun getItemCount(): Int

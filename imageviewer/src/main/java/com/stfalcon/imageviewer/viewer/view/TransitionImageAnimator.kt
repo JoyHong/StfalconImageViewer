@@ -21,9 +21,12 @@ import android.animation.Animator
 import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
 import android.view.View
+import android.view.ViewGroup
 import android.view.animation.*
+import com.github.chrisbanes.photoview.PhotoView
 import com.stfalcon.imageviewer.common.extensions.*
-
+import com.stfalcon.imageviewer.common.pager.RecyclingPagerAdapter
+import com.stfalcon.imageviewer.viewer.adapter.ImagesPagerAdapter
 
 
 internal class TransitionImageAnimator(
@@ -32,8 +35,7 @@ internal class TransitionImageAnimator(
 ) {
 
     companion object {
-        private const val TRANSITION_DURATION_OPEN = 200L
-        private const val TRANSITION_DURATION_CLOSE = 250L
+        private const val TRANSITION_DURATION = 250L
     }
 
     internal var isAnimating = false
@@ -41,13 +43,15 @@ internal class TransitionImageAnimator(
     private var scaleNumber: Float = 0f
     private var resetToXValue: Float = 0f
     private var resetToYValue: Float = 0f
-
+    var scaleDirection: Int = RecyclingPagerAdapter.SCALE_DIRECTION_HORIZONTAL
+    var viewType = RecyclingPagerAdapter.VIEW_TYPE_IMAGE
+    var scaleSize = 1.0f
     internal fun animateOpen(
         onTransitionStart: (Long) -> Unit,
         onTransitionEnd: () -> Unit
     ) {
         if (externalImage.isRectVisible) {
-            onTransitionStart(TRANSITION_DURATION_OPEN)
+            onTransitionStart(TRANSITION_DURATION)
             doOpenTransition(onTransitionEnd)
         } else {
             onTransitionEnd()
@@ -63,7 +67,7 @@ internal class TransitionImageAnimator(
         onTransitionEnd: () -> Unit
     ) {
         if (externalImage.isRectVisible && !shouldDismissToBottom) {
-            onTransitionStart(TRANSITION_DURATION_CLOSE)
+            onTransitionStart(TRANSITION_DURATION)
             doCloseTransition(translationX, translationY, scaleTemp, onTransitionEnd)
         } else {
             externalImage?.visibility = View.VISIBLE
@@ -74,10 +78,10 @@ internal class TransitionImageAnimator(
     internal fun animateClose(
         shouldDismissToBottom: Boolean,
         onTransitionStart: (Long) -> Unit,
-        onTransitionEnd: () -> Unit
+        onTransitionEnd: () -> Unit,
     ) {
         if (externalImage.isRectVisible && !shouldDismissToBottom) {
-            onTransitionStart(TRANSITION_DURATION_CLOSE)
+            onTransitionStart(TRANSITION_DURATION)
             doCloseTransition(onTransitionEnd)
         } else {
             externalImage?.visibility = View.VISIBLE
@@ -111,7 +115,7 @@ internal class TransitionImageAnimator(
             PropertyValuesHolder.ofFloat("scaleY", scaleTemp, scaleNumber)
         val animator: ObjectAnimator =
             ObjectAnimator.ofPropertyValuesHolder(internalImage, p1, p2, p3, p4)
-        animator.duration = TRANSITION_DURATION_CLOSE
+        animator.duration = TRANSITION_DURATION
         animator.addListener(object : Animator.AnimatorListener {
             override fun onAnimationStart(p0: Animator?) {
 
@@ -122,8 +126,6 @@ internal class TransitionImageAnimator(
                     isAnimating = false
                 }
                 onTransitionEnd.invoke()
-
-
             }
 
             override fun onAnimationCancel(p0: Animator?) {
@@ -135,7 +137,6 @@ internal class TransitionImageAnimator(
             }
         })
         animator.start()
-
     }
 
 
@@ -147,11 +148,14 @@ internal class TransitionImageAnimator(
     }
 
 
-    fun updateTransitionView(itemView: View?, externalImage: View?) {
+    fun updateTransitionView(itemView: View?, externalImage: View?, scaleDirection: Int) {
         this.internalImage = itemView!!
-
+        this.scaleDirection = scaleDirection
         //缩放动画
-        val toX = externalImage!!.width * 1f / itemView.width / itemView.scaleX
+        var toX = externalImage!!.width * 1f / itemView.width / itemView.scaleX
+        if (scaleDirection == RecyclingPagerAdapter.SCALE_DIRECTION_VERTICAL) {
+            toX = externalImage.height * 1f / itemView.height / itemView.scaleY
+        }
         //保存缩放比例,拖动缩小后恢复到原图大小需用到比例
         scaleNumber = toX
 
@@ -173,7 +177,6 @@ internal class TransitionImageAnimator(
         val toXValue = (externalCenterX - centerX) * 1f
         val toYValue = (externalCenterY - centerY) * 1f
 
-
         resetToXValue = toXValue
         resetToYValue = toYValue
 
@@ -185,13 +188,18 @@ internal class TransitionImageAnimator(
         onTransitionEnd: (() -> Unit)? = null,
         isOpen: Boolean
     ) {
-
         //缩放动画
-        val toX = externalImage!!.width * 1f / itemView!!.width / itemView.scaleX
+        var toX: Float
+        toX = externalImage!!.width * 1f / itemView!!.width / itemView.scaleX
+        if (scaleDirection == RecyclingPagerAdapter.SCALE_DIRECTION_VERTICAL) {
+            toX = externalImage.height * 1f / itemView.height / itemView.scaleY
+        }
 
-        //保存缩放比例,拖动缩小后恢复到原图大小需用到比例
+        if (viewType == RecyclingPagerAdapter.VIEW_TYPE_IMAGE && scaleDirection == RecyclingPagerAdapter.SCALE_DIRECTION_HORIZONTAL){
+            toX /= scaleSize
+        }
         scaleNumber = toX
-
+        println()
         //以自己为中心进行缩放
         val scaleAnimation: ScaleAnimation = if (isOpen) {
             ScaleAnimation(
@@ -265,7 +273,7 @@ internal class TransitionImageAnimator(
         val animationSet = AnimationSet(true)
         animationSet.addAnimation(scaleAnimation)
         animationSet.addAnimation(translateAnimation)
-        animationSet.duration = TRANSITION_DURATION_CLOSE
+        animationSet.duration = TRANSITION_DURATION
         animationSet.fillAfter = true
         itemView.startAnimation(animationSet)
 

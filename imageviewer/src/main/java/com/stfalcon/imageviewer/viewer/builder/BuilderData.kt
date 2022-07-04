@@ -19,6 +19,7 @@ package com.stfalcon.imageviewer.viewer.builder
 import android.graphics.Color
 import android.view.View
 import android.widget.ImageView
+import com.stfalcon.imageviewer.common.pager.RecyclingPagerAdapter
 import com.stfalcon.imageviewer.listeners.OnChildAttachStateChangeListener
 import com.stfalcon.imageviewer.listeners.OnDismissListener
 import com.stfalcon.imageviewer.loader.GetViewType
@@ -26,6 +27,7 @@ import com.stfalcon.imageviewer.listeners.OnImageChangeListener
 import com.stfalcon.imageviewer.loader.BindItemView
 import com.stfalcon.imageviewer.loader.CreateItemView
 import com.stfalcon.imageviewer.loader.ImageLoader
+import com.stfalcon.imageviewer.viewer.adapter.ImagesPagerAdapter
 
 internal class BuilderData<T>(
     val images: List<T>,
@@ -47,4 +49,6 @@ internal class BuilderData<T>(
     var isSwipeToDismissAllowed = true
     var transitionView: View? = null
     var useDialogStyle = false
+    var scaleDirection = RecyclingPagerAdapter.SCALE_DIRECTION_HORIZONTAL
+
 }

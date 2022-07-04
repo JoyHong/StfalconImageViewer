@@ -83,8 +83,8 @@ internal class ImageViewerDialog<T>(
         return viewerView.currentPosition
     }
 
-    fun updateTransitionImage(view: View?) {
-        viewerView.updateTransitionImage(view)
+    fun updateTransitionImage(view: View?, scaleDirection: Int) {
+        viewerView.updateTransitionImage(view, scaleDirection)
     }
 
     private fun onDialogKeyEvent(keyCode: Int, event: KeyEvent): Boolean {
@@ -112,6 +112,7 @@ internal class ImageViewerDialog<T>(
             onChildAttach = { view -> builderData.onChildAttachStateChangeListener?.onChildViewAttachedToWindow(view) }
             onChildDetached = { view -> builderData.onChildAttachStateChangeListener?.onChildViewDetachedFromWindow(view) }
             onDismiss = { dialog.dismiss() }
+            scaleDirection = builderData.scaleDirection
         }
     }
 }

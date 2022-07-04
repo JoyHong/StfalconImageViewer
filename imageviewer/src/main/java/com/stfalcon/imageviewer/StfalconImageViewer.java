@@ -23,6 +23,7 @@ import android.widget.ImageView;
 import androidx.annotation.*;
 import androidx.core.content.ContextCompat;
 
+import com.stfalcon.imageviewer.common.pager.RecyclingPagerAdapter;
 import com.stfalcon.imageviewer.listeners.OnChildAttachStateChangeListener;
 import com.stfalcon.imageviewer.listeners.OnDismissListener;
 import com.stfalcon.imageviewer.loader.BindItemView;
@@ -30,6 +31,7 @@ import com.stfalcon.imageviewer.loader.CreateItemView;
 import com.stfalcon.imageviewer.loader.GetViewType;
 import com.stfalcon.imageviewer.listeners.OnImageChangeListener;
 import com.stfalcon.imageviewer.loader.ImageLoader;
+import com.stfalcon.imageviewer.viewer.adapter.ImagesPagerAdapter;
 import com.stfalcon.imageviewer.viewer.builder.BuilderData;
 import com.stfalcon.imageviewer.viewer.dialog.ImageViewerDialog;
 
@@ -113,7 +115,11 @@ public class StfalconImageViewer<T> {
      * Useful for a case when image position has changed and you want to update the transition animation target.
      */
     public void updateTransitionImage(View view) {
-        dialog.updateTransitionImage(view);
+        updateTransitionImage(view, RecyclingPagerAdapter.SCALE_DIRECTION_HORIZONTAL);
+    }
+
+    public void updateTransitionImage(View view, int scaleDirection) {
+        dialog.updateTransitionImage(view, scaleDirection);
     }
 
     /**
@@ -286,6 +292,11 @@ public class StfalconImageViewer<T> {
          */
         public Builder<T> withUseDialogStyle(Boolean useDialogStyle) {
             this.data.setUseDialogStyle(useDialogStyle);
+            return this;
+        }
+
+        public Builder<T> withScaleDirection(int scaleDirection) {
+            this.data.setScaleDirection(scaleDirection);
             return this;
         }
 

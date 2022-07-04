@@ -29,6 +29,7 @@ import androidx.core.view.GestureDetectorCompat
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
 import androidx.viewpager2.widget.ViewPager2
+import com.github.chrisbanes.photoview.PhotoView
 import com.stfalcon.imageviewer.R
 import com.stfalcon.imageviewer.common.extensions.*
 import com.stfalcon.imageviewer.common.gestures.detector.SimpleOnGestureListener
@@ -76,8 +77,10 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
     private val isInitState
         get() = imagesAdapter?.isInitState(currentPosition) ?: true
 
-    internal var containerPadding = intArrayOf(0, 0, 0, 0)
+    private val scaledSize
+        get() = imagesAdapter?.scaledSize(currentPosition) ?: 1.0f
 
+    internal var containerPadding = intArrayOf(0, 0, 0, 0)
 
     internal var overlayView: View? = null
         set(value) {
@@ -112,6 +115,7 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
     private var isStartInit = true
     internal var isIdle = true
     private var isUpdate = true
+    var scaleDirection = RecyclingPagerAdapter.SCALE_DIRECTION_HORIZONTAL
 
     var viewType = RecyclingPagerAdapter.VIEW_TYPE_IMAGE
     private var startPosition: Int = 0
@@ -145,6 +149,7 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
                     isStartInit = false
                     transitionImageAnimator =
                         createTransitionImageAnimator(externalTransitionImageView, dismissContainer)
+                    transitionImageAnimator.scaleDirection = scaleDirection
                     animateOpen()
                     imagesPager.makeVisible()
                 }
@@ -153,17 +158,21 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
             override fun onChildViewDetachedFromWindow(view: View) {
                 onChildDetached?.invoke(view)
             }
-
         })
 
 
         imagesPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
-                externalTransitionImageView?.apply {
-                    if (isAtStartPosition) makeInvisible() else makeVisible()
-                }
                 onPageChange?.invoke(position)
+                val recyclerView1 = imagesPager.getChildAt(0) as RecyclerView
+                val findViewByPosition = recyclerView1.layoutManager!!.findViewByPosition(position)
+                if (findViewByPosition != null) {
+                    val childView = (findViewByPosition as ViewGroup).getChildAt(0)
+                    if (childView is PhotoView) {
+                        transitionImageAnimator.scaleSize = scaledSize
+                    }
+                }
             }
 
             override fun onPageScrollStateChanged(state: Int) {
@@ -264,14 +273,17 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
         imagesAdapter?.updateImages(images)
     }
 
-    internal fun updateTransitionImage(imageView: View?) {
+    internal fun updateTransitionImage(imageView: View?, scaleDirection: Int) {
         externalTransitionImageView?.makeVisible()
         externalTransitionImageView = imageView
         startPosition = currentPosition
         transitionImageAnimator =
             createTransitionImageAnimator(externalTransitionImageView, dismissContainer)
-        transitionImageAnimator.updateTransitionView(dismissContainer, externalTransitionImageView)
-
+        transitionImageAnimator.updateTransitionView(
+            dismissContainer,
+            externalTransitionImageView,
+            scaleDirection
+        )
     }
 
     private fun animateOpen() {
@@ -281,6 +293,7 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
                 overlayView?.animateAlpha(0f, 1f, duration)
             },
             onTransitionEnd = { prepareViewsForViewer() })
+        transitionImageAnimator.viewType = viewType
     }
 
     private fun animateClose(translationX: Float, translationY: Float, scaleTemp: Float) {
@@ -296,9 +309,13 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
                 overlayView?.animateAlpha(overlayView?.alpha, 0f, duration)
             },
             onTransitionEnd = { onDismiss?.invoke() })
+        transitionImageAnimator.viewType = viewType
     }
 
     private fun animateClose() {
+        if (scaledSize != -1.0f) {
+            transitionImageAnimator.scaleSize = scaledSize
+        }
         dismissContainer.applyMargin(0, 0, 0, 0)
         externalTransitionImageView!!.makeVisible()
         transitionImageAnimator.animateClose(
@@ -307,16 +324,18 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
                 backgroundView.animateAlpha(backgroundView.alpha, 0f, duration)
                 overlayView?.animateAlpha(overlayView?.alpha, 0f, duration)
             },
-            onTransitionEnd = { onDismiss?.invoke() })
+            onTransitionEnd = { onDismiss?.invoke() },
+        )
+        transitionImageAnimator.viewType = viewType
     }
 
     private fun prepareViewsForTransition() {
+        backgroundView.alpha = 0f
         transitionImageContainer.makeVisible()
         imagesPager.makeInvisible()
     }
 
     private fun prepareViewsForViewer() {
-        backgroundView.alpha = 1f
         imagesPager.makeVisible()
     }
 

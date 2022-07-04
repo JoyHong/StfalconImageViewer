@@ -53,6 +53,9 @@ class ImagesPagerAdapter<T>(
     fun isScaled(position: Int): Boolean =
         holders.firstOrNull { it.position == position }?.isScaled ?: false
 
+    fun scaledSize(position: Int): Float =
+        holders.firstOrNull { it.position == position }?.scaledSize ?: -1.0f
+
     fun isTopOrBottom(position: Int): Int =
         holders.firstOrNull { it.position == position }?.topOrBottom ?: IMAGE_POSITION_DEFAULT
 
@@ -81,6 +84,7 @@ class ImagesPagerAdapter<T>(
         var isScaled: Boolean = false
         var isInitState: Boolean = true  //初次加载的状态
         var topOrBottom: Int = IMAGE_POSITION_DEFAULT
+        var scaledSize = 1.0f
 
         fun bind(position: Int) {
             bindItemView.bindItemView(itemView, viewType, position, imageLoader)
@@ -91,6 +95,7 @@ class ImagesPagerAdapter<T>(
                     val photoView = viewGroup.getChildAt(0) as PhotoView
                     photoView.setOnScaleChangeListener { _, _, _ ->
                         isScaled = photoView.scale >= 1.1f
+                        scaledSize = photoView.scale
                     }
                 }
 
