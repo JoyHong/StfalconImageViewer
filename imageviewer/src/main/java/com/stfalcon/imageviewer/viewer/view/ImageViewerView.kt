@@ -324,7 +324,7 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
                 backgroundView.animateAlpha(backgroundView.alpha, 0f, duration)
                 overlayView?.animateAlpha(overlayView?.alpha, 0f, duration)
             },
-            onTransitionEnd = { onDismiss?.invoke() }
+            onTransitionEnd = { onDismiss?.invoke() },
         )
         transitionImageAnimator.viewType = viewType
     }
