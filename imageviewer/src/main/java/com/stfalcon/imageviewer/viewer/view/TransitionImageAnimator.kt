@@ -78,7 +78,7 @@ internal class TransitionImageAnimator(
     internal fun animateClose(
         shouldDismissToBottom: Boolean,
         onTransitionStart: (Long) -> Unit,
-        onTransitionEnd: () -> Unit,
+        onTransitionEnd: () -> Unit
     ) {
         if (externalImage.isRectVisible && !shouldDismissToBottom) {
             onTransitionStart(TRANSITION_DURATION)
