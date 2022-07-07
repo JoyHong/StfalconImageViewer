@@ -19,7 +19,6 @@ package com.stfalcon.imageviewer.viewer.dialog
 import android.content.Context
 import android.view.KeyEvent
 import android.view.View
-import android.widget.ImageView
 import androidx.appcompat.app.AlertDialog
 import com.stfalcon.imageviewer.R
 import com.stfalcon.imageviewer.viewer.builder.BuilderData
@@ -32,9 +31,8 @@ internal class ImageViewerDialog<T>(
 
     private val dialog: AlertDialog
     private val viewerView: ImageViewerView<T> = ImageViewerView(context)
-    private var animateOpen = true
 
-    private val dialogStyle: Int
+    private val dialogStyle
         get() = if (builderData.shouldStatusBarHide)
             R.style.ImageViewerDialog_NoStatusBar
         else
@@ -42,24 +40,25 @@ internal class ImageViewerDialog<T>(
 
     init {
         setupViewerView()
-
-        val builder : AlertDialog.Builder = if (builderData.useDialogStyle){
-            AlertDialog.Builder(context,dialogStyle)
-        }else{
+        dialog = (if (builderData.useDialogStyle) {
+            AlertDialog.Builder(context, dialogStyle)
+        } else {
             AlertDialog.Builder(context)
-        }
-        dialog = builder
+        })
             .setView(viewerView)
             .setOnKeyListener { _, keyCode, event -> onDialogKeyEvent(keyCode, event) }
             .create()
             .apply {
-                setOnShowListener { viewerView.open(builderData.transitionView) }
-                setOnDismissListener { builderData.onDismissListener?.onDismiss() }
+                setOnShowListener {
+                    viewerView.open(builderData.transitionView)
+                }
+                setOnDismissListener {
+                    builderData.onDismissListener?.onDismiss()
+                }
             }
     }
 
-    fun show(animate: Boolean) {
-        animateOpen = animate
+    fun show() {
         dialog.show()
     }
 
@@ -75,15 +74,14 @@ internal class ImageViewerDialog<T>(
         viewerView.updateImages(images)
     }
 
-    fun getCurrentPosition(): Int =
-        viewerView.currentPosition
+    fun getCurrentItem(): Int =
+        viewerView.currentItem
 
-    fun setCurrentPosition(position: Int): Int {
-        viewerView.currentPosition = position
-        return viewerView.currentPosition
+    fun setCurrentItem(item: Int) {
+        viewerView.setCurrentItem(item)
     }
 
-    fun updateTransitionImage(view: View?, scaleDirection: Int) {
+    fun updateTransitionImage(view: View, scaleDirection: Int) {
         viewerView.updateTransitionImage(view, scaleDirection)
     }
 
@@ -101,18 +99,28 @@ internal class ImageViewerDialog<T>(
     private fun setupViewerView() {
         viewerView.apply {
             isSwipeToDismissAllowed = builderData.isSwipeToDismissAllowed
-
-            containerPadding = builderData.containerPaddingPixels
             overlayView = builderData.overlayView
-
-            setBackgroundColor(builderData.backgroundColor)
-            setImages(builderData.images, builderData.startPosition, builderData.imageLoader, builderData.getViewType,builderData.createItemView,builderData.bindItemView)
-
-            onPageChange = { position -> builderData.imageChangeListener?.onImageChange(position) }
-            onChildAttach = { view -> builderData.onChildAttachStateChangeListener?.onChildViewAttachedToWindow(view) }
-            onChildDetached = { view -> builderData.onChildAttachStateChangeListener?.onChildViewDetachedFromWindow(view) }
-            onDismiss = { dialog.dismiss() }
             scaleDirection = builderData.scaleDirection
+            setBackgroundColor(builderData.backgroundColor)
+            setImages(
+                builderData.images,
+                builderData.startPosition,
+                builderData.imageLoader,
+                builderData.getViewType,
+                builderData.createItemView
+            )
+            onPageChanged = { position ->
+                builderData.imageChangeListener?.onImageChange(position)
+            }
+            onChildViewAttachToWindow = { view ->
+                builderData.onChildAttachStateChangeListener?.onChildViewAttachedToWindow(view)
+            }
+            onChildViewDetachedFromWindow = { view ->
+                builderData.onChildAttachStateChangeListener?.onChildViewDetachedFromWindow(view)
+            }
+            onDismiss = {
+                dialog.dismiss()
+            }
         }
     }
 }

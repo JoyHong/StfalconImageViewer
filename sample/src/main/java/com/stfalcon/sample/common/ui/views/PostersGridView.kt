@@ -5,7 +5,6 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
-import com.stfalcon.imageviewer.loader.ImageLoader
 import com.stfalcon.sample.R
 import com.stfalcon.sample.common.models.Demo
 import com.stfalcon.sample.common.models.Poster
@@ -39,7 +38,6 @@ class PostersGridView @JvmOverloads constructor(
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-
         imageViews.values.forEachIndexed { index, imageView ->
             imageLoader?.invoke(imageView, Demo.posters.getOrNull(index))
             imageView.setOnClickListener { onPosterClick?.invoke(index, imageView) }

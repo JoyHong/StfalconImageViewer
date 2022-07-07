@@ -1,22 +1,16 @@
 package com.stfalcon.sample.features.demo.rotation
 
 import android.content.Context
-import android.graphics.PointF
-import android.graphics.Rect
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
-import com.github.chrisbanes.photoview.OnScaleChangedListener
 import com.github.chrisbanes.photoview.PhotoView
 import com.stfalcon.imageviewer.StfalconImageViewer
 import com.stfalcon.imageviewer.common.pager.RecyclingPagerAdapter
-import com.stfalcon.imageviewer.loader.ImageLoader
-import com.stfalcon.imageviewer.viewer.adapter.ImagesPagerAdapter
 import com.stfalcon.sample.R
 import com.stfalcon.sample.common.extensions.getDrawableCompat
-import com.stfalcon.sample.common.extensions.getImageFromAssetsFile
 import com.stfalcon.sample.common.extensions.loadImage
 import com.stfalcon.sample.common.models.Demo
 import com.stfalcon.sample.common.models.Poster
@@ -66,7 +60,7 @@ class RotationDemoActivity : AppCompatActivity() {
     }
 
     private fun openViewer(startPosition: Int) {
-        viewer = StfalconImageViewer.Builder<Poster>(this, Demo.posters, ::loadPosterImage,::getItemViewType,::createItemView,::bindItemView)
+        viewer = StfalconImageViewer.Builder<Poster>(this, Demo.posters, ::loadPosterImage,::getItemViewType,::createItemView)
             .withTransitionFrom(getTransitionTarget(startPosition))
             .withStartPosition(startPosition)
             .withImageChangeListener {
@@ -74,7 +68,7 @@ class RotationDemoActivity : AppCompatActivity() {
                 viewer.updateTransitionImage(getTransitionTarget(it))
             }
             .withDismissListener { isDialogShown = false }
-            .show(!isDialogShown)
+            .show()
 
         currentPosition = startPosition
         isDialogShown = true
@@ -123,15 +117,4 @@ class RotationDemoActivity : AppCompatActivity() {
         return itemView
     }
 
-    private fun bindItemView (itemView : View, viewType: Int, position: Int, imageLoader: ImageLoader<Poster> ){
-        when (viewType) {
-            RecyclingPagerAdapter.VIEW_TYPE_IMAGE -> {
-                imageLoader.loadImage(itemView, Demo.posters[position])
-            }
-
-            RecyclingPagerAdapter.VIEW_TYPE_SUBSAMPLING_IMAGE -> {
-                imageLoader.loadImage(itemView, Demo.posters[position])
-            }
-        }
-    }
 }

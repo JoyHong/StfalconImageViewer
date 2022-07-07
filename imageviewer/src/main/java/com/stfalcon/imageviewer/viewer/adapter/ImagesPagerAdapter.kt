@@ -25,23 +25,19 @@ import android.widget.RelativeLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
 import com.github.chrisbanes.photoview.PhotoView
-import com.stfalcon.imageviewer.R
 import com.stfalcon.imageviewer.common.pager.RecyclingPagerAdapter
-import com.stfalcon.imageviewer.loader.BindItemView
-import com.stfalcon.imageviewer.loader.CreateItemView
 import com.stfalcon.imageviewer.loader.GetViewType
 import com.stfalcon.imageviewer.loader.ImageLoader
+import com.stfalcon.imageviewer.loader.OnCreateView
 
 class ImagesPagerAdapter<T>(
     private val context: Context,
-    _images: List<T>,
+    private var images: List<T>,
     private val imageLoader: ImageLoader<T>,
     private var getViewType: GetViewType,
-    private var createItemView: CreateItemView,
-    private var bindItemView: BindItemView<T>
-) : RecyclingPagerAdapter<T,ImagesPagerAdapter<T>.ViewHolder>() {
+    private var onCreateView: OnCreateView
+) : RecyclingPagerAdapter<T, ImagesPagerAdapter<T>.ViewHolder>() {
 
-    private var images = _images
     private val holders = mutableListOf<ViewHolder>()
 
     companion object {
@@ -51,23 +47,34 @@ class ImagesPagerAdapter<T>(
     }
 
     fun isScaled(position: Int): Boolean =
-        holders.firstOrNull { it.position == position }?.isScaled ?: false
+        holders.firstOrNull {
+            it.adapterPosition == position
+        }?.isScaled ?: false
 
     fun scaledSize(position: Int): Float =
-        holders.firstOrNull { it.position == position }?.scaledSize ?: -1.0f
+        holders.firstOrNull {
+            it.adapterPosition == position
+        }?.scaledSize ?: 1.0f
 
     fun isTopOrBottom(position: Int): Int =
-        holders.firstOrNull { it.position == position }?.topOrBottom ?: IMAGE_POSITION_DEFAULT
+        holders.firstOrNull {
+            it.adapterPosition == position
+        }?.topOrBottom ?: IMAGE_POSITION_DEFAULT
 
     fun isInitState(position: Int) =
-        holders.firstOrNull { it.position == position }?.isInitState ?: true
+        holders.firstOrNull {
+            it.adapterPosition == position
+        }?.isInitState ?: true
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val itemView = createItemView.createItemView(context, viewType)
-        return ViewHolder(itemView, viewType).also { holders.add(it) }
+        val itemView = onCreateView.createView(context, viewType)
+        return ViewHolder(itemView, viewType)
+            .also {
+                holders.add(it)
+            }
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) = holder.bind(position)
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) = holder.bind(images[position])
 
     override fun getItemCount() = images.size
 
@@ -78,17 +85,14 @@ class ImagesPagerAdapter<T>(
         notifyDataSetChanged()
     }
 
-    inner class ViewHolder(itemView: View, private var viewType: Int) :
-        RecyclerView.ViewHolder(itemView) {
+    inner class ViewHolder(itemView: View, private var viewType: Int) : RecyclerView.ViewHolder(itemView) {
 
-        var isScaled: Boolean = false
-        var isInitState: Boolean = true  //初次加载的状态
-        var topOrBottom: Int = IMAGE_POSITION_DEFAULT
+        var isScaled = viewType == VIEW_TYPE_SUBSAMPLING_IMAGE
+        var isInitState = true  // 初次加载的状态
+        var topOrBottom = IMAGE_POSITION_DEFAULT
         var scaledSize = 1.0f
 
-        fun bind(position: Int) {
-            bindItemView.bindItemView(itemView, viewType, position, imageLoader)
-
+        init {
             when (viewType) {
                 VIEW_TYPE_IMAGE -> {
                     val viewGroup = itemView as RelativeLayout
@@ -98,39 +102,41 @@ class ImagesPagerAdapter<T>(
                         scaledSize = photoView.scale
                     }
                 }
-
                 VIEW_TYPE_SUBSAMPLING_IMAGE -> {
                     val viewGroup = itemView as RelativeLayout
                     val subsamplingScaleImageView = viewGroup.getChildAt(0) as SubsamplingScaleImageView
-                    isScaled = true
-                    isInitState = true
                     subsamplingScaleImageView.setOnStateChangedListener(object :
                         SubsamplingScaleImageView.OnStateChangedListener {
                         override fun onScaleChanged(newScale: Float, origin: Int) {
-
                         }
-
                         override fun onCenterChanged(newCenter: PointF?, origin: Int) {
-                            val resourceWidth = subsamplingScaleImageView.sWidth   //源文件宽
-                            val resourceHeight = subsamplingScaleImageView.sHeight   //源文件高
+                            val resourceWidth = subsamplingScaleImageView.sWidth   // 源文件宽
+                            val resourceHeight = subsamplingScaleImageView.sHeight   // 源文件高
                             val rect = Rect()
                             subsamplingScaleImageView.visibleFileRect(rect)
-                            if (rect.top == 0 && rect.bottom == resourceHeight) {
-                                topOrBottom = IMAGE_POSITION_DEFAULT
-                                isScaled = false
-                            } else if (rect.top == 0 && rect.bottom < resourceHeight) {
-                                topOrBottom = IMAGE_POSITION_TOP
-                                isScaled = true
-                            } else if (rect.top > 0 && rect.bottom == resourceHeight) {
-                                topOrBottom = IMAGE_POSITION_BOTTOM
-                                isScaled = true
-                            } else {
-                                topOrBottom = IMAGE_POSITION_DEFAULT
-                                isScaled = true
+                            topOrBottom = when {
+                                rect.top == 0 -> {
+                                    IMAGE_POSITION_TOP
+                                }
+                                rect.bottom == resourceHeight -> {
+                                    IMAGE_POSITION_BOTTOM
+                                }
+                                else -> {
+                                    IMAGE_POSITION_DEFAULT
+                                }
                             }
                             isInitState = false
                         }
                     })
+                }
+            }
+        }
+
+        fun bind(image: T) {
+            imageLoader.loadImage(itemView, image)
+            when (viewType) {
+                VIEW_TYPE_SUBSAMPLING_IMAGE -> {
+                    isInitState = true
                 }
             }
         }

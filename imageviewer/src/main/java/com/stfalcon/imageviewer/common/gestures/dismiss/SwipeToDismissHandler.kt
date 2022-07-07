@@ -89,7 +89,7 @@ internal class SwipeToDismissHandler(
     }
 
     internal fun initiateDismissToBottom() {
-        animateTranslation(swipeView.height.toFloat(),swipeView.width.toFloat())
+        animateTranslation(swipeView.height.toFloat(), 0F)
     }
 
     private fun onTrackingEnd(parentHeight: Int,parentWith : Int) {
@@ -115,16 +115,14 @@ internal class SwipeToDismissHandler(
             else -> 0f
         }
 
-        if ((animateToY != 0f || animateToX != 0f)  && !shouldAnimateDismiss()) {
-            onDismiss(translationX,translationY,scaleTemp)
+        if ((animateToY != 0f || animateToX != 0f) && !shouldAnimateDismiss()) {
+            onDismiss(translationX, translationY, scaleTemp)
         } else {
-            animateTranslation(animateToY,animateToX)
+            animateTranslation(animateToY, animateToX)
         }
     }
 
-
-
-    private fun animateTranslation(translationToY: Float,translationToX: Float) {
+    private fun animateTranslation(translationToY: Float, translationToX: Float) {
         swipeView.animate()
             .translationY(translationToY)
             .translationX(translationToX)
@@ -135,13 +133,11 @@ internal class SwipeToDismissHandler(
             .setUpdateListener { onSwipeViewMove(swipeView.translationY, translationLimit) }
             .setAnimatorListener(onAnimationEnd = {
                 if (translationToY != 0f) {
-                    onDismiss(translationX,translationY,scaleTemp)
+                    onDismiss(translationX, translationY, scaleTemp)
                 }
-
                 //remove the update listener, otherwise it will be saved on the next animation execution:
                 swipeView.animate().setUpdateListener(null)
             })
             .start()
-
     }
 }

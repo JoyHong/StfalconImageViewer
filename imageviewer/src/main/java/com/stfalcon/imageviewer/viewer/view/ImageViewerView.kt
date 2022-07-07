@@ -16,20 +16,17 @@
 
 package com.stfalcon.imageviewer.viewer.view
 
-
 import android.content.Context
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
 import android.widget.RelativeLayout
 import androidx.core.view.GestureDetectorCompat
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
 import androidx.viewpager2.widget.ViewPager2
-import com.github.chrisbanes.photoview.PhotoView
 import com.stfalcon.imageviewer.R
 import com.stfalcon.imageviewer.common.extensions.*
 import com.stfalcon.imageviewer.common.gestures.detector.SimpleOnGestureListener
@@ -38,13 +35,11 @@ import com.stfalcon.imageviewer.common.gestures.direction.SwipeDirection.*
 import com.stfalcon.imageviewer.common.gestures.direction.SwipeDirectionDetector
 import com.stfalcon.imageviewer.common.gestures.dismiss.SwipeToDismissHandler
 import com.stfalcon.imageviewer.common.pager.RecyclingPagerAdapter
-import com.stfalcon.imageviewer.loader.BindItemView
-import com.stfalcon.imageviewer.loader.CreateItemView
 import com.stfalcon.imageviewer.loader.GetViewType
 import com.stfalcon.imageviewer.loader.ImageLoader
+import com.stfalcon.imageviewer.loader.OnCreateView
 import com.stfalcon.imageviewer.viewer.adapter.ImagesPagerAdapter
 import kotlin.math.abs
-
 
 internal class ImageViewerView<T> @JvmOverloads constructor(
     context: Context,
@@ -52,134 +47,110 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : RelativeLayout(context, attrs, defStyleAttr) {
 
-    internal var isSwipeToDismissAllowed = true
+    /**
+     * 是否允许拖动退出
+     */
+    var isSwipeToDismissAllowed = true
 
-    internal var currentPosition: Int
+    internal val currentItem
         get() = imagesPager.currentItem
-        set(value) {
-            if (isStartInit || isUpdate) {
-                isUpdate = false
-                imagesPager.setCurrentItem(value, false)
-            } else {
-                imagesPager.currentItem = value
-            }
-        }
+
+    fun setCurrentItem(item: Int, smoothScroll: Boolean = true) {
+        imagesPager.setCurrentItem(item, smoothScroll)
+    }
 
     internal var onDismiss: (() -> Unit)? = null
-    internal var onPageChange: ((position: Int) -> Unit)? = null
-    internal var onChildAttach: ((view: View) -> Unit)? = null
-    internal var onChildDetached: ((view: View) -> Unit)? = null
+    internal var onPageChanged: ((position: Int) -> Unit)? = null
+    internal var onChildViewAttachToWindow: ((view: View) -> Unit)? = null
+    internal var onChildViewDetachedFromWindow: ((view: View) -> Unit)? = null
     private val isScaled
-        get() = imagesAdapter?.isScaled(currentPosition) ?: false
+        get() = imagesAdapter?.isScaled(currentItem) ?: false
 
     private var topOrBottom: Int = ImagesPagerAdapter.IMAGE_POSITION_DEFAULT
 
     private val isInitState
-        get() = imagesAdapter?.isInitState(currentPosition) ?: true
+        get() = imagesAdapter?.isInitState(currentItem) ?: true
 
     private val scaledSize
-        get() = imagesAdapter?.scaledSize(currentPosition) ?: 1.0f
-
-    internal var containerPadding = intArrayOf(0, 0, 0, 0)
+        get() = imagesAdapter?.scaledSize(currentItem) ?: 1.0f
 
     internal var overlayView: View? = null
         set(value) {
             field = value
-            value?.let { rootContainer.addView(it) }
+            value?.let {
+                rootContainer.addView(it)
+            }
         }
 
-    private var rootContainer: ViewGroup
-    private var backgroundView: View
-    private var dismissContainer: ViewGroup
+    private val rootContainer: ViewGroup
+    private val backgroundView: View
+    private val dismissContainer: ViewGroup
 
-    private val transitionImageContainer: FrameLayout
     private var externalTransitionImageView: View? = null
 
-    private var imagesPager: ViewPager2
+    private val imagesPager: ViewPager2
     private var imagesAdapter: ImagesPagerAdapter<T>? = null
 
-    private var directionDetector: SwipeDirectionDetector
-    private var gestureDetector: GestureDetectorCompat
-    private var scaleDetector: ScaleGestureDetector
+    private val directionDetector: SwipeDirectionDetector
+    private val gestureDetector: GestureDetectorCompat
+    private val scaleDetector: ScaleGestureDetector
     private lateinit var swipeDismissHandler: SwipeToDismissHandler
 
-    private var wasScaled: Boolean = false
+    private var wasScaled = false
     private var wasDoubleTapped = false
-    private var isOverlayWasClicked: Boolean = false
+    private var isOverlayWasClicked = false
     private var swipeDirection: SwipeDirection? = null
 
-    private var images: List<T> = listOf()
-    private var imageLoader: ImageLoader<T>? = null
-    private lateinit var transitionImageAnimator: TransitionImageAnimator
+    private var transitionImageAnimator: TransitionImageAnimator? = null
     private var trackEnable = false
-    private var isStartInit = true
-    internal var isIdle = true
-    private var isUpdate = true
-    var scaleDirection = RecyclingPagerAdapter.SCALE_DIRECTION_HORIZONTAL
+    private var isFirstChildAttached = false
+    private var isIdle = true
+    internal var scaleDirection = RecyclingPagerAdapter.SCALE_DIRECTION_HORIZONTAL
 
-    var viewType = RecyclingPagerAdapter.VIEW_TYPE_IMAGE
-    private var startPosition: Int = 0
-        set(value) {
-            field = value
-            currentPosition = value
-        }
+    private var viewType = RecyclingPagerAdapter.VIEW_TYPE_IMAGE
 
     private val shouldDismissToBottom: Boolean
-        get() = externalTransitionImageView == null
-                || !externalTransitionImageView.isRectVisible
-                || !isAtStartPosition
-
-    private val isAtStartPosition: Boolean
-        get() = currentPosition == startPosition
+        get() = externalTransitionImageView?.isRectVisible?.not() ?: true
 
     init {
         View.inflate(context, R.layout.image_viewer_mage_viewer, this)
         rootContainer = findViewById(R.id.rootContainer)
         backgroundView = findViewById(R.id.backgroundView)
         dismissContainer = findViewById(R.id.dismissContainer)
-        transitionImageContainer = findViewById(R.id.transitionImageContainer)
         imagesPager = findViewById(R.id.imagesPager)
         val recyclerView = imagesPager.getChildAt(0) as RecyclerView
         recyclerView.addOnChildAttachStateChangeListener(object :
             RecyclerView.OnChildAttachStateChangeListener {
             override fun onChildViewAttachedToWindow(view: View) {
-                onChildAttach?.invoke(view)
-
-                if (isStartInit) {
-                    isStartInit = false
-                    transitionImageAnimator =
-                        createTransitionImageAnimator(externalTransitionImageView, dismissContainer)
-                    transitionImageAnimator.scaleDirection = scaleDirection
-                    animateOpen()
+                onChildViewAttachToWindow?.invoke(view)
+                if (!isFirstChildAttached) {
+                    isFirstChildAttached = true
+                    transitionImageAnimator = createTransitionImageAnimator(externalTransitionImageView, dismissContainer)
+                        .also {
+                            it.scaleDirection = scaleDirection
+                        }
                     imagesPager.makeVisible()
+                    animateOpen()
                 }
             }
 
             override fun onChildViewDetachedFromWindow(view: View) {
-                onChildDetached?.invoke(view)
+                onChildViewDetachedFromWindow?.invoke(view)
             }
         })
-
-
         imagesPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
-                onPageChange?.invoke(position)
-                val recyclerView1 = imagesPager.getChildAt(0) as RecyclerView
-                val findViewByPosition = recyclerView1.layoutManager!!.findViewByPosition(position)
-                if (findViewByPosition != null) {
-                    val childView = (findViewByPosition as ViewGroup).getChildAt(0)
-                    if (childView is PhotoView) {
-                        transitionImageAnimator.scaleSize = scaledSize
-                    }
-                }
+                onPageChanged?.invoke(position)
+                // 同步退出动画的缩放比例
+                transitionImageAnimator?.scaleSize = scaledSize
             }
-
             override fun onPageScrollStateChanged(state: Int) {
                 super.onPageScrollStateChanged(state)
                 isIdle = state == ViewPager.SCROLL_STATE_IDLE
             }
         })
+
         directionDetector = createSwipeDirectionDetector()
         gestureDetector = createGestureDetector()
         scaleDetector = createScaleGestureDetector()
@@ -190,7 +161,7 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
             return true
         }
 
-        if (!this::transitionImageAnimator.isInitialized || transitionImageAnimator.isAnimating) {
+        if (transitionImageAnimator?.isAnimating != false) {
             return true
         }
 
@@ -202,8 +173,8 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
             return true
         }
 
-        viewType = imagesAdapter?.getItemViewType(currentPosition)!!
-        topOrBottom = imagesAdapter?.isTopOrBottom(currentPosition)!!
+        viewType = imagesAdapter?.getItemViewType(currentItem)!!
+        topOrBottom = imagesAdapter?.isTopOrBottom(currentItem)!!
         trackEnable = handleEventAction(event, topOrBottom)
 
         handleUpDownEvent(event)
@@ -224,7 +195,6 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
         return if (isScaled) super.dispatchTouchEvent(event) else handleTouchIfNotScaled(event)
     }
 
-
     override fun setBackgroundColor(color: Int) {
         findViewById<View>(R.id.backgroundView).setBackgroundColor(color)
     }
@@ -234,22 +204,21 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
         startPosition: Int,
         imageLoader: ImageLoader<T>,
         getViewType: GetViewType,
-        createItemView: CreateItemView,
-        bindItemView: BindItemView<T>
+        createItemView: OnCreateView
     ) {
-        this.images = images
-        this.imageLoader = imageLoader
-        this.imagesAdapter =
-            ImagesPagerAdapter(
-                context,
-                images,
-                imageLoader,
-                getViewType,
-                createItemView,
-                bindItemView
-            )
+        this.imagesAdapter = ImagesPagerAdapter(
+            context,
+            images,
+            imageLoader,
+            getViewType,
+            createItemView
+        )
         this.imagesPager.adapter = imagesAdapter
-        this.startPosition = startPosition
+        this.imagesPager.setCurrentItem(startPosition, false)
+    }
+
+    internal fun updateImages(images: List<T>) {
+        imagesAdapter?.updateImages(images)
     }
 
     internal fun open(transitionImageView: View?) {
@@ -267,19 +236,11 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
         }
     }
 
-    internal fun updateImages(images: List<T>) {
-        this.images = images
-        isUpdate = true
-        imagesAdapter?.updateImages(images)
-    }
-
-    internal fun updateTransitionImage(imageView: View?, scaleDirection: Int) {
-        externalTransitionImageView?.makeVisible()
+    internal fun updateTransitionImage(imageView: View, scaleDirection: Int) {
         externalTransitionImageView = imageView
-        startPosition = currentPosition
         transitionImageAnimator =
             createTransitionImageAnimator(externalTransitionImageView, dismissContainer)
-        transitionImageAnimator.updateTransitionView(
+        transitionImageAnimator!!.updateTransitionView(
             dismissContainer,
             externalTransitionImageView,
             scaleDirection
@@ -287,19 +248,18 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
     }
 
     private fun animateOpen() {
-        transitionImageAnimator.animateOpen(
+        transitionImageAnimator!!.animateOpen(
             onTransitionStart = { duration ->
                 backgroundView.animateAlpha(0f, 1f, duration)
                 overlayView?.animateAlpha(0f, 1f, duration)
             },
             onTransitionEnd = { prepareViewsForViewer() })
-        transitionImageAnimator.viewType = viewType
+        transitionImageAnimator!!.viewType = viewType
     }
 
     private fun animateClose(translationX: Float, translationY: Float, scaleTemp: Float) {
         dismissContainer.applyMargin(0, 0, 0, 0)
-        externalTransitionImageView!!.makeVisible()
-        transitionImageAnimator.transitionAnimateClose(
+        transitionImageAnimator!!.transitionAnimateClose(
             translationX = translationX,
             translationY = translationY,
             scaleTemp = scaleTemp,
@@ -309,16 +269,15 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
                 overlayView?.animateAlpha(overlayView?.alpha, 0f, duration)
             },
             onTransitionEnd = { onDismiss?.invoke() })
-        transitionImageAnimator.viewType = viewType
+        transitionImageAnimator!!.viewType = viewType
     }
 
     private fun animateClose() {
         if (scaledSize != -1.0f) {
-            transitionImageAnimator.scaleSize = scaledSize
+            transitionImageAnimator!!.scaleSize = scaledSize
         }
         dismissContainer.applyMargin(0, 0, 0, 0)
-        externalTransitionImageView!!.makeVisible()
-        transitionImageAnimator.animateClose(
+        transitionImageAnimator!!.animateClose(
             shouldDismissToBottom = shouldDismissToBottom,
             onTransitionStart = { duration ->
                 backgroundView.animateAlpha(backgroundView.alpha, 0f, duration)
@@ -326,12 +285,11 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
             },
             onTransitionEnd = { onDismiss?.invoke() }
         )
-        transitionImageAnimator.viewType = viewType
+        transitionImageAnimator!!.viewType = viewType
     }
 
     private fun prepareViewsForTransition() {
         backgroundView.alpha = 0f
-        transitionImageContainer.makeVisible()
         imagesPager.makeInvisible()
     }
 
@@ -353,7 +311,6 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
             else -> true
         }
     }
-
 
     private fun handleUpDownEvent(event: MotionEvent) {
         if (event.action == MotionEvent.ACTION_UP) {
@@ -381,25 +338,23 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
      * 其他情况下正常滑动
      * */
     private fun handleEventAction(event: MotionEvent, topOrBottom: Int): Boolean {
-        var tarckEnable = false
+        var trackEnable = false
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
                 startY = event.y
             }
-
             MotionEvent.ACTION_UP, MotionEvent.ACTION_MOVE -> {
                 val distance = event.y - startY
                 if ((distance > 0 && distance > limitDistance) && topOrBottom == ImagesPagerAdapter.IMAGE_POSITION_TOP) {  //下滑手势
-                    tarckEnable = true
+                    trackEnable = true
                 } else if ((distance < 0 && abs(distance) > limitDistance) && topOrBottom == ImagesPagerAdapter.IMAGE_POSITION_BOTTOM) {//上滑手势
-                    tarckEnable = true
-                } else if ((distance > 0 && distance > limitDistance) && isInitState) { //初始状态，往下滑可以退出
-                    tarckEnable = true
+                    trackEnable = true
+                } else if ((distance > 0 && distance > limitDistance) && isInitState) { // 初始状态，往下滑可以退出
+                    trackEnable = true
                 }
             }
-
         }
-        return tarckEnable
+        return trackEnable
     }
 
     private fun handleEventActionDown(event: MotionEvent) {
@@ -419,7 +374,7 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
 
     private fun handleSingleTap(event: MotionEvent, isOverlayWasClicked: Boolean) {
         if (overlayView != null && !isOverlayWasClicked) {
-            overlayView?.switchVisibilityWithAnimation()
+            overlayView!!.switchVisibilityWithAnimation()
             super.dispatchTouchEvent(event)
         }
     }
@@ -432,14 +387,18 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
 
     private fun dispatchOverlayTouch(event: MotionEvent): Boolean =
         overlayView
-            ?.let { it.isVisible && it.dispatchTouchEvent(event) }
+            ?.let {
+                it.isVisible && it.dispatchTouchEvent(event)
+            }
             ?: false
 
     private fun calculateTranslationAlpha(translationY: Float, translationLimit: Int): Float =
         1.0f - 1.0f / translationLimit.toFloat() / 4f * abs(translationY)
 
     private fun createSwipeDirectionDetector() =
-        SwipeDirectionDetector(context) { swipeDirection = it }
+        SwipeDirectionDetector(context) {
+            swipeDirection = it
+        }
 
     private fun createGestureDetector() =
         GestureDetectorCompat(context, SimpleOnGestureListener(
@@ -458,21 +417,23 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
     private fun createScaleGestureDetector() =
         ScaleGestureDetector(context, ScaleGestureDetector.SimpleOnScaleGestureListener())
 
-    private fun createSwipeToDismissHandler()
-            : SwipeToDismissHandler = SwipeToDismissHandler(
-        swipeView = dismissContainer,
-        shouldAnimateDismiss = { shouldDismissToBottom },
-        onDismiss = { fl: Float, fl1: Float, fl2: Float -> animateClose(fl, fl1, fl2) },
-        onSwipeViewMove = ::handleSwipeViewMove
-    )
+    private fun createSwipeToDismissHandler() =
+        SwipeToDismissHandler(
+            swipeView = dismissContainer,
+            shouldAnimateDismiss = { shouldDismissToBottom },
+            onDismiss = { fl: Float, fl1: Float, fl2: Float -> animateClose(fl, fl1, fl2) },
+            onSwipeViewMove = ::handleSwipeViewMove
+        )
 
-    private fun createTransitionImageAnimator(
-        transitionImageView: View?,
-        internalImage: View?
-    ) =
+    private fun createTransitionImageAnimator(transitionImageView: View?, internalImage: View?) =
         TransitionImageAnimator(
             externalImage = transitionImageView,
             internalImage = internalImage
         )
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        imagesPager.adapter = null
+    }
 
 }

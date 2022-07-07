@@ -21,12 +21,12 @@ import android.animation.Animator
 import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
 import android.view.View
-import android.view.ViewGroup
-import android.view.animation.*
-import com.github.chrisbanes.photoview.PhotoView
-import com.stfalcon.imageviewer.common.extensions.*
+import android.view.animation.Animation
+import android.view.animation.AnimationSet
+import android.view.animation.ScaleAnimation
+import android.view.animation.TranslateAnimation
+import com.stfalcon.imageviewer.common.extensions.isRectVisible
 import com.stfalcon.imageviewer.common.pager.RecyclingPagerAdapter
-import com.stfalcon.imageviewer.viewer.adapter.ImagesPagerAdapter
 
 
 internal class TransitionImageAnimator(
@@ -70,7 +70,6 @@ internal class TransitionImageAnimator(
             onTransitionStart(TRANSITION_DURATION)
             doCloseTransition(translationX, translationY, scaleTemp, onTransitionEnd)
         } else {
-            externalImage?.visibility = View.VISIBLE
             onTransitionEnd()
         }
     }
@@ -84,7 +83,6 @@ internal class TransitionImageAnimator(
             onTransitionStart(TRANSITION_DURATION)
             doCloseTransition(onTransitionEnd)
         } else {
-            externalImage?.visibility = View.VISIBLE
             onTransitionEnd()
         }
     }

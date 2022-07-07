@@ -2,8 +2,6 @@ package com.stfalcon.sample.features.demo.styled
 
 import android.content.Context
 import android.graphics.Color
-import android.graphics.PointF
-import android.graphics.Rect
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -12,12 +10,9 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
-import com.github.chrisbanes.photoview.OnScaleChangedListener
 import com.github.chrisbanes.photoview.PhotoView
 import com.stfalcon.imageviewer.StfalconImageViewer
 import com.stfalcon.imageviewer.common.pager.RecyclingPagerAdapter
-import com.stfalcon.imageviewer.loader.ImageLoader
-import com.stfalcon.imageviewer.viewer.adapter.ImagesPagerAdapter
 import com.stfalcon.sample.R
 import com.stfalcon.sample.common.extensions.showShortToast
 import com.stfalcon.sample.common.models.Demo
@@ -25,14 +20,7 @@ import com.stfalcon.sample.common.models.Poster
 import com.stfalcon.sample.common.ui.base.BaseActivity
 import com.stfalcon.sample.common.ui.views.PosterOverlayView
 import com.stfalcon.sample.features.demo.styled.options.StylingOptions
-import com.stfalcon.sample.features.demo.styled.options.StylingOptions.Property.CONTAINER_PADDING
-import com.stfalcon.sample.features.demo.styled.options.StylingOptions.Property.HIDE_STATUS_BAR
-import com.stfalcon.sample.features.demo.styled.options.StylingOptions.Property.IMAGES_MARGIN
-import com.stfalcon.sample.features.demo.styled.options.StylingOptions.Property.RANDOM_BACKGROUND
-import com.stfalcon.sample.features.demo.styled.options.StylingOptions.Property.SHOW_OVERLAY
-import com.stfalcon.sample.features.demo.styled.options.StylingOptions.Property.SHOW_TRANSITION
-import com.stfalcon.sample.features.demo.styled.options.StylingOptions.Property.SWIPE_TO_DISMISS
-import com.stfalcon.sample.features.demo.styled.options.StylingOptions.Property.ZOOMING
+import com.stfalcon.sample.features.demo.styled.options.StylingOptions.Property.*
 import kotlinx.android.synthetic.main.activity_demo_styling.*
 
 class StylingDemoActivity : BaseActivity() {
@@ -65,7 +53,7 @@ class StylingDemoActivity : BaseActivity() {
 //        var posters = Demo.posters.toMutableList()
 //        var posters = Demo.posters.toMutableList()
 
-        val builder = StfalconImageViewer.Builder<Poster>(this, posters, ::loadPosterImage,::getItemViewType,::createItemView,::bindItemView)
+        val builder = StfalconImageViewer.Builder<Poster>(this, posters, ::loadPosterImage,::getItemViewType,::createItemView)
             .withStartPosition(startPosition)
             .withImageChangeListener { position ->
                 if (options.isPropertyEnabled(SHOW_TRANSITION)) {
@@ -80,10 +68,6 @@ class StylingDemoActivity : BaseActivity() {
 
         if (options.isPropertyEnabled(IMAGES_MARGIN)) {
             builder.withImagesMargin(R.dimen.image_margin)
-        }
-
-        if (options.isPropertyEnabled(CONTAINER_PADDING)) {
-            builder.withContainerPadding(R.dimen.image_margin)
         }
 
         if (options.isPropertyEnabled(SHOW_TRANSITION)) {
@@ -111,7 +95,7 @@ class StylingDemoActivity : BaseActivity() {
             update(posterList[startPosition])
 
             onDeleteClick = {
-                val currentPosition = viewer?.currentPosition() ?: 0
+                val currentPosition = viewer?.getCurrentItem() ?: 0
                 if (posterList.size > 1){
                     posterList.removeAt(currentPosition)
                     viewer?.updateImages(posterList)
@@ -161,19 +145,4 @@ class StylingDemoActivity : BaseActivity() {
         return itemView
     }
 
-    private fun bindItemView (itemView : View, viewType: Int, position: Int, imageLoader: ImageLoader<Poster>){
-        when (viewType) {
-            RecyclingPagerAdapter.VIEW_TYPE_IMAGE -> {
-                imageLoader.loadImage(itemView, posters[position])
-            }
-
-            RecyclingPagerAdapter.VIEW_TYPE_SUBSAMPLING_IMAGE -> {
-                imageLoader.loadImage(itemView, posters[position])
-            }
-
-            RecyclingPagerAdapter.VIEW_TYPE_TEXT->{
-                imageLoader.loadImage(itemView,posters[position])
-            }
-        }
-    }
 }

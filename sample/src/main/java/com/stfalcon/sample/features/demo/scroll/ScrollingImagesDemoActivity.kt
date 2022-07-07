@@ -1,20 +1,14 @@
 package com.stfalcon.sample.features.demo.scroll
 
 import android.content.Context
-import android.graphics.PointF
-import android.graphics.Rect
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
-import com.github.chrisbanes.photoview.OnScaleChangedListener
 import com.github.chrisbanes.photoview.PhotoView
 import com.stfalcon.imageviewer.StfalconImageViewer
-
 import com.stfalcon.imageviewer.common.pager.RecyclingPagerAdapter
-import com.stfalcon.imageviewer.loader.ImageLoader
-import com.stfalcon.imageviewer.viewer.adapter.ImagesPagerAdapter
 import com.stfalcon.sample.R
 import com.stfalcon.sample.common.extensions.getDrawableCompat
 import com.stfalcon.sample.common.extensions.loadImage
@@ -65,7 +59,7 @@ class ScrollingImagesDemoActivity : AppCompatActivity() {
         target: ImageView,
         images: List<String>,
         imageViews: List<ImageView>) {
-        viewer = StfalconImageViewer.Builder<String>(this, images, ::loadImage, ::getItemViewType,::createItemView,::bindItemView)
+        viewer = StfalconImageViewer.Builder<String>(this, images, ::loadImage, ::getItemViewType,::createItemView)
             .withStartPosition(startPosition)
             .withTransitionFrom(target)
             .withImageChangeListener { viewer.updateTransitionImage(imageViews.getOrNull(it)) }
@@ -101,15 +95,4 @@ class ScrollingImagesDemoActivity : AppCompatActivity() {
         return itemView
     }
 
-    private fun bindItemView (itemView : View, viewType: Int, position: Int, imageLoader: ImageLoader<String> ) {
-        when (viewType) {
-            RecyclingPagerAdapter.VIEW_TYPE_IMAGE -> {
-                imageLoader.loadImage(itemView, Demo.verticalImages.getOrNull(position))
-            }
-
-            RecyclingPagerAdapter.VIEW_TYPE_SUBSAMPLING_IMAGE -> {
-                imageLoader.loadImage(itemView, Demo.verticalImages.getOrNull(position))
-            }
-        }
-    }
 }
