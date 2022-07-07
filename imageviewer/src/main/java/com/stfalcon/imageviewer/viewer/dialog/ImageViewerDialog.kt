@@ -81,7 +81,7 @@ internal class ImageViewerDialog<T>(
         viewerView.setCurrentItem(item)
     }
 
-    fun updateTransitionImage(view: View, scaleDirection: Int) {
+    fun updateTransitionImage(view: View?, scaleDirection: Int) {
         viewerView.updateTransitionImage(view, scaleDirection)
     }
 

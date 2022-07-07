@@ -236,7 +236,7 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
         }
     }
 
-    internal fun updateTransitionImage(imageView: View, scaleDirection: Int) {
+    internal fun updateTransitionImage(imageView: View?, scaleDirection: Int) {
         externalTransitionImageView = imageView
         transitionImageAnimator =
             createTransitionImageAnimator(externalTransitionImageView, dismissContainer)
