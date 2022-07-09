@@ -35,7 +35,7 @@ internal class SwipeToDismissHandler(
     }
     private var translationX = 0f
     private var translationY = 0f
-    private var translationLimit: Int = swipeView.height / 4
+    private var translationLimit: Int = swipeView.height / 9
     private var isTracking = false
     private var startY: Float = 0f
     private var startX: Float = 0f
