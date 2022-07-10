@@ -77,8 +77,8 @@ internal class ImageViewerDialog<T>(
     fun getCurrentItem(): Int =
         viewerView.currentItem
 
-    fun setCurrentItem(item: Int) {
-        viewerView.setCurrentItem(item)
+    fun setCurrentItem(item: Int, smoothScroll: Boolean) {
+        viewerView.setCurrentItem(item, smoothScroll)
     }
 
     fun updateTransitionImage(view: View?) {
