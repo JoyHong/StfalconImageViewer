@@ -148,8 +148,8 @@ internal class TransitionImageAnimator(
     fun updateTransitionView(itemView: View?, externalImage: View?) {
         this.internalImage = itemView!!
         //缩放动画
-        val scaleX = externalImage!!.width * 1f / itemView.width / itemView.scaleX
-        val scaleY = externalImage.height * 1f / itemView.height / itemView.scaleY
+        val scaleX = externalImage!!.width * 1f / itemView.width
+        val scaleY = externalImage.height * 1f / itemView.height
         val toX = if (scaleX > scaleY) {  //那个缩放的比例小就用哪个(例如: 0.9 收缩比例 比0.3要小)
             scaleX
         } else {
@@ -170,8 +170,8 @@ internal class TransitionImageAnimator(
         itemView.getLocationOnScreen(itemViewLocation)
 
 
-        val centerX = itemViewLocation[0] + itemView.width / 2 * itemView.scaleX
-        val centerY = itemViewLocation[1] + itemView.height / 2 * itemView.scaleY
+        val centerX = itemViewLocation[0] + itemView.width / 2
+        val centerY = itemViewLocation[1] + itemView.height / 2
 
         val toXValue = (externalCenterX - centerX) * 1f
         val toYValue = (externalCenterY - centerY) * 1f
@@ -188,8 +188,8 @@ internal class TransitionImageAnimator(
         isOpen: Boolean
     ) {
         //缩放动画
-        val scaleX = externalImage!!.width * 1f / itemView!!.width / itemView.scaleX
-        val scaleY = externalImage.height * 1f / itemView.height / itemView.scaleY
+        val scaleX = externalImage!!.width * 1f / itemView!!.width
+        val scaleY = externalImage.height * 1f / itemView.height
         var toX = if (scaleX > scaleY) { //那个缩放的比例小就用哪个(例如: 0.9 收缩比例 比0.3要小)
             scaleX
         } else {
@@ -238,8 +238,8 @@ internal class TransitionImageAnimator(
         itemView.getLocationOnScreen(itemViewLocation)
 
 
-        val centerX = itemViewLocation[0] + itemView.width / 2 * itemView.scaleX
-        val centerY = itemViewLocation[1] + itemView.height / 2 * itemView.scaleY
+        val centerX = itemViewLocation[0] + itemView.width / 2
+        val centerY = itemViewLocation[1] + itemView.height / 2
 
         val toXValue = (externalCenterX - centerX) * 1f
         val toYValue = (externalCenterY - centerY) * 1f
