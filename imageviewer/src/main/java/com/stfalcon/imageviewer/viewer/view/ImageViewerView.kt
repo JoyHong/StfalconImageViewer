@@ -52,24 +52,8 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
      */
     var isSwipeToDismissAllowed = true
 
-    internal var currentItem: Int
+    internal val currentItem
         get() = imagesPager.currentItem
-        set(value) {
-            if (isUpdate) {
-                isUpdate = false
-                imagesPager.setCurrentItem(value, false)
-            } else {
-                imagesPager.currentItem = value
-            }
-        }
-
-    private var isUpdate = true
-    private var startPosition: Int = 0
-        set(value) {
-            field = value
-            currentItem = value
-        }
-
 
     fun setCurrentItem(item: Int, smoothScroll: Boolean = true) {
         imagesPager.setCurrentItem(item, smoothScroll)
@@ -226,11 +210,9 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
         )
         this.imagesPager.adapter = imagesAdapter
         this.imagesPager.setCurrentItem(startPosition, false)
-        this.startPosition = startPosition
     }
 
     internal fun updateImages(images: List<T>) {
-        isUpdate = true
         imagesAdapter?.updateImages(images)
     }
 
@@ -251,7 +233,6 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
 
     internal fun updateTransitionImage(imageView: View?) {
         externalTransitionImageView = imageView
-        startPosition = currentItem
         transitionImageAnimator =
             createTransitionImageAnimator(externalTransitionImageView, dismissContainer)
         transitionImageAnimator!!.updateTransitionView(
