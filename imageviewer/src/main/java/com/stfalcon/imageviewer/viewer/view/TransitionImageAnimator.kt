@@ -101,7 +101,6 @@ internal class TransitionImageAnimator(
     ) {
         isAnimating = true
         isClosing = true
-
         val p1: PropertyValuesHolder =
             PropertyValuesHolder.ofFloat("translationX", translationX, resetToXValue)
         val p2: PropertyValuesHolder =
@@ -144,7 +143,6 @@ internal class TransitionImageAnimator(
 
     }
 
-
     fun updateTransitionView(itemView: View?, externalImage: View?) {
         this.internalImage = itemView!!
         //缩放动画
@@ -178,7 +176,6 @@ internal class TransitionImageAnimator(
 
         resetToXValue = toXValue
         resetToYValue = toYValue
-
     }
 
     private fun startAnimation(
@@ -200,7 +197,6 @@ internal class TransitionImageAnimator(
             toX /= scaleSize
         }
         scaleNumber = toX
-        println()
         //以自己为中心进行缩放
         val scaleAnimation: ScaleAnimation = if (isOpen) {
             ScaleAnimation(
