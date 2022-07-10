@@ -44,5 +44,4 @@ internal class BuilderData<T>(
     var isSwipeToDismissAllowed = true
     var transitionView: View? = null
     var useDialogStyle = false
-    var scaleDirection = RecyclingPagerAdapter.SCALE_DIRECTION_HORIZONTAL
 }

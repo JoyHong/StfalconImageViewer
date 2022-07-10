@@ -43,7 +43,6 @@ internal class TransitionImageAnimator(
     private var scaleNumber: Float = 0f
     private var resetToXValue: Float = 0f
     private var resetToYValue: Float = 0f
-    var scaleDirection: Int = RecyclingPagerAdapter.SCALE_DIRECTION_HORIZONTAL
     var viewType = RecyclingPagerAdapter.VIEW_TYPE_IMAGE
     var scaleSize = 1.0f
     internal fun animateOpen(
@@ -146,13 +145,15 @@ internal class TransitionImageAnimator(
     }
 
 
-    fun updateTransitionView(itemView: View?, externalImage: View?, scaleDirection: Int) {
+    fun updateTransitionView(itemView: View?, externalImage: View?) {
         this.internalImage = itemView!!
-        this.scaleDirection = scaleDirection
         //缩放动画
-        var toX = externalImage!!.width * 1f / itemView.width / itemView.scaleX
-        if (scaleDirection == RecyclingPagerAdapter.SCALE_DIRECTION_VERTICAL) {
-            toX = externalImage.height * 1f / itemView.height / itemView.scaleY
+        val scaleX = externalImage!!.width * 1f / itemView.width / itemView.scaleX
+        val scaleY = externalImage.height * 1f / itemView.height / itemView.scaleY
+        val toX = if (scaleX > scaleY) {  //那个缩放的比例小就用哪个(例如: 0.9 收缩比例 比0.3要小)
+            scaleX
+        } else {
+            scaleY
         }
         //保存缩放比例,拖动缩小后恢复到原图大小需用到比例
         scaleNumber = toX
@@ -187,13 +188,15 @@ internal class TransitionImageAnimator(
         isOpen: Boolean
     ) {
         //缩放动画
-        var toX: Float
-        toX = externalImage!!.width * 1f / itemView!!.width / itemView.scaleX
-        if (scaleDirection == RecyclingPagerAdapter.SCALE_DIRECTION_VERTICAL) {
-            toX = externalImage.height * 1f / itemView.height / itemView.scaleY
+        val scaleX = externalImage!!.width * 1f / itemView!!.width / itemView.scaleX
+        val scaleY = externalImage.height * 1f / itemView.height / itemView.scaleY
+        var toX = if (scaleX > scaleY) { //那个缩放的比例小就用哪个(例如: 0.9 收缩比例 比0.3要小)
+            scaleX
+        } else {
+            scaleY
         }
 
-        if (viewType == RecyclingPagerAdapter.VIEW_TYPE_IMAGE && scaleDirection == RecyclingPagerAdapter.SCALE_DIRECTION_HORIZONTAL){
+        if (viewType == RecyclingPagerAdapter.VIEW_TYPE_IMAGE && (scaleX > scaleY)) {
             toX /= scaleSize
         }
         scaleNumber = toX

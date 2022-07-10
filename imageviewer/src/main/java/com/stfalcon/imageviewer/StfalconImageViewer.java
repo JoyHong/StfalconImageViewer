@@ -107,11 +107,7 @@ public class StfalconImageViewer<T> {
      * Useful for a case when image position has changed and you want to update the transition animation target.
      */
     public void updateTransitionImage(View view) {
-        updateTransitionImage(view, RecyclingPagerAdapter.SCALE_DIRECTION_HORIZONTAL);
-    }
-
-    public void updateTransitionImage(View view, int scaleDirection) {
-        dialog.updateTransitionImage(view, scaleDirection);
+        dialog.updateTransitionImage(view);
     }
 
     /**
@@ -234,11 +230,6 @@ public class StfalconImageViewer<T> {
          */
         public Builder<T> withUseDialogStyle(Boolean useDialogStyle) {
             this.data.setUseDialogStyle(useDialogStyle);
-            return this;
-        }
-
-        public Builder<T> withScaleDirection(int scaleDirection) {
-            this.data.setScaleDirection(scaleDirection);
             return this;
         }
 

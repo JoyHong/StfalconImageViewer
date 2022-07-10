@@ -105,8 +105,6 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
     private var trackEnable = false
     private var isFirstChildAttached = false
     private var isIdle = true
-    internal var scaleDirection = RecyclingPagerAdapter.SCALE_DIRECTION_HORIZONTAL
-
     private var viewType = RecyclingPagerAdapter.VIEW_TYPE_IMAGE
 
     private val shouldDismissToBottom: Boolean
@@ -126,9 +124,6 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
                 if (!isFirstChildAttached) {
                     isFirstChildAttached = true
                     transitionImageAnimator = createTransitionImageAnimator(externalTransitionImageView, dismissContainer)
-                        .also {
-                            it.scaleDirection = scaleDirection
-                        }
                     imagesPager.makeVisible()
                     animateOpen()
                 }
@@ -236,14 +231,13 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
         }
     }
 
-    internal fun updateTransitionImage(imageView: View?, scaleDirection: Int) {
+    internal fun updateTransitionImage(imageView: View?) {
         externalTransitionImageView = imageView
         transitionImageAnimator =
             createTransitionImageAnimator(externalTransitionImageView, dismissContainer)
         transitionImageAnimator!!.updateTransitionView(
             dismissContainer,
-            externalTransitionImageView,
-            scaleDirection
+            externalTransitionImageView
         )
     }
 

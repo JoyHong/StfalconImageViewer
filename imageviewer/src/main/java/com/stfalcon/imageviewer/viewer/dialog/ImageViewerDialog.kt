@@ -81,8 +81,8 @@ internal class ImageViewerDialog<T>(
         viewerView.setCurrentItem(item)
     }
 
-    fun updateTransitionImage(view: View?, scaleDirection: Int) {
-        viewerView.updateTransitionImage(view, scaleDirection)
+    fun updateTransitionImage(view: View?) {
+        viewerView.updateTransitionImage(view)
     }
 
     private fun onDialogKeyEvent(keyCode: Int, event: KeyEvent): Boolean {
@@ -100,7 +100,6 @@ internal class ImageViewerDialog<T>(
         viewerView.apply {
             isSwipeToDismissAllowed = builderData.isSwipeToDismissAllowed
             overlayView = builderData.overlayView
-            scaleDirection = builderData.scaleDirection
             setBackgroundColor(builderData.backgroundColor)
             setImages(
                 builderData.images,
