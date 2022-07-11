@@ -227,7 +227,9 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
         if (shouldDismissToBottom) {
             swipeDismissHandler.initiateDismissToBottom()
         } else {
-            animateClose()
+            if (!transitionImageAnimator!!.isAnimating){
+                animateClose()
+            }
         }
     }
 
