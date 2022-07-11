@@ -234,6 +234,15 @@ public class StfalconImageViewer<T> {
         }
 
         /**
+         * 设置状态栏透明
+         * @return This Builder object to allow calls chaining
+         */
+        public Builder<T> withStatusBarTransparent(Boolean statusBarTransparent) {
+            this.data.setStatusBarTransparent(statusBarTransparent);
+            return this;
+        }
+
+        /**
          * Sets {@link OnImageChangeListener} for the viewer.
          *
          * @return This Builder object to allow calls chaining

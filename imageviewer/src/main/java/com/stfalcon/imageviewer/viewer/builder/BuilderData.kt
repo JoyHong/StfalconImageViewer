@@ -44,4 +44,5 @@ internal class BuilderData<T>(
     var isSwipeToDismissAllowed = true
     var transitionView: View? = null
     var useDialogStyle = false
+    var statusBarTransparent = false
 }

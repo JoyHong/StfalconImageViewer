@@ -17,8 +17,9 @@
 package com.stfalcon.imageviewer.viewer.dialog
 
 import android.content.Context
-import android.view.KeyEvent
-import android.view.View
+import android.graphics.Color
+import android.os.Build
+import android.view.*
 import androidx.appcompat.app.AlertDialog
 import com.stfalcon.imageviewer.R
 import com.stfalcon.imageviewer.viewer.builder.BuilderData
@@ -56,6 +57,27 @@ internal class ImageViewerDialog<T>(
                     builderData.onDismissListener?.onDismiss()
                 }
             }
+
+        if (builderData.statusBarTransparent) {  //设置透明状态栏
+            val window = dialog.window!!
+            val lp = window.attributes
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                    lp.layoutInDisplayCutoutMode =
+                        WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES;
+                }
+                window.attributes = lp
+                window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                        or View.SYSTEM_UI_FLAG_LAYOUT_STABLE or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
+
+                window.statusBarColor = Color.TRANSPARENT
+                window.navigationBarColor = Color.TRANSPARENT
+                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+            } else {
+                window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+                window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+            }
+        }
     }
 
     fun show() {
