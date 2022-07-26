@@ -3,7 +3,7 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 31
     defaultConfig {
         applicationId "com.stfalcon.stfalconimageviewersample"
         minSdkVersion 19
@@ -25,14 +25,14 @@ dependencies {
     implementation project(':imageviewer')
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'androidx.appcompat:appcompat:1.4.2'
     implementation 'androidx.cardview:cardview:1.0.0'
-    implementation 'androidx.transition:transition:1.2.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.0-beta3'
-    implementation 'androidx.coordinatorlayout:coordinatorlayout:1.1.0-rc01'
+    implementation 'androidx.transition:transition:1.4.1'
+    implementation 'androidx.constraintlayout:constraintlayout:2.2.0-alpha03'
+    implementation 'androidx.coordinatorlayout:coordinatorlayout:1.2.0'
 
     //UI
     implementation 'com.squareup.picasso:picasso:2.71828'
     implementation 'me.relex:circleindicator:2.1.0'
-    implementation 'com.google.android.material:material:1.4.0'
+    implementation 'com.google.android.material:material:1.6.1'
 }
