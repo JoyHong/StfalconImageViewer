@@ -21,10 +21,15 @@ import android.animation.Animator
 import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
 import android.view.View
+import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.AnimationSet
 import android.view.animation.ScaleAnimation
 import android.view.animation.TranslateAnimation
+import androidx.recyclerview.widget.RecyclerView
+import androidx.viewpager2.widget.ViewPager2
+import com.github.chrisbanes.photoview.PhotoView
+import com.stfalcon.imageviewer.R
 import com.stfalcon.imageviewer.common.extensions.isRectVisible
 import com.stfalcon.imageviewer.common.pager.RecyclingPagerAdapter
 
@@ -193,9 +198,28 @@ internal class TransitionImageAnimator(
             scaleY
         }
 
-        if (viewType == RecyclingPagerAdapter.VIEW_TYPE_IMAGE && (scaleX > scaleY)) {
-            toX /= scaleSize
+        if (!isOpen && viewType == RecyclingPagerAdapter.VIEW_TYPE_IMAGE) {
+            fun animResetScale(view: View?) {
+                if (view is PhotoView) {
+                    view.setScale(1F, true)
+                    return
+                }
+                if (view is ViewGroup) {
+                    val count = view.childCount
+                    for (index in 0..count) {
+                        val childView = view.getChildAt(index)
+                        animResetScale(childView)
+                    }
+                }
+            }
+            // itemView 是 dismissContainer, FrameLayout 包裹一个 ViewPager2, @see image_viewer_mage_viewer
+            val viewPager2 =
+                itemView.findViewById<ViewPager2>(com.stfalcon.imageviewer.R.id.imagesPager)
+            val childView =
+                (viewPager2.getChildAt(0) as RecyclerView).layoutManager?.findViewByPosition(viewPager2.currentItem)
+            animResetScale(childView)
         }
+
         scaleNumber = toX
         //以自己为中心进行缩放
         val scaleAnimation: ScaleAnimation = if (isOpen) {
