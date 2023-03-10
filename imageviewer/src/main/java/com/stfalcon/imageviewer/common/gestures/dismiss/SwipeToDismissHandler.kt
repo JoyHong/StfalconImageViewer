@@ -41,6 +41,7 @@ internal class SwipeToDismissHandler(
     private var translationY = 0f
     private var translationLimit: Int = swipeView.height / 9
     private var isTracking = false
+    private var isTrackingRecorded = false
     private var startY: Float = 0f
     private var startX: Float = 0f
     private var scaleTemp: Float = 0f
@@ -50,7 +51,7 @@ internal class SwipeToDismissHandler(
             MotionEvent.ACTION_DOWN -> {
                 if (swipeView.hitRect.contains(event.x.toInt(), event.y.toInt())) {
                     isTracking = true
-                    onSwipeTrackingStart.invoke()
+                    isTrackingRecorded = false
                 }
                 startY = event.y
                 startX = event.x
@@ -59,17 +60,25 @@ internal class SwipeToDismissHandler(
             MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                 if (isTracking) {
                     isTracking = false
-                    val translationX = event.x - startX
-                    val translationY = event.y - startY
-                    this.translationX = translationX
-                    this.translationY = translationY
-                    onSwipeTrackingEnd.invoke()
-                    onTrackingEnd(v.height,v.width)
+                    if (isTrackingRecorded) {
+                        isTrackingRecorded = false
+                        val translationX = event.x - startX
+                        val translationY = event.y - startY
+                        this.translationX = translationX
+                        this.translationY = translationY
+                        onSwipeTrackingEnd.invoke()
+                        onTrackingEnd(v.height,v.width)
+                    }
                 }
                 return true
             }
             MotionEvent.ACTION_MOVE -> {
                 if (isTracking) {
+                    if (!isTrackingRecorded) {
+                        isTrackingRecorded = true
+                        onSwipeTrackingStart.invoke()
+                    }
+
                     val translationY = event.y - startY
                     val translationX = event.x - startX
                     swipeView.translationY = translationY

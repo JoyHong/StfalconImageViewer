@@ -322,8 +322,7 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
     }
 
     private fun handleUpDownEvent(event: MotionEvent) {
-        if (event.action == MotionEvent.ACTION_UP
-            || event.action == MotionEvent.ACTION_CANCEL) {
+        if (event.action == MotionEvent.ACTION_UP) {
             handleEventActionUp(event)
         }
 
