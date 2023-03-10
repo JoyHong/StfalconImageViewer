@@ -133,12 +133,6 @@ internal class ImageViewerDialog<T>(
             onPageChanged = { position ->
                 builderData.imageChangeListener?.onImageChange(position)
             }
-            onChildViewAttachToWindow = { view ->
-                builderData.onChildAttachStateChangeListener?.onChildViewAttachedToWindow(view)
-            }
-            onChildViewDetachedFromWindow = { view ->
-                builderData.onChildAttachStateChangeListener?.onChildViewDetachedFromWindow(view)
-            }
             onDismiss = {
                 dialog.dismiss()
             }

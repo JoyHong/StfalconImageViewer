@@ -26,8 +26,6 @@ import androidx.annotation.DimenRes;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 
-import com.stfalcon.imageviewer.common.pager.RecyclingPagerAdapter;
-import com.stfalcon.imageviewer.listeners.OnChildAttachStateChangeListener;
 import com.stfalcon.imageviewer.listeners.OnDismissListener;
 import com.stfalcon.imageviewer.listeners.OnImageChangeListener;
 import com.stfalcon.imageviewer.loader.GetViewType;
@@ -259,16 +257,6 @@ public class StfalconImageViewer<T> {
          */
         public Builder<T> withDismissListener(OnDismissListener onDismissListener) {
             this.data.setOnDismissListener(onDismissListener);
-            return this;
-        }
-
-        /**
-         * Sets {@link OnChildAttachStateChangeListener} for viewer.
-         *
-         * @return This Builder object to allow calls chaining
-         */
-        public Builder<T> withChildAttachStateChangeListener(OnChildAttachStateChangeListener onChildAttachStateChangeListener) {
-            this.data.setOnChildAttachStateChangeListener(onChildAttachStateChangeListener);
             return this;
         }
 

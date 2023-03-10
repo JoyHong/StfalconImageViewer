@@ -61,8 +61,6 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
 
     internal var onDismiss: (() -> Unit)? = null
     internal var onPageChanged: ((position: Int) -> Unit)? = null
-    internal var onChildViewAttachToWindow: ((view: View) -> Unit)? = null
-    internal var onChildViewDetachedFromWindow: ((view: View) -> Unit)? = null
     private val isScaled
         get() = imagesAdapter?.isScaled(currentItem) ?: false
 
@@ -120,7 +118,6 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
         recyclerView.addOnChildAttachStateChangeListener(object :
             RecyclerView.OnChildAttachStateChangeListener {
             override fun onChildViewAttachedToWindow(view: View) {
-                onChildViewAttachToWindow?.invoke(view)
                 if (!isFirstChildAttached) {
                     isFirstChildAttached = true
                     transitionImageAnimator = createTransitionImageAnimator(externalTransitionImageView, dismissContainer)
@@ -130,7 +127,6 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
             }
 
             override fun onChildViewDetachedFromWindow(view: View) {
-                onChildViewDetachedFromWindow?.invoke(view)
             }
         })
         imagesPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {

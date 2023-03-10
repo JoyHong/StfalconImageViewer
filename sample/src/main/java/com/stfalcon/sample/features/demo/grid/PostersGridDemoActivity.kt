@@ -11,7 +11,6 @@ import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
 import com.github.chrisbanes.photoview.PhotoView
 import com.stfalcon.imageviewer.StfalconImageViewer
 import com.stfalcon.imageviewer.common.pager.RecyclingPagerAdapter
-import com.stfalcon.imageviewer.listeners.OnChildAttachStateChangeListener
 import com.stfalcon.sample.R
 import com.stfalcon.sample.common.extensions.getDrawableCompat
 import com.stfalcon.sample.common.extensions.loadImage
@@ -46,12 +45,6 @@ class PostersGridDemoActivity : AppCompatActivity() {
             .withImageChangeListener {
                 viewer.updateTransitionImage(postersGridView.imageViews[it])
             }
-            .withChildAttachStateChangeListener(object : OnChildAttachStateChangeListener {
-                override fun onChildViewAttachedToWindow(view: View) {
-                }
-                override fun onChildViewDetachedFromWindow(view: View) {
-                }
-            })
             .show()
     }
 
