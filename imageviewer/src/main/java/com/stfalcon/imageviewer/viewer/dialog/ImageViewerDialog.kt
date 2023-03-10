@@ -133,8 +133,8 @@ internal class ImageViewerDialog<T>(
             onPageChanged = { position ->
                 builderData.imageChangeListener?.onImageChange(position)
             }
-            onAnimationStart = {
-                builderData.onStateListener?.onAnimationStart(viewerView)
+            onAnimationStart = { willDismiss ->
+                builderData.onStateListener?.onAnimationStart(viewerView, willDismiss)
             }
             onAnimationEnd = { willDismiss ->
                 builderData.onStateListener?.onAnimationEnd(viewerView, willDismiss)

@@ -47,7 +47,7 @@ class PostersGridDemoActivity : AppCompatActivity() {
                 viewer.updateTransitionImage(postersGridView.imageViews[it])
             }
             .withStateListener(object : OnStateListener {
-                override fun onAnimationStart(view: View) {
+                override fun onAnimationStart(view: View, willDismiss: Boolean) {
                 }
 
                 override fun onAnimationEnd(view: View, willDismiss: Boolean) {

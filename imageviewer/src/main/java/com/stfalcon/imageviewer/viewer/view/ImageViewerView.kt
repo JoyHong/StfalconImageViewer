@@ -61,7 +61,7 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
 
     internal var onDismiss: (() -> Unit)? = null
     internal var onPageChanged: ((position: Int) -> Unit)? = null
-    internal var onAnimationStart: (() -> Unit)? = null
+    internal var onAnimationStart: ((willDismiss: Boolean) -> Unit)? = null
     internal var onAnimationEnd: ((willDismiss: Boolean) -> Unit)? = null
     internal var onTrackingStart: (() -> Unit)? = null
     internal var onTrackingEnd: (() -> Unit)? = null
@@ -249,7 +249,7 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
             onTransitionStart = { duration ->
                 backgroundView.animateAlpha(0f, 1f, duration)
                 overlayView?.animateAlpha(0f, 1f, duration)
-                onAnimationStart?.invoke()
+                onAnimationStart?.invoke(false)
             },
             onTransitionEnd = {
                 prepareViewsForViewer()
@@ -268,7 +268,7 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
             onTransitionStart = { duration ->
                 backgroundView.animateAlpha(backgroundView.alpha, 0f, duration)
                 overlayView?.animateAlpha(overlayView?.alpha, 0f, duration)
-                onAnimationStart?.invoke()
+                onAnimationStart?.invoke(true)
             },
             onTransitionEnd = {
                 onAnimationEnd?.invoke(true)
@@ -287,7 +287,7 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
             onTransitionStart = { duration ->
                 backgroundView.animateAlpha(backgroundView.alpha, 0f, duration)
                 overlayView?.animateAlpha(overlayView?.alpha, 0f, duration)
-                onAnimationStart?.invoke()
+                onAnimationStart?.invoke(true)
             },
             onTransitionEnd = {
                 onAnimationEnd?.invoke(true)
@@ -434,7 +434,7 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
             onSwipeTrackingStart = { onTrackingStart?.invoke() },
             onSwipeTrackingEnd = { onTrackingEnd?.invoke() },
             onSwipeViewMove = ::handleSwipeViewMove,
-            onAnimationStart = { onAnimationStart?.invoke() },
+            onAnimationStart = { willDismiss ->  onAnimationStart?.invoke(willDismiss) },
             onAnimationEnd = { willDismiss -> onAnimationEnd?.invoke(willDismiss) }
         )
 

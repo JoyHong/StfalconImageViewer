@@ -26,7 +26,7 @@ import androidx.annotation.NonNull;
 //N.B.! This class is written in Java for convenient use of lambdas due to languages compatibility issues.
 public interface OnStateListener {
 
-    void onAnimationStart(@NonNull View view);
+    void onAnimationStart(@NonNull View view, boolean willDismiss);
 
     void onAnimationEnd(@NonNull View view, boolean willDismiss);
 

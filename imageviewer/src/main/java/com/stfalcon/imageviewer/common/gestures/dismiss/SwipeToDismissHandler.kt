@@ -30,7 +30,7 @@ internal class SwipeToDismissHandler(
     private val onSwipeTrackingStart: () -> Unit,
     private val onSwipeTrackingEnd: () -> Unit,
     private val onSwipeViewMove: (translationY: Float, translationLimit: Int) -> Unit,
-    private val onAnimationStart: () -> Unit,
+    private val onAnimationStart: (willDismiss: Boolean) -> Unit,
     private val onAnimationEnd: (willDismiss: Boolean) -> Unit,
     private val shouldAnimateDismiss: () -> Boolean
 ) : View.OnTouchListener {
@@ -147,7 +147,7 @@ internal class SwipeToDismissHandler(
             .setUpdateListener { onSwipeViewMove(swipeView.translationY, translationLimit) }
             .setAnimatorListener(
                 onAnimationStart = {
-                    onAnimationStart.invoke()
+                    onAnimationStart.invoke(false)
                 },
                 onAnimationEnd = {
                     // remove the update listener, otherwise it will be saved on the next animation execution:
