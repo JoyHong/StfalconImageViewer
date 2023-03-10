@@ -133,6 +133,18 @@ internal class ImageViewerDialog<T>(
             onPageChanged = { position ->
                 builderData.imageChangeListener?.onImageChange(position)
             }
+            onAnimationStart = {
+                builderData.onStateListener?.onAnimationStart(viewerView)
+            }
+            onAnimationEnd = { willDismiss ->
+                builderData.onStateListener?.onAnimationEnd(viewerView, willDismiss)
+            }
+            onTrackingStart = {
+                builderData.onStateListener?.onTrackingStart(viewerView)
+            }
+            onTrackingEnd = {
+                builderData.onStateListener?.onTrackingEnd(viewerView)
+            }
             onDismiss = {
                 dialog.dismiss()
             }

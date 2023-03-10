@@ -61,6 +61,11 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
 
     internal var onDismiss: (() -> Unit)? = null
     internal var onPageChanged: ((position: Int) -> Unit)? = null
+    internal var onAnimationStart: (() -> Unit)? = null
+    internal var onAnimationEnd: ((willDismiss: Boolean) -> Unit)? = null
+    internal var onTrackingStart: (() -> Unit)? = null
+    internal var onTrackingEnd: (() -> Unit)? = null
+
     private val isScaled
         get() = imagesAdapter?.isScaled(currentItem) ?: false
 
@@ -244,8 +249,12 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
             onTransitionStart = { duration ->
                 backgroundView.animateAlpha(0f, 1f, duration)
                 overlayView?.animateAlpha(0f, 1f, duration)
+                onAnimationStart?.invoke()
             },
-            onTransitionEnd = { prepareViewsForViewer() })
+            onTransitionEnd = {
+                prepareViewsForViewer()
+                onAnimationEnd?.invoke(false)
+            })
         transitionImageAnimator!!.viewType = viewType
     }
 
@@ -259,8 +268,12 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
             onTransitionStart = { duration ->
                 backgroundView.animateAlpha(backgroundView.alpha, 0f, duration)
                 overlayView?.animateAlpha(overlayView?.alpha, 0f, duration)
+                onAnimationStart?.invoke()
             },
-            onTransitionEnd = { onDismiss?.invoke() })
+            onTransitionEnd = {
+                onAnimationEnd?.invoke(true)
+                onDismiss?.invoke()
+            })
         transitionImageAnimator!!.viewType = viewType
     }
 
@@ -274,8 +287,12 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
             onTransitionStart = { duration ->
                 backgroundView.animateAlpha(backgroundView.alpha, 0f, duration)
                 overlayView?.animateAlpha(overlayView?.alpha, 0f, duration)
+                onAnimationStart?.invoke()
             },
-            onTransitionEnd = { onDismiss?.invoke() }
+            onTransitionEnd = {
+                onAnimationEnd?.invoke(true)
+                onDismiss?.invoke()
+            }
         )
         transitionImageAnimator!!.viewType = viewType
     }
@@ -305,7 +322,8 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
     }
 
     private fun handleUpDownEvent(event: MotionEvent) {
-        if (event.action == MotionEvent.ACTION_UP) {
+        if (event.action == MotionEvent.ACTION_UP
+            || event.action == MotionEvent.ACTION_CANCEL) {
             handleEventActionUp(event)
         }
 
@@ -414,7 +432,11 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
             swipeView = dismissContainer,
             shouldAnimateDismiss = { shouldDismissToBottom },
             onDismiss = { fl: Float, fl1: Float, fl2: Float -> animateClose(fl, fl1, fl2) },
-            onSwipeViewMove = ::handleSwipeViewMove
+            onSwipeTrackingStart = { onTrackingStart?.invoke() },
+            onSwipeTrackingEnd = { onTrackingEnd?.invoke() },
+            onSwipeViewMove = ::handleSwipeViewMove,
+            onAnimationStart = { onAnimationStart?.invoke() },
+            onAnimationEnd = { willDismiss -> onAnimationEnd?.invoke(willDismiss) }
         )
 
     private fun createTransitionImageAnimator(transitionImageView: View?, internalImage: View?) =

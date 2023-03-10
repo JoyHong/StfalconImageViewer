@@ -28,6 +28,7 @@ import androidx.core.content.ContextCompat;
 
 import com.stfalcon.imageviewer.listeners.OnDismissListener;
 import com.stfalcon.imageviewer.listeners.OnImageChangeListener;
+import com.stfalcon.imageviewer.listeners.OnStateListener;
 import com.stfalcon.imageviewer.loader.GetViewType;
 import com.stfalcon.imageviewer.loader.ImageLoader;
 import com.stfalcon.imageviewer.loader.OnCreateView;
@@ -257,6 +258,16 @@ public class StfalconImageViewer<T> {
          */
         public Builder<T> withDismissListener(OnDismissListener onDismissListener) {
             this.data.setOnDismissListener(onDismissListener);
+            return this;
+        }
+
+        /**
+         * Sets {@link OnStateListener} for viewer.
+         *
+         * @return This Builder object to allow calls chaining
+         */
+        public Builder<T> withStateListener(OnStateListener onStateListener) {
+            this.data.setOnStateListener(onStateListener);
             return this;
         }
 

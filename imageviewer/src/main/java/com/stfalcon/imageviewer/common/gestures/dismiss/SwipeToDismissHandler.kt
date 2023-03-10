@@ -27,7 +27,11 @@ import com.stfalcon.imageviewer.common.extensions.setAnimatorListener
 internal class SwipeToDismissHandler(
     private val swipeView: View,
     private val onDismiss: (translationX : Float,translationY : Float,scaleTemp : Float) -> Unit,
+    private val onSwipeTrackingStart: () -> Unit,
+    private val onSwipeTrackingEnd: () -> Unit,
     private val onSwipeViewMove: (translationY: Float, translationLimit: Int) -> Unit,
+    private val onAnimationStart: () -> Unit,
+    private val onAnimationEnd: (willDismiss: Boolean) -> Unit,
     private val shouldAnimateDismiss: () -> Boolean
 ) : View.OnTouchListener {
     companion object {
@@ -46,6 +50,7 @@ internal class SwipeToDismissHandler(
             MotionEvent.ACTION_DOWN -> {
                 if (swipeView.hitRect.contains(event.x.toInt(), event.y.toInt())) {
                     isTracking = true
+                    onSwipeTrackingStart.invoke()
                 }
                 startY = event.y
                 startX = event.x
@@ -58,8 +63,8 @@ internal class SwipeToDismissHandler(
                     val translationY = event.y - startY
                     this.translationX = translationX
                     this.translationY = translationY
+                    onSwipeTrackingEnd.invoke()
                     onTrackingEnd(v.height,v.width)
-
                 }
                 return true
             }
@@ -131,13 +136,18 @@ internal class SwipeToDismissHandler(
             .setDuration(ANIMATION_DURATION)
             .setInterpolator(AccelerateInterpolator())
             .setUpdateListener { onSwipeViewMove(swipeView.translationY, translationLimit) }
-            .setAnimatorListener(onAnimationEnd = {
-                if (translationToY != 0f) {
-                    onDismiss(translationX, translationY, scaleTemp)
-                }
-                //remove the update listener, otherwise it will be saved on the next animation execution:
-                swipeView.animate().setUpdateListener(null)
-            })
+            .setAnimatorListener(
+                onAnimationStart = {
+                    onAnimationStart.invoke()
+                },
+                onAnimationEnd = {
+                    // remove the update listener, otherwise it will be saved on the next animation execution:
+                    swipeView.animate().setUpdateListener(null)
+                    if (translationToY != 0f) {
+                        onDismiss(translationX, translationY, scaleTemp)
+                    }
+                    onAnimationEnd.invoke(false)
+                })
             .start()
     }
 }
