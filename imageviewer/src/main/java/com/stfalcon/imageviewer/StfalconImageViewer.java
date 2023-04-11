@@ -162,6 +162,16 @@ public class StfalconImageViewer<T> {
         }
 
         /**
+         * Enables or disables custom overlay view switch animation. True by default.
+         *
+         * @return This Builder object to allow calls chaining
+         */
+        public Builder<T> withOverlayViewSwitchAnimation(boolean enable) {
+            this.data.setOverlayViewSwitchAnimationEnable(enable);
+            return this;
+        }
+
+        /**
          * Sets space between the images using dimension.
          *
          * @return This Builder object to allow calls chaining

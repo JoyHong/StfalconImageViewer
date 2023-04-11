@@ -122,6 +122,7 @@ internal class ImageViewerDialog<T>(
         viewerView.apply {
             isSwipeToDismissAllowed = builderData.isSwipeToDismissAllowed
             overlayView = builderData.overlayView
+            overlayViewSwitchAnimationEnable = builderData.overlayViewSwitchAnimationEnable
             setBackgroundColor(builderData.backgroundColor)
             setImages(
                 builderData.images,

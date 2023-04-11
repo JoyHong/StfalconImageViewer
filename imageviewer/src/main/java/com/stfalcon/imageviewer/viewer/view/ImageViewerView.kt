@@ -84,6 +84,7 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
                 rootContainer.addView(it)
             }
         }
+    internal var overlayViewSwitchAnimationEnable = true
 
     private val rootContainer: ViewGroup
     private val backgroundView: View
@@ -383,7 +384,9 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
 
     private fun handleSingleTap(event: MotionEvent, isOverlayWasClicked: Boolean) {
         if (overlayView != null && !isOverlayWasClicked) {
-            overlayView!!.switchVisibilityWithAnimation()
+            if (overlayViewSwitchAnimationEnable) {
+                overlayView!!.switchVisibilityWithAnimation()
+            }
             super.dispatchTouchEvent(event)
         }
     }

@@ -38,6 +38,7 @@ internal class BuilderData<T>(
     var onDismissListener: OnDismissListener? = null
     var onStateListener: OnStateListener? = null
     var overlayView: View? = null
+    var overlayViewSwitchAnimationEnable: Boolean = true
     var imageMarginPixels: Int = 0
     var shouldStatusBarHide = false
     var isZoomingAllowed = true
