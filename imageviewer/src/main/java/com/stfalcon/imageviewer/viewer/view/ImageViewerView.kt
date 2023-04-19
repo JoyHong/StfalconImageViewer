@@ -387,7 +387,7 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
             if (overlayViewSwitchAnimationEnable) {
                 overlayView!!.switchVisibilityWithAnimation()
             }
-            super.dispatchTouchEvent(event)
+//            super.dispatchTouchEvent(event)
         }
     }
 
