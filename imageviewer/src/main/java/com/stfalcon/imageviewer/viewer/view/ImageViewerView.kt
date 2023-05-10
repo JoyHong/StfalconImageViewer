@@ -179,18 +179,18 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
 
         if (swipeDirection == null && (scaleDetector.isInProgress || event.pointerCount > 1 || wasScaled)) {
             wasScaled = true
-            return imagesPager.dispatchTouchEvent(event)
+            return dispatchTouchEvent2ImagesPager(event)
         }
 
         if (viewType == RecyclingPagerAdapter.VIEW_TYPE_SUBSAMPLING_IMAGE) { //subsamplingView需要单独处理长图滑动状态
             //放大情况下正常滑动预览
             return if (!trackEnable && isScaled) {
-                imagesPager.dispatchTouchEvent(event)
+                dispatchTouchEvent2ImagesPager(event)
             } else {
                 handleTouchIfNotScaled(event)
             }
         }
-        return if (isScaled) super.dispatchTouchEvent(event) else handleTouchIfNotScaled(event)
+        return if (isScaled) dispatchTouchEvent2ImagesPager(event) else handleTouchIfNotScaled(event)
     }
 
     override fun setBackgroundColor(color: Int) {
@@ -306,6 +306,17 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
 
     private fun prepareViewsForViewer() {
         imagesPager.makeVisible()
+    }
+
+    /**
+     * handleUpDownEvent 中 imagesPager 已处理了 ACTION_DOWN 和 ACTION_UP，需要过滤这两个事件，避免重复处理
+     */
+    private fun dispatchTouchEvent2ImagesPager(event: MotionEvent): Boolean {
+        return if (event.action != MotionEvent.ACTION_DOWN && event.action != MotionEvent.ACTION_UP) {
+            imagesPager.dispatchTouchEvent(event)
+        } else {
+            true
+        }
     }
 
     private fun handleTouchIfNotScaled(event: MotionEvent): Boolean {
