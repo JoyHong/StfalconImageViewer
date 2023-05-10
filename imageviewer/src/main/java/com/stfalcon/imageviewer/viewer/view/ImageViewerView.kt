@@ -104,6 +104,7 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
     private var wasDoubleTapped = false
     private var isOverlayWasClicked = false
     private var swipeDirection: SwipeDirection? = null
+    private var swipeDismissHandling = false
 
     private var transitionImageAnimator: TransitionImageAnimator? = null
     private var trackEnable = false
@@ -178,18 +179,18 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
 
         if (swipeDirection == null && (scaleDetector.isInProgress || event.pointerCount > 1 || wasScaled)) {
             wasScaled = true
-            return imagesPager.dispatchTouchEvent(event)
+            return dispatchTouchEvent2ImagesPager(event)
         }
 
         if (viewType == RecyclingPagerAdapter.VIEW_TYPE_SUBSAMPLING_IMAGE) { //subsamplingView需要单独处理长图滑动状态
             //放大情况下正常滑动预览
             return if (!trackEnable && isScaled) {
-                imagesPager.dispatchTouchEvent(event)
+                dispatchTouchEvent2ImagesPager(event)
             } else {
                 handleTouchIfNotScaled(event)
             }
         }
-        return if (isScaled) super.dispatchTouchEvent(event) else handleTouchIfNotScaled(event)
+        return if (isScaled) dispatchTouchEvent2ImagesPager(event) else handleTouchIfNotScaled(event)
     }
 
     override fun setBackgroundColor(color: Int) {
@@ -307,11 +308,28 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
         imagesPager.makeVisible()
     }
 
+    /**
+     * handleUpDownEvent 中 imagesPager 已处理了 ACTION_DOWN 和 ACTION_UP，需要过滤这两个事件，避免重复处理
+     */
+    private fun dispatchTouchEvent2ImagesPager(event: MotionEvent): Boolean {
+        return if (event.action != MotionEvent.ACTION_DOWN && event.action != MotionEvent.ACTION_UP) {
+            imagesPager.dispatchTouchEvent(event)
+        } else {
+            true
+        }
+    }
+
     private fun handleTouchIfNotScaled(event: MotionEvent): Boolean {
         directionDetector.handleTouchEvent(event)
         return when (swipeDirection) {
             UP, DOWN -> {
                 if (isSwipeToDismissAllowed && !wasScaled && isIdle) {
+                    // 判定进入滑动退出状态时，触发一次 dispatchTouchEvent，避免 item View 因只接收到
+                    // ACTION_DOWN event，而在拖动过程中触发 onLongClick 或在拖动结束时触发 onClick
+                    if (!swipeDismissHandling) {
+                        swipeDismissHandling = true
+                        imagesPager.dispatchTouchEvent(event)
+                    }
                     swipeDismissHandler.onTouch(rootContainer, event)
                 } else true
             }
@@ -370,6 +388,7 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
     private fun handleEventActionDown(event: MotionEvent) {
         swipeDirection = null
         wasScaled = false
+        swipeDismissHandling = false
         imagesPager.dispatchTouchEvent(event)
         swipeDismissHandler.onTouch(rootContainer, event)
         isOverlayWasClicked = dispatchOverlayTouch(event)
