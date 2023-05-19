@@ -174,6 +174,10 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
         topOrBottom = imagesAdapter?.isTopOrBottom(currentItem)!!
         trackEnable = handleEventAction(event, topOrBottom)
 
+        if (event.action == MotionEvent.ACTION_DOWN && !imagesPager.isUserInputEnabled) {
+            imagesPager.isUserInputEnabled = true
+        }
+
         handleUpDownEvent(event)
 
         if (swipeDirection == null && (scaleDetector.isInProgress || event.pointerCount > 1 || wasScaled)) {
@@ -323,6 +327,10 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
         return when (swipeDirection) {
             UP, DOWN -> {
                 if (isSwipeToDismissAllowed && !wasScaled && isIdle) {
+                    if (imagesPager.isUserInputEnabled) {
+                        imagesPager.isUserInputEnabled = false
+                    }
+                    imagesPager.dispatchTouchEvent(event)
                     swipeDismissHandler.onTouch(rootContainer, event)
                 } else true
             }
