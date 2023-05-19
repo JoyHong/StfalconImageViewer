@@ -104,7 +104,6 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
     private var wasDoubleTapped = false
     private var isOverlayWasClicked = false
     private var swipeDirection: SwipeDirection? = null
-    private var swipeDismissHandling = false
 
     private var transitionImageAnimator: TransitionImageAnimator? = null
     private var trackEnable = false
@@ -324,12 +323,6 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
         return when (swipeDirection) {
             UP, DOWN -> {
                 if (isSwipeToDismissAllowed && !wasScaled && isIdle) {
-                    // 判定进入滑动退出状态时，触发一次 dispatchTouchEvent，避免 item View 因只接收到
-                    // ACTION_DOWN event，而在拖动过程中触发 onLongClick 或在拖动结束时触发 onClick
-                    if (!swipeDismissHandling) {
-                        swipeDismissHandling = true
-                        imagesPager.dispatchTouchEvent(event)
-                    }
                     swipeDismissHandler.onTouch(rootContainer, event)
                 } else true
             }
@@ -388,7 +381,6 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
     private fun handleEventActionDown(event: MotionEvent) {
         swipeDirection = null
         wasScaled = false
-        swipeDismissHandling = false
         imagesPager.dispatchTouchEvent(event)
         swipeDismissHandler.onTouch(rootContainer, event)
         isOverlayWasClicked = dispatchOverlayTouch(event)
