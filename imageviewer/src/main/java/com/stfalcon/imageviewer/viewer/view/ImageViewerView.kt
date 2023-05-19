@@ -337,7 +337,13 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
             LEFT, RIGHT -> {
                 imagesPager.dispatchTouchEvent(event)
             }
-            else -> true
+            else -> {
+                if (event.action == MotionEvent.ACTION_CANCEL) {
+                    imagesPager.dispatchTouchEvent(event)
+                } else {
+                    true
+                }
+            }
         }
     }
 
