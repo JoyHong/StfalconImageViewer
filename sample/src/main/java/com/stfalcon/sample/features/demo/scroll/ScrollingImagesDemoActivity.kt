@@ -63,7 +63,7 @@ class ScrollingImagesDemoActivity : AppCompatActivity() {
             .withStartPosition(startPosition)
             .withTransitionFrom(target)
             .withImageChangeListener { viewer.updateTransitionImage(imageViews.getOrNull(it)) }
-            .show()
+            .show(supportFragmentManager)
     }
 
     private fun loadImage(view: View, url: String?) {

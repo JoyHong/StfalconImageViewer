@@ -68,7 +68,7 @@ class RotationDemoActivity : AppCompatActivity() {
                 viewer.updateTransitionImage(getTransitionTarget(it))
             }
             .withDismissListener { isDialogShown = false }
-            .show()
+            .show(supportFragmentManager)
 
         currentPosition = startPosition
         isDialogShown = true

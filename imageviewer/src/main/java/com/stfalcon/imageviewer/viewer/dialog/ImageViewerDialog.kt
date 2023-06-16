@@ -16,11 +16,19 @@
 
 package com.stfalcon.imageviewer.viewer.dialog
 
+import android.app.Dialog
 import android.content.Context
+import android.content.DialogInterface
+import android.content.DialogInterface.*
 import android.graphics.Color
 import android.os.Build
+import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.*
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatDialogFragment
+import androidx.fragment.app.FragmentManager
 import com.stfalcon.imageviewer.R
 import com.stfalcon.imageviewer.viewer.builder.BuilderData
 import com.stfalcon.imageviewer.viewer.view.ImageViewerView
@@ -30,8 +38,8 @@ internal class ImageViewerDialog<T>(
     private val builderData: BuilderData<T>
 ) {
 
-    private val dialog: AlertDialog
     private val viewerView: ImageViewerView<T> = ImageViewerView(context)
+    private var dialog: ImageViewerDialogFragment<T>? = null
 
     private val dialogStyle
         get() = if (builderData.shouldStatusBarHide)
@@ -41,47 +49,31 @@ internal class ImageViewerDialog<T>(
 
     init {
         setupViewerView()
-        dialog = (if (builderData.useDialogStyle) {
-            AlertDialog.Builder(context, dialogStyle)
-        } else {
-            AlertDialog.Builder(context)
-        })
-            .setView(viewerView)
-            .setOnKeyListener { _, keyCode, event -> onDialogKeyEvent(keyCode, event) }
-            .create()
-            .apply {
-                setOnShowListener {
-                    viewerView.open(builderData.transitionView)
-                }
-                setOnDismissListener {
-                    builderData.onDismissListener?.onDismiss()
-                }
-            }
-
-        if (builderData.statusBarTransparent) {  //设置透明状态栏
-            val window = dialog.window!!
-            val lp = window.attributes
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                    lp.layoutInDisplayCutoutMode =
-                        WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES;
-                }
-                window.attributes = lp
-                window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                        or View.SYSTEM_UI_FLAG_LAYOUT_STABLE or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
-
-                window.statusBarColor = Color.TRANSPARENT
-                window.navigationBarColor = Color.TRANSPARENT
-                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-            } else {
-                window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-                window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
-            }
-        }
     }
 
-    fun show() {
-        dialog.show()
+    fun show(fm: FragmentManager) {
+        dialog = ImageViewerDialogFragment(viewerView,
+            if (builderData.useDialogStyle) dialogStyle else 0,
+            object : OnKeyListener {
+                override fun onKey(dialog: DialogInterface, keyCode: Int, event: KeyEvent
+                ): Boolean {
+                    return onDialogKeyEvent(keyCode, event)
+                }
+            },
+            object : OnShowListener {
+                override fun onShow(dialog: DialogInterface) {
+                    viewerView.open(builderData.transitionView)
+                }
+            },
+            object : OnDismissListener {
+                override fun onDismiss(dialog: DialogInterface?) {
+                    builderData.onDismissListener?.onDismiss()
+                }
+            },
+            builderData.statusBarTransparent
+        ).apply {
+            show(fm, "ImageViewerDialog")
+        }
     }
 
     fun close() {
@@ -89,7 +81,7 @@ internal class ImageViewerDialog<T>(
     }
 
     fun dismiss() {
-        dialog.dismiss()
+        dialog?.dismiss()
     }
 
     fun updateImages(images: List<T>) {
@@ -147,8 +139,58 @@ internal class ImageViewerDialog<T>(
                 builderData.onStateListener?.onTrackingEnd(viewerView)
             }
             onDismiss = {
-                dialog.dismiss()
+                dialog?.dismiss()
             }
         }
     }
+
+    internal class ImageViewerDialogFragment<T> constructor(
+        private val viewerView: ImageViewerView<T>? = null,
+        private val themeResId: Int = 0,
+        private val onKeyListener: DialogInterface.OnKeyListener? = null,
+        private val onShowListener: OnShowListener? = null,
+        private val onDismissListener: OnDismissListener? = null,
+        private val statusBarTransparent: Boolean = false
+    ) : AppCompatDialogFragment() {
+
+        override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+            return (if (themeResId > 0) {
+                AlertDialog.Builder(requireContext(), themeResId)
+            } else {
+                AlertDialog.Builder(requireContext())
+            }).setView(viewerView)
+                .setOnKeyListener(onKeyListener)
+                .create().apply {
+                    setOnShowListener(onShowListener)
+                    setOnDismissListener(onDismissListener)
+                    if (statusBarTransparent) {
+                        val window = window!!
+                        val lp = window.attributes
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                                lp.layoutInDisplayCutoutMode =
+                                    WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES;
+                            }
+                            window.attributes = lp
+                            window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                                    or View.SYSTEM_UI_FLAG_LAYOUT_STABLE or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
+
+                            window.statusBarColor = Color.TRANSPARENT
+                            window.navigationBarColor = Color.TRANSPARENT
+                            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+                        } else {
+                            window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
+                            window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION)
+                        }
+                    }
+                    if (viewerView == null) {
+                        Handler(Looper.getMainLooper()).post {
+                            dismiss();
+                        }
+                    }
+                };
+        }
+
+    }
+
 }

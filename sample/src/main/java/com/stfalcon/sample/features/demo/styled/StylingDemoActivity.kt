@@ -86,7 +86,7 @@ class StylingDemoActivity : BaseActivity() {
             builder.withBackgroundColor(getRandomColor())
         }
 
-        viewer = builder.show()
+        viewer = builder.show(supportFragmentManager)
     }
 
     //删除按钮回调位置

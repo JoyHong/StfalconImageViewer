@@ -59,7 +59,7 @@ class PostersGridDemoActivity : AppCompatActivity() {
                 override fun onTrackingEnd(view: View) {
                 }
             })
-            .show()
+            .show(supportFragmentManager)
     }
 
 

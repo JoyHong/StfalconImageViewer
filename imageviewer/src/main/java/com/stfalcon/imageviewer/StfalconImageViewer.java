@@ -25,6 +25,7 @@ import androidx.annotation.ColorRes;
 import androidx.annotation.DimenRes;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentManager;
 
 import com.stfalcon.imageviewer.listeners.OnDismissListener;
 import com.stfalcon.imageviewer.listeners.OnImageChangeListener;
@@ -56,9 +57,9 @@ public class StfalconImageViewer<T> {
     /**
      * Displays the built viewer if passed list of images is not empty
      */
-    public void show() {
+    public void show(FragmentManager fm) {
         if (!builderData.getImages().isEmpty()) {
-            dialog.show();
+            dialog.show(fm);
         }
     }
 
@@ -284,7 +285,7 @@ public class StfalconImageViewer<T> {
         /**
          * Creates a {@link StfalconImageViewer} with the arguments supplied to this builder. It does not
          * show the dialog. This allows the user to do any extra processing
-         * before displaying the dialog. Use {@link #show()} if you don't have any other processing
+         * before displaying the dialog. Use {@link #show(FragmentManager)} if you don't have any other processing
          * to do and want this to be created and displayed.
          */
         public StfalconImageViewer<T> build() {
@@ -295,9 +296,9 @@ public class StfalconImageViewer<T> {
          * Creates the {@link StfalconImageViewer} with the arguments supplied to this builder and
          * shows the dialog.
          */
-        public StfalconImageViewer<T> show() {
+        public StfalconImageViewer<T> show(FragmentManager fm) {
             StfalconImageViewer<T> viewer = build();
-            viewer.show();
+            viewer.show(fm);
             return viewer;
         }
     }
