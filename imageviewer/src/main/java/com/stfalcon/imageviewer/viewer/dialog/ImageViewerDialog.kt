@@ -162,7 +162,7 @@ internal class ImageViewerDialog<T>(
                 .setOnKeyListener(onKeyListener)
                 .create().apply {
                     setOnShowListener(onShowListener)
-                    setOnDismissListener(onDismissListener)
+//                    setOnDismissListener(onDismissListener)
                     if (statusBarTransparent) {
                         val window = window!!
                         val lp = window.attributes
@@ -173,7 +173,7 @@ internal class ImageViewerDialog<T>(
                             }
                             window.attributes = lp
                             window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                                    or View.SYSTEM_UI_FLAG_LAYOUT_STABLE or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
+                                    or View.SYSTEM_UI_FLAG_LAYOUT_STABLE or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION)
 
                             window.statusBarColor = Color.TRANSPARENT
                             window.navigationBarColor = Color.TRANSPARENT
@@ -188,7 +188,12 @@ internal class ImageViewerDialog<T>(
                             dismiss();
                         }
                     }
-                };
+                }
+        }
+
+        override fun onDismiss(dialog: DialogInterface) {
+            super.onDismiss(dialog)
+            onDismissListener?.onDismiss(dialog)
         }
 
     }
