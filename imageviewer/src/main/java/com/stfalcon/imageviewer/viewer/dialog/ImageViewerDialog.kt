@@ -139,7 +139,7 @@ internal class ImageViewerDialog<T>(
                 builderData.onStateListener?.onTrackingEnd(viewerView)
             }
             onDismiss = {
-                dialog?.dismiss()
+                dialog?.dismissAllowingStateLoss()
             }
         }
     }
