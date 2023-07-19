@@ -81,7 +81,7 @@ internal class ImageViewerDialog<T>(
     }
 
     fun dismiss() {
-        dialog?.dismiss()
+        dialog?.dismissAllowingStateLoss()
     }
 
     fun updateImages(images: List<T>) {
