@@ -88,9 +88,10 @@ public class StfalconImageViewer<T> {
      * Updates an existing images list if a new list is not empty, otherwise closes the viewer
      */
     public void updateImages(List<T> images) {
-        dialog.updateImages(images);
-        if (images.isEmpty()){
+        if (images.isEmpty()) {
             dialog.close();
+        } else {
+            dialog.updateImages(images);
         }
     }
 
