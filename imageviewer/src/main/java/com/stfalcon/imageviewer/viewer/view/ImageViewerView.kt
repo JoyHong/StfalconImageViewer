@@ -170,6 +170,10 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
             return true
         }
 
+        if (currentItem >= imagesAdapter?.itemCount ?: 0) {
+            return true
+        }
+
         viewType = imagesAdapter?.getItemViewType(currentItem)!!
         topOrBottom = imagesAdapter?.isTopOrBottom(currentItem)!!
         trackEnable = handleEventAction(event, topOrBottom)
