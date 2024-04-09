@@ -1,4 +1,3 @@
+rootProject.name = "imageviewer"
 include ':sample'
-
-include 'imageviewer'
-project(':imageviewer').projectDir = new File('imageviewer')
+include ':imageviewer'

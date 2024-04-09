@@ -16,10 +16,6 @@ buildscript {
     }
 }
 
-plugins {
-    id 'maven-publish'
-}
-
 allprojects {
     repositories {
         maven { url 'https://maven.aliyun.com/repository/google' }
@@ -27,8 +23,4 @@ allprojects {
         google()
         maven { url "https://jitpack.io" }
     }
-}
-
-task clean(type: Delete) {
-    delete rootProject.buildDir
 }
