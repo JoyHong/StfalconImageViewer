@@ -38,13 +38,14 @@ class PostersGridDemoActivity : AppCompatActivity() {
             Demo.posters,
             ::loadPosterImage,
             ::getItemViewType,
+            ::getItemViewSize,
             ::createItemView
         )
             .withStartPosition(startPosition)
             .withTransitionFrom(target)
             .withUseDialogStyle(true)
             .withImageChangeListener {
-                viewer.updateTransitionImage(postersGridView.imageViews[it])
+                viewer.updateTransitionImage(postersGridView.imageViews[it], it)
             }
             .withStateListener(object : OnStateListener {
                 override fun onAnimationStart(view: View, willDismiss: Boolean) {
@@ -91,6 +92,10 @@ class PostersGridDemoActivity : AppCompatActivity() {
     //获取视图类型的回调方法
     private fun getItemViewType(position: Int): Int {
         return Demo.posters[position].viewType
+    }
+
+    private fun getItemViewSize(position: Int): IntArray? {
+        return null
     }
 
     //根据需要加载控件的不同加载不同的itemView

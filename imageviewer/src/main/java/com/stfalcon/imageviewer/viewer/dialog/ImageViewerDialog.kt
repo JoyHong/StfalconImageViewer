@@ -62,7 +62,7 @@ internal class ImageViewerDialog<T>(
             },
             object : OnShowListener {
                 override fun onShow(dialog: DialogInterface) {
-                    viewerView.open(builderData.transitionView)
+                    viewerView.open(builderData.transitionView, builderData.startPosition)
                 }
             },
             object : OnDismissListener {
@@ -95,8 +95,8 @@ internal class ImageViewerDialog<T>(
         viewerView.setCurrentItem(item, smoothScroll)
     }
 
-    fun updateTransitionImage(view: View?) {
-        viewerView.updateTransitionImage(view)
+    fun updateTransitionImage(view: View?, position: Int) {
+        viewerView.updateTransitionImage(view, position)
     }
 
     private fun onDialogKeyEvent(keyCode: Int, event: KeyEvent): Boolean {
@@ -121,6 +121,7 @@ internal class ImageViewerDialog<T>(
                 builderData.startPosition,
                 builderData.imageLoader,
                 builderData.getViewType,
+                builderData.getViewSize,
                 builderData.createItemView
             )
             onPageChanged = { position ->

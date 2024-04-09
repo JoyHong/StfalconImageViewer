@@ -53,11 +53,11 @@ class StylingDemoActivity : BaseActivity() {
 //        var posters = Demo.posters.toMutableList()
 //        var posters = Demo.posters.toMutableList()
 
-        val builder = StfalconImageViewer.Builder<Poster>(this, posters, ::loadPosterImage,::getItemViewType,::createItemView)
+        val builder = StfalconImageViewer.Builder<Poster>(this, posters, ::loadPosterImage, ::getItemViewType, ::getItemViewSize, ::createItemView)
             .withStartPosition(startPosition)
             .withImageChangeListener { position ->
                 if (options.isPropertyEnabled(SHOW_TRANSITION)) {
-                    viewer?.updateTransitionImage(stylingPostersGridView.imageViews[position])
+                    viewer?.updateTransitionImage(stylingPostersGridView.imageViews[position], position)
                 }
 
                 overlayView?.update(posters[position])
@@ -117,6 +117,10 @@ class StylingDemoActivity : BaseActivity() {
 
     fun getItemViewType(position: Int): Int {
         return  posters[position].viewType
+    }
+
+    fun getItemViewSize(position: Int): IntArray? {
+        return null
     }
 
     fun createItemView (context : Context, viewType: Int): View {

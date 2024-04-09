@@ -34,8 +34,8 @@ class ImagesPagerAdapter<T>(
     private val context: Context,
     private var images: List<T>,
     private val imageLoader: ImageLoader<T>,
-    private var getViewType: GetViewType,
-    private var onCreateView: OnCreateView
+    private val getViewType: GetViewType,
+    private val onCreateView: OnCreateView
 ) : RecyclingPagerAdapter<T, ImagesPagerAdapter<T>.ViewHolder>() {
 
     private val holders = mutableListOf<ViewHolder>()

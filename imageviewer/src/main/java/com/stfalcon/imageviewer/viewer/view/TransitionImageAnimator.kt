@@ -29,14 +29,15 @@ import android.view.animation.TranslateAnimation
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.github.chrisbanes.photoview.PhotoView
-import com.stfalcon.imageviewer.R
 import com.stfalcon.imageviewer.common.extensions.isRectVisible
 import com.stfalcon.imageviewer.common.pager.RecyclingPagerAdapter
+import kotlin.math.min
 
 
 internal class TransitionImageAnimator(
     private val externalImage: View?,
-    private var internalImage: View?
+    private var internalImage: View?,
+    private val imageSize: IntArray?
 ) {
 
     companion object {
@@ -150,20 +151,28 @@ internal class TransitionImageAnimator(
 
     fun updateTransitionView(itemView: View?, externalImage: View?) {
         this.internalImage = itemView!!
-        //缩放动画
-        val scaleX = externalImage!!.width * 1f / itemView.width
-        val scaleY = externalImage.height * 1f / itemView.height
-        val toX = if (scaleX > scaleY) {  //那个缩放的比例小就用哪个(例如: 0.9 收缩比例 比0.3要小)
+        // 缩放动画
+        val transitionWidth = (imageSize?.let { array ->
+            val scale = min(array[0] * 1F / externalImage!!.width, array[1] * 1F / externalImage.height)
+            array[0] / scale
+        } ?: externalImage!!.width).toFloat()
+        val transitionHeight = (imageSize?.let { array ->
+            val scale = min(array[0] * 1F / externalImage!!.width, array[1] * 1F / externalImage.height)
+            array[1] / scale
+        } ?: externalImage!!.height).toFloat()
+        val scaleX = transitionWidth / itemView.width
+        val scaleY = transitionHeight / itemView.height
+        val toX = if (scaleX > scaleY) {  // 哪个缩放的比例小就用哪个(例如: 0.9 收缩比例 比0.3要小)
             scaleX
         } else {
             scaleY
         }
-        //保存缩放比例,拖动缩小后恢复到原图大小需用到比例
+        // 保存缩放比例,拖动缩小后恢复到原图大小需用到比例
         scaleNumber = toX
 
         //平移到外部imageView的中心点
         val location = IntArray(2)
-        externalImage.getLocationOnScreen(location)
+        externalImage!!.getLocationOnScreen(location)
 
         val externalCenterX = (location[0] + externalImage.width / 2)
         val externalCenterY = (location[1] + externalImage.height / 2)
@@ -189,10 +198,19 @@ internal class TransitionImageAnimator(
         onTransitionEnd: (() -> Unit)? = null,
         isOpen: Boolean
     ) {
-        //缩放动画
-        val scaleX = externalImage!!.width * 1f / itemView!!.width
-        val scaleY = externalImage.height * 1f / itemView.height
-        var toX = if (scaleX > scaleY) { //那个缩放的比例小就用哪个(例如: 0.9 收缩比例 比0.3要小)
+        val transitionWidth = (imageSize?.let { array ->
+            val scale = min(array[0] * 1F / externalImage!!.width, array[1] * 1F / externalImage.height)
+            array[0] / scale
+        } ?: externalImage!!.width).toFloat()
+        val transitionHeight = (imageSize?.let { array ->
+            val scale = min(array[0] * 1F / externalImage!!.width, array[1] * 1F / externalImage.height)
+            array[1] / scale
+        } ?: externalImage!!.height).toFloat()
+
+        // 缩放动画
+        val scaleX = transitionWidth / itemView!!.width
+        val scaleY = transitionHeight / itemView.height
+        val toX = if (scaleX > scaleY) { //那个缩放的比例小就用哪个(例如: 0.9 收缩比例 比0.3要小)
             scaleX
         } else {
             scaleY
@@ -248,7 +266,7 @@ internal class TransitionImageAnimator(
 
         //平移到外部imageView的中心点
         val location = IntArray(2)
-        externalImage.getLocationOnScreen(location)
+        externalImage!!.getLocationOnScreen(location)
 
         val externalCenterX = (location[0] + externalImage.width / 2)
         val externalCenterY = (location[1] + externalImage.height / 2)

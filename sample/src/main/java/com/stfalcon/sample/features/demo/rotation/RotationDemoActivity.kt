@@ -60,12 +60,12 @@ class RotationDemoActivity : AppCompatActivity() {
     }
 
     private fun openViewer(startPosition: Int) {
-        viewer = StfalconImageViewer.Builder<Poster>(this, Demo.posters, ::loadPosterImage,::getItemViewType,::createItemView)
+        viewer = StfalconImageViewer.Builder<Poster>(this, Demo.posters, ::loadPosterImage, ::getItemViewType, ::getItemViewSize, ::createItemView)
             .withTransitionFrom(getTransitionTarget(startPosition))
             .withStartPosition(startPosition)
             .withImageChangeListener {
                 currentPosition = it
-                viewer.updateTransitionImage(getTransitionTarget(it))
+                viewer.updateTransitionImage(getTransitionTarget(it), it)
             }
             .withDismissListener { isDialogShown = false }
             .show(supportFragmentManager)
@@ -98,6 +98,10 @@ class RotationDemoActivity : AppCompatActivity() {
 
     fun getItemViewType(position: Int): Int {
         return  Demo.posters[position].viewType
+    }
+
+    fun getItemViewSize(position: Int): IntArray? {
+        return null
     }
 
     fun createItemView (context : Context, viewType: Int): View{

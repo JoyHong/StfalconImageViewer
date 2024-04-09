@@ -35,6 +35,7 @@ import com.stfalcon.imageviewer.common.gestures.direction.SwipeDirection.*
 import com.stfalcon.imageviewer.common.gestures.direction.SwipeDirectionDetector
 import com.stfalcon.imageviewer.common.gestures.dismiss.SwipeToDismissHandler
 import com.stfalcon.imageviewer.common.pager.RecyclingPagerAdapter
+import com.stfalcon.imageviewer.loader.GetViewSize
 import com.stfalcon.imageviewer.loader.GetViewType
 import com.stfalcon.imageviewer.loader.ImageLoader
 import com.stfalcon.imageviewer.loader.OnCreateView
@@ -91,9 +92,12 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
     private val dismissContainer: ViewGroup
 
     private var externalTransitionImageView: View? = null
+    private var externalTransitionPosition = -1
 
     private val imagesPager: ViewPager2
     private var imagesAdapter: ImagesPagerAdapter<T>? = null
+
+    private var getViewSize: GetViewSize? = null
 
     private val directionDetector: SwipeDirectionDetector
     private val gestureDetector: GestureDetectorCompat
@@ -126,7 +130,7 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
             override fun onChildViewAttachedToWindow(view: View) {
                 if (!isFirstChildAttached) {
                     isFirstChildAttached = true
-                    transitionImageAnimator = createTransitionImageAnimator(externalTransitionImageView, dismissContainer)
+                    transitionImageAnimator = createTransitionImageAnimator(externalTransitionImageView, getViewSize?.getItemViewSize(externalTransitionPosition), dismissContainer)
                     imagesPager.makeVisible()
                     animateOpen()
                 }
@@ -209,6 +213,7 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
         startPosition: Int,
         imageLoader: ImageLoader<T>,
         getViewType: GetViewType,
+        getViewSize: GetViewSize,
         createItemView: OnCreateView
     ) {
         this.imagesAdapter = ImagesPagerAdapter(
@@ -220,15 +225,17 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
         )
         this.imagesPager.adapter = imagesAdapter
         this.imagesPager.setCurrentItem(startPosition, false)
+        this.getViewSize = getViewSize
     }
 
     internal fun updateImages(images: List<T>) {
         imagesAdapter?.updateImages(images)
     }
 
-    internal fun open(transitionImageView: View?) {
+    internal fun open(transitionImageView: View?, transitionPosition: Int) {
         prepareViewsForTransition()
         externalTransitionImageView = transitionImageView
+        externalTransitionPosition = transitionPosition
         swipeDismissHandler = createSwipeToDismissHandler()
         rootContainer.setOnTouchListener(swipeDismissHandler)
     }
@@ -243,10 +250,11 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
         }
     }
 
-    internal fun updateTransitionImage(imageView: View?) {
+    internal fun updateTransitionImage(imageView: View?, position: Int) {
         externalTransitionImageView = imageView
+        externalTransitionPosition = position
         transitionImageAnimator =
-            createTransitionImageAnimator(externalTransitionImageView, dismissContainer)
+            createTransitionImageAnimator(externalTransitionImageView, getViewSize?.getItemViewSize(externalTransitionPosition), dismissContainer)
         transitionImageAnimator!!.updateTransitionView(
             dismissContainer,
             externalTransitionImageView
@@ -470,10 +478,11 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
             onAnimationEnd = { willDismiss -> onAnimationEnd?.invoke(willDismiss) }
         )
 
-    private fun createTransitionImageAnimator(transitionImageView: View?, internalImage: View?) =
+    private fun createTransitionImageAnimator(transitionImageView: View?, imageSize: IntArray?, internalImage: View?) =
         TransitionImageAnimator(
             externalImage = transitionImageView,
-            internalImage = internalImage
+            internalImage = internalImage,
+            imageSize = imageSize
         )
 
     override fun onDetachedFromWindow() {

@@ -30,6 +30,7 @@ import androidx.fragment.app.FragmentManager;
 import com.stfalcon.imageviewer.listeners.OnDismissListener;
 import com.stfalcon.imageviewer.listeners.OnImageChangeListener;
 import com.stfalcon.imageviewer.listeners.OnStateListener;
+import com.stfalcon.imageviewer.loader.GetViewSize;
 import com.stfalcon.imageviewer.loader.GetViewType;
 import com.stfalcon.imageviewer.loader.ImageLoader;
 import com.stfalcon.imageviewer.loader.OnCreateView;
@@ -107,8 +108,8 @@ public class StfalconImageViewer<T> {
      * Updates transition image view.
      * Useful for a case when image position has changed and you want to update the transition animation target.
      */
-    public void updateTransitionImage(View view) {
-        dialog.updateTransitionImage(view);
+    public void updateTransitionImage(View view, int position) {
+        dialog.updateTransitionImage(view, position);
     }
 
     /**
@@ -118,9 +119,9 @@ public class StfalconImageViewer<T> {
         private final Context context;
         private final BuilderData<T> data;
 
-        public Builder(Context context, List<T> images, ImageLoader<T> imageLoader, GetViewType getViewType, OnCreateView createItemView) {
+        public Builder(Context context, List<T> images, ImageLoader<T> imageLoader, GetViewType getViewType, GetViewSize getViewSize, OnCreateView createItemView) {
             this.context = context;
-            this.data = new BuilderData<>(images, imageLoader, getViewType, createItemView);
+            this.data = new BuilderData<>(images, imageLoader, getViewType, getViewSize, createItemView);
         }
 
         /**

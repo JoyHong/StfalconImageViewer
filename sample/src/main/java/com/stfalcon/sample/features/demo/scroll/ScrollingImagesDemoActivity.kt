@@ -59,10 +59,10 @@ class ScrollingImagesDemoActivity : AppCompatActivity() {
         target: ImageView,
         images: List<String>,
         imageViews: List<ImageView>) {
-        viewer = StfalconImageViewer.Builder<String>(this, images, ::loadImage, ::getItemViewType,::createItemView)
+        viewer = StfalconImageViewer.Builder<String>(this, images, ::loadImage, ::getItemViewType, ::getItemViewSize, ::createItemView)
             .withStartPosition(startPosition)
             .withTransitionFrom(target)
-            .withImageChangeListener { viewer.updateTransitionImage(imageViews.getOrNull(it)) }
+            .withImageChangeListener { viewer.updateTransitionImage(imageViews.getOrNull(it), it) }
             .show(supportFragmentManager)
     }
 
@@ -76,6 +76,10 @@ class ScrollingImagesDemoActivity : AppCompatActivity() {
 
     private fun getItemViewType(position: Int): Int {
         return  Demo.posters[position].viewType
+    }
+
+    private fun getItemViewSize(position: Int): IntArray? {
+        return null
     }
 
     private fun createItemView (context : Context, viewType: Int): View{

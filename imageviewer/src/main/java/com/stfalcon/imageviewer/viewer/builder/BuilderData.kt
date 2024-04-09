@@ -23,6 +23,7 @@ import com.stfalcon.imageviewer.listeners.OnDismissListener
 import com.stfalcon.imageviewer.loader.GetViewType
 import com.stfalcon.imageviewer.listeners.OnImageChangeListener
 import com.stfalcon.imageviewer.listeners.OnStateListener
+import com.stfalcon.imageviewer.loader.GetViewSize
 import com.stfalcon.imageviewer.loader.OnCreateView
 import com.stfalcon.imageviewer.loader.ImageLoader
 
@@ -30,6 +31,7 @@ internal class BuilderData<T>(
     val images: List<T>,
     val imageLoader: ImageLoader<T>,
     val getViewType: GetViewType,
+    val getViewSize: GetViewSize,
     val createItemView: OnCreateView
 ) {
     var backgroundColor = Color.BLACK
