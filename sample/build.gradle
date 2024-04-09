@@ -3,7 +3,8 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
 android {
-    compileSdkVersion 31
+    namespace "com.stfalcon.sample"
+    compileSdk 31
     defaultConfig {
         applicationId "com.stfalcon.stfalconimageviewersample"
         minSdkVersion 19
