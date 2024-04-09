@@ -4,11 +4,11 @@ apply plugin: 'maven-publish'
 
 android {
     namespace "com.stfalcon.imageviewer"
-    compileSdk 31
+    compileSdk 34
 
     defaultConfig {
         minSdkVersion 19
-        targetSdkVersion 30
+        targetSdkVersion 34
         versionCode 1
         versionName "1.0"
     }

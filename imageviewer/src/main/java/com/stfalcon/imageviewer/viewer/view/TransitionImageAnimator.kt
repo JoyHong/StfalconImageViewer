@@ -118,22 +118,22 @@ internal class TransitionImageAnimator(
             ObjectAnimator.ofPropertyValuesHolder(internalImage, p1, p2, p3, p4)
         animator.duration = TRANSITION_DURATION
         animator.addListener(object : Animator.AnimatorListener {
-            override fun onAnimationStart(p0: Animator?) {
+            override fun onAnimationStart(p0: Animator) {
 
             }
 
-            override fun onAnimationEnd(p0: Animator?) {
+            override fun onAnimationEnd(p0: Animator) {
                 if (!isClosing) {
                     isAnimating = false
                 }
                 onTransitionEnd.invoke()
             }
 
-            override fun onAnimationCancel(p0: Animator?) {
+            override fun onAnimationCancel(p0: Animator) {
 
             }
 
-            override fun onAnimationRepeat(p0: Animator?) {
+            override fun onAnimationRepeat(p0: Animator) {
 
             }
         })

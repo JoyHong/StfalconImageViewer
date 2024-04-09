@@ -17,7 +17,8 @@
         <activity
             android:name=".features.main.MainActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppThemeNoActionBar">
+            android:theme="@style/AppThemeNoActionBar"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -27,18 +28,22 @@
         <activity
             android:name=".features.demo.grid.PostersGridDemoActivity"
             android:label="@string/action_images_grid"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:exported="false" />
         <activity
             android:name=".features.demo.scroll.ScrollingImagesDemoActivity"
             android:label="@string/action_scroll"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:exported="false" />
         <activity
             android:name=".features.demo.styled.StylingDemoActivity"
             android:label="@string/action_style"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:exported="false" />
         <activity
             android:name=".features.demo.rotation.RotationDemoActivity"
-            android:label="@string/action_rotation" />
+            android:label="@string/action_rotation"
+            android:exported="false" />
     </application>
 
 </manifest>
